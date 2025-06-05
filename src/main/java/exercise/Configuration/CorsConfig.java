@@ -12,7 +12,7 @@ public class CorsConfig implements CorsConfigurationSource {
         private final List<String> allowedOrigins = List.of(
                         "http://localhost:[*]",
                         "http://10.0.2.2:[*]",
-                        "http://eray.ordanuc.com");
+                        "https://eray.ordanuc.com");
 
         private final List<String> allowedMethods = List.of(
                         "GET",
