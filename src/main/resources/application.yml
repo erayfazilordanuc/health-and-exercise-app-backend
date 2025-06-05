@@ -1,0 +1,31 @@
+spring:
+  config:
+    import:
+      "file:./stage.yml"
+
+  application:
+    name: Exercise
+
+  datasource:
+    url: "${spring.datasource.url}"
+    username: "${spring.datasource.username}"
+    password: "${spring.datasource.password}"
+
+springdoc:
+  swagger-ui:
+    enabled: true
+
+logging:
+  level:
+    jwt: DEBUG
+    org:
+      hibernate:
+        sql: debug
+        type:
+          descriptor:
+            sql:
+              BasicBinder: trace
+      springframework:
+        web: debug
+        security: TRACE
+        transaction: debug

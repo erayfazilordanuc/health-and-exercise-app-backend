@@ -1,0 +1,129 @@
+# ============================
+# 1. Maven Build / Target
+# ============================
+/target/
+/!mvnw
+/!mvnw.cmd
+
+# ============================
+# 2. IntelliJ IDEA (varsa)
+# ============================
+*.iml
+*.iws
+*.ipr
+.idea/
+
+# ============================
+# 3. VSCode (varsa)
+# ============================
+.vscode/
+
+# ============================
+# 4. Eclipse (varsa)
+# ============================
+.classpath
+.project
+.settings/
+
+# ============================
+# 5. Windows / macOS / Linux temp
+# ============================
+# Windows Thumbs.db
+Thumbs.db
+# macOS DS_Store
+.DS_Store
+# Linux temp swap
+*~
+
+# ============================
+# 6. Log & Temporary Files
+# ============================
+*.log
+logs/
+*.tmp
+*.temp
+
+# ============================
+# 7. Spring Boot Dev Tools / IDE klasörleri
+# ============================
+# (Eğer Spring DevTools kullanıyorsan)
+spring-boot-devtools/build/
+
+# ============================
+# 8. “stage.env” veya .env dosyaları
+# ============================
+# stage.yml
+# stage.env
+# *.yml
+# *.env
+/stage.yml
+/stage.env
+/*.yml
+/*.env
+
+# ============================
+# 9. Credentials / Secrets arttan dosyalar
+# ============================
+# (application.yml içinde değil de dış dosya olarak sakladığın her türlü özel dosya)
+*.jks
+*.keystore
+*.p12
+
+# ============================
+# 10. Docker (varsa)
+# ============================
+docker-compose.override.yml
+docker-compose.*.yml
+
+# ============================
+# 11. IDE/Editor “workspace” ayarları
+# ============================
+*.swp
+*.swo
+*.bak
+*.orig
+
+# ============================
+# 12. Diğer: OS- veya araç- kaynaklı
+# ============================
+# JetBrains Rider
+.idea/
+*.sln
+# Vagrant
+.vagrant/
+
+# ============================
+# 13. Maven Wrapper (sürüm kontrolüne almak istemezsen)
+# ============================
+# (Ancak genellikle mvnw ve mvnw.cmd repo’da kalmalı; wrapper jar yalnızca burada değilse kaldırabilirsin)
+/.mvn/wrapper/maven-wrapper.jar
+
+# ============================
+# 14. GraalVM Native Image (varsa)
+# ============================
+/native/
+
+# ============================
+# 15. IDE-dışı diğer
+# ============================
+# Eclipse Launch Configurations
+*.launch
+# STS (Spring Tool Suite)
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+
+# ============================
+# 16. Build Artifacts & Paketler
+# ============================
+*.jar
+*.war
+*.ear
+
+# ============================
+# 17. OS-işaretçisi dosyalar
+# ============================
+ehthumbs.db
+Icon?
