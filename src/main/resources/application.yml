@@ -29,3 +29,10 @@ logging:
         web: debug
         security: TRACE
         transaction: debug
+
+swagger:
+  server:
+    local:
+      url: http://localhost:8080
+    prod:
+      url: https://eray.ordanuc.com
