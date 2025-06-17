@@ -1,6 +1,8 @@
 package exercise.Authentication;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,5 +38,10 @@ public class AuthenticationController {
     @PostMapping("/guest")
     public String guest(@RequestParam String username) {
         return authenticationService.guest(username);
+    }
+
+    @PostMapping("/refresh-token")
+    public AuthResponseDTO refreshAccessToken(@RequestParam String refreshToken) {
+        return authenticationService.refreshAccessToken(refreshToken);
     }
 }

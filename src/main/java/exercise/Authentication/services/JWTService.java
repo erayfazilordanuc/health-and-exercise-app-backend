@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -18,23 +19,33 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JWTService {
 
-    // Replace this with a secure key in a real application, ideally fetched from environment variables
-    public static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    // Replace this with a secure key in a real application, ideally fetched from
+    // environment variables
+    @Value("${jwt.secret.key}")
+    private String SECRET;
+
+    public String generateAccessToken(String username) {
+        return generateToken(username, "access", 1000 * 60 * 60);
+    }
+
+    public String generateRefreshToken(String username) {
+        return generateToken(username, "refresh", 1000 * 60 * 60 * 24 * 7);
+    }
 
     // Generate token with given user name
-    public String generateToken(String username, String password) {
+    public String generateToken(String username, String tokenType, Integer milliseconds) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("password", password);
-        return createToken(claims, username);
+        claims.put("tokenType", tokenType);
+        return createToken(claims, username, milliseconds);
     }
 
     // Create a JWT token with specified claims and subject (user name)
-    private String createToken(Map<String, Object> claims, String username) {
+    private String createToken(Map<String, Object> claims, String username, Integer milliseconds) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Token valid for 60 minutes
+                .setExpiration(new Date(System.currentTimeMillis() + milliseconds))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

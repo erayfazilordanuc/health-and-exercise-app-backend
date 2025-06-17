@@ -19,5 +19,8 @@ public class AuthResponseDTO {
     @NotEmpty
     private String accessToken;
 
+    @NotEmpty
+    private String refreshToken;
+
     // TO DO refresh token eklenebilir
 }
