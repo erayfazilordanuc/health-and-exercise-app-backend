@@ -85,11 +85,9 @@ public class AuthenticationService {
             String username = jwtService.extractUsername(refreshToken);
             User user = userRepo.findByUsername(username);
             UserDetails userDetails = userService.loadUserByUsername(username);
-            boolean isValid = jwtService.validateToken(refreshToken, userDetails);
-            String tokenType = jwtService.extractClaim(refreshToken, claims -> claims.get("tokenType", String.class));
-            boolean isRefreshToken = tokenType.equals("refresh");
+            boolean isValid = jwtService.validateToken(refreshToken, userDetails, "refresh");
 
-            if (isValid && isRefreshToken) {
+            if (isValid) {
                 String newAccessToken = "Bearer " + jwtService.generateAccessToken(username);
                 String newRefreshToken = "Bearer " + jwtService.generateRefreshToken(username);
                 AuthResponseDTO response = new AuthResponseDTO(user, newAccessToken, newRefreshToken);

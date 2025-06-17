@@ -87,8 +87,10 @@ public class JWTService {
     }
 
     // Validate the token against user details and expiration
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token, UserDetails userDetails, String desiredTokenType) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        String tokenType = extractClaim(token, claims -> claims.get("tokenType", String.class));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token)
+                && tokenType.equals(desiredTokenType));
     }
 }
