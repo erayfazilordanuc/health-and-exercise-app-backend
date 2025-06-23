@@ -15,5 +15,8 @@ public class RegisterRequestDTO {
     private String email;
 
     @NotEmpty
+    private String fullName;
+
+    @NotEmpty
     private String password;
 }

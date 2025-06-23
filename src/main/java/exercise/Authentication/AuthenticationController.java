@@ -41,7 +41,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/refresh-token")
-    public AuthResponseDTO refreshAccessToken(@RequestParam String refreshToken) {
+    public AuthResponseDTO refreshAccessToken(@RequestBody String refreshToken) {
         return authenticationService.refreshAccessToken(refreshToken);
     }
 }

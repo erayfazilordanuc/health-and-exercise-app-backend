@@ -8,12 +8,10 @@ import exercise.Common.validation.login.ValidLoginRequestDTO;
 @Getter
 @Setter
 // This validation is for username or email login options
-@ValidLoginRequestDTO(username = "username", email = "email")
 public class LoginRequestDTO {
 
+    @NotEmpty
     private String username;
-
-    private String email;
 
     @NotEmpty
     private String password;

@@ -38,9 +38,7 @@ public class AuthenticationService {
     private PasswordEncoder passwordEncoder;
 
     public AuthResponseDTO login(LoginRequestDTO requestDTO) {
-        requestDTO.setUsername(
-                (requestDTO.getUsername() == null) ? userRepo.findByEmail(requestDTO.getEmail()).getUsername()
-                        : requestDTO.getUsername());
+        requestDTO.setUsername(requestDTO.getUsername());
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDTO.getUsername(), requestDTO.getPassword()));
@@ -61,8 +59,8 @@ public class AuthenticationService {
 
     public AuthResponseDTO register(RegisterRequestDTO requestDTO) {
         // TO DO check email pattern
-        User user = new User(null, requestDTO.getUsername(), requestDTO.getEmail(),
-                passwordEncoder.encode(requestDTO.getPassword()));
+        User user = new User(null, requestDTO.getUsername(), requestDTO.getEmail(), null,
+                passwordEncoder.encode(requestDTO.getPassword()), null);
         userRepo.save(user);
         String accessToken = "Bearer " + jwtService.generateAccessToken(requestDTO.getUsername());
         String refreshToken = "Bearer " + jwtService.generateRefreshToken(requestDTO.getUsername());
@@ -73,7 +71,7 @@ public class AuthenticationService {
     }
 
     public String guest(String username) {
-        User user = new User(null, username, null, null);
+        User user = new User(null, username, null, null, null, null);
         userRepo.save(user);
         String token = jwtService.generateToken(username, null, null);
 
@@ -82,6 +80,7 @@ public class AuthenticationService {
 
     public AuthResponseDTO refreshAccessToken(String refreshToken) {
         try {
+            refreshToken = refreshToken.replaceFirst("^Bearer\\s+", "");
             String username = jwtService.extractUsername(refreshToken);
             User user = userRepo.findByUsername(username);
             UserDetails userDetails = userService.loadUserByUsername(username);

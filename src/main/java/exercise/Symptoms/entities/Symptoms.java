@@ -1,6 +1,7 @@
-package exercise.Note.entities;
+package exercise.Symptoms.entities;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -15,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,36 +27,28 @@ import exercise.User.entities.User;
 @Entity
 @Getter
 @Setter
-@Table(name = "notes")
+@Table(name = "symptoms")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Note {
+public class Symptoms {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String title;
+    private Integer pulse; // bpm
+    private Integer steps; // steps count
+    private Integer sleep; // sleep duration in minutes
 
-    @Column
-    private String content;
+    @Column(columnDefinition = "TEXT")
+    private String sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
-    private User author;
-
-    private Boolean isFavorited;
-
-    @CreationTimestamp
-    @Column(updatable = false)
-    private Timestamp createdAt;
+    private User owner;
 
     @UpdateTimestamp
-    @Column()
+    @Column
     private Timestamp updatedAt;
-
-    @Column(name = "deleted_at")
-    private Timestamp deletedAt;
 }

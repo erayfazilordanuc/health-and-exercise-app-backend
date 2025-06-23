@@ -13,8 +13,8 @@ public class UserMapper {
     PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public User DTOToEntity(UserDTO userDTO, User user) {
-        User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(),
-                passwordEncoder.encode(userDTO.getPassword()));
+        User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(), userDTO.getFullName(),
+                passwordEncoder.encode(userDTO.getPassword()), userDTO.getSymptoms());
 
         return userEntity;
     }
