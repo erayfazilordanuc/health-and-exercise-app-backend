@@ -28,7 +28,7 @@ public class SymptomsService {
         User owner = userRepo.findById(symptomsDTO.getOwnerId()).get();
 
         Symptoms newSymptoms = new Symptoms(null, symptomsDTO.getPulse(), symptomsDTO.getSteps(),
-                symptomsDTO.getSleep(), symptomsDTO.getSleepSession(), owner, null);
+                symptomsDTO.getSleep(), symptomsDTO.getSleepSession(), owner, null, null);
         Symptoms savedSymptoms = symptomsRepo.save(newSymptoms);
 
         return savedSymptoms;

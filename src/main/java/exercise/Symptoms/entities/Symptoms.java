@@ -43,10 +43,14 @@ public class Symptoms {
     @Column(columnDefinition = "TEXT")
     private String sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     @JsonIgnore
     private User owner;
+
+    @CreationTimestamp
+    @Column
+    private Timestamp createdAt;
 
     @UpdateTimestamp
     @Column

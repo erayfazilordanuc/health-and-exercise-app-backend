@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS symptoms;
-DROP TABLE IF EXISTS users;
+-- DROP TABLE IF EXISTS symptoms;
+-- DROP TABLE IF EXISTS users;
 
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
@@ -16,9 +16,14 @@ CREATE TABLE symptoms (
   sleep INTEGER,
   sleep_session TEXT,
   user_id BIGINT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_symptom_user FOREIGN KEY (user_id)
       REFERENCES users (id)
       ON DELETE CASCADE
 );
+
+-- GRANT SELECT, INSERT, UPDATE, DELETE
+-- ON TABLE public.users, public.symptoms
+-- TO eray;

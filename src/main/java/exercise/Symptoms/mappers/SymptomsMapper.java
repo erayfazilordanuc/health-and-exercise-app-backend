@@ -44,7 +44,7 @@ public class SymptomsMapper {
         SymptomsDTO symptomsDTO = new SymptomsDTO(symptoms.getId(), symptoms.getPulse(), symptoms.getSteps(),
                 symptoms.getSleep(),
                 symptoms.getSleepSession(),
-                symptoms.getOwner().getId());
+                symptoms.getOwner().getId(), symptoms.getCreatedAt(), symptoms.getUpdatedAt());
 
         return symptomsDTO;
     }

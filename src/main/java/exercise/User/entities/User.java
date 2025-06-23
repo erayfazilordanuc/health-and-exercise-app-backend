@@ -51,7 +51,7 @@ public class User implements UserDetails {
     @Column
     private String password;
 
-    @OneToOne(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Symptoms symptoms;
 
     @Override

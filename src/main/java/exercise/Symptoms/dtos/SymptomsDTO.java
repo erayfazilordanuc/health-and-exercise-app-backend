@@ -1,7 +1,9 @@
 package exercise.Symptoms.dtos;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import exercise.Common.entities.TimeStamps;
 import exercise.User.entities.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
@@ -24,4 +26,7 @@ public class SymptomsDTO {
     private String sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
     private Long ownerId;
+
+    private Timestamp createdAt;
+    private Timestamp updatedAt;
 }
