@@ -1,6 +1,7 @@
 package exercise.Symptoms.services;
 
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -57,6 +58,33 @@ public class SymptomsService {
         if (!Objects.equals(userId,
                 symptoms.getUser().getId())) {
             throw new Error("This symptoms is not yours");
+        }
+
+        System.out.println(symptoms);
+
+        symptoms.setPulse(symptomsDTO.getPulse());
+        symptoms.setSteps(symptomsDTO.getSteps());
+        symptoms.setSleep(symptomsDTO.getSleep());
+        symptoms.setSleepSession(symptomsDTO.getSleepSession());
+
+        Symptoms savedSymptoms = symptomsRepo.save(symptoms);
+
+        return savedSymptoms;
+    }
+
+    public Symptoms upsertSymptoms(Long id, UpdateSymptomsDTO symptomsDTO, User user) {
+        Optional<Symptoms> optionalSymptoms = symptomsRepo.findById(id);
+
+        Symptoms symptoms = optionalSymptoms.orElseGet(() -> {
+            Symptoms s = new Symptoms();
+            s.setUser(user);
+            return s;
+        });
+
+        if (optionalSymptoms.isPresent()) {
+            if (!Objects.equals(user.getId(), symptoms.getUser().getId())) {
+                throw new Error("This symptoms is not yours");
+            }
         }
 
         System.out.println(symptoms);

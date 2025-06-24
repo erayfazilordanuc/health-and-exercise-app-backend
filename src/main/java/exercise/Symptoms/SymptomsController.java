@@ -85,11 +85,20 @@ public class SymptomsController {
     return symptoms;
   }
 
+  // @PutMapping("/{id}")
+  // public Symptoms updateSymptoms(@PathVariable Long id, @RequestBody UpdateSymptomsDTO symptomsDTO,
+  //     @AuthenticationPrincipal User user) {
+
+  //   Symptoms symptoms = symptomsService.updateSymptoms(id, symptomsDTO, user.getId());
+
+  //   return symptoms;
+  // }
+
   @PutMapping("/{id}")
-  public Symptoms updateSymptoms(@PathVariable Long id, @RequestBody UpdateSymptomsDTO symptomsDTO,
+  public Symptoms upsertSymptoms(@PathVariable Long id, @RequestBody UpdateSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
 
-    Symptoms symptoms = symptomsService.updateSymptoms(id, symptomsDTO, user.getId());
+    Symptoms symptoms = symptomsService.upsertSymptoms(id, symptomsDTO, user);
 
     return symptoms;
   }
