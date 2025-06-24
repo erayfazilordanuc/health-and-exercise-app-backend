@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import exercise.User.dtos.UserDTO;
+import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.mappers.UserMapper;
 import exercise.User.repositories.UserRepository;
@@ -20,8 +21,13 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserMapper userMapper;
 
-    public User updateUser(UserDTO newUserDTO, User user) {
-        User updatedUser = userMapper.DTOToEntity(newUserDTO, user);
+    public UserDTO getUserDTO(User user) {
+        UserDTO userDTO = userMapper.entityToDTO(user);
+        return userDTO;
+    }
+
+    public User updateUser(UpdateUserDTO newUserDTO, User user) {
+        User updatedUser = userMapper.updateDTOToEntity(newUserDTO, user);
 
         userRepo.save(updatedUser);
 

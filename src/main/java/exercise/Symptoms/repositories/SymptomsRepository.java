@@ -11,6 +11,6 @@ import exercise.Symptoms.entities.Symptoms;
 @Repository
 public interface SymptomsRepository extends JpaRepository<Symptoms, Long> {
 
-    @Query("SELECT symptoms FROM Symptoms symptoms WHERE symptoms.owner.id = :ownerId")
-    public Symptoms findByOwnerId(Long ownerId);
+    @Query("SELECT symptoms FROM Symptoms symptoms WHERE symptoms.user.id = :userId ORDER BY symptoms.updatedAt DESC")
+    public List<Symptoms> findByUserId(Long userId);
 }

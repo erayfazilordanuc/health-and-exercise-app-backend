@@ -9,14 +9,12 @@ import exercise.Symptoms.entities.Symptoms;
 import exercise.User.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-public class UserDTO {
+public class UpdateUserDTO {
 
     private Long id;
 
@@ -26,9 +24,9 @@ public class UserDTO {
 
     private String fullName;
 
-    private List<SymptomsDTO> symptomList = new ArrayList<>();
+    private String password;
 
-    public UserDTO(User user) {
+    public UpdateUserDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();

@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import exercise.User.dtos.UserDTO;
+import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.services.UserService;
 
@@ -25,12 +27,14 @@ public class UserController {
 
     @GetMapping
     @Cacheable("user")
-    public User getUser(@AuthenticationPrincipal User user) {
-        return user;
+    @Transactional(readOnly = true)
+    public UserDTO getUser(@AuthenticationPrincipal User user) {
+        UserDTO userDTO = userService.getUserDTO(user);
+        return userDTO;
     }
 
     @PutMapping
-    public String updateUser(@RequestBody UserDTO newUser, @AuthenticationPrincipal User user) throws Exception {
+    public String updateUser(@RequestBody UpdateUserDTO newUser, @AuthenticationPrincipal User user) throws Exception {
         User updatedUser = userService.updateUser(newUser, user);
 
         return "User " + updatedUser.getId() + " updated";

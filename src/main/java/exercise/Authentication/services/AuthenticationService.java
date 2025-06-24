@@ -59,8 +59,8 @@ public class AuthenticationService {
 
     public AuthResponseDTO register(RegisterRequestDTO requestDTO) {
         // TO DO check email pattern
-        User user = new User(null, requestDTO.getUsername(), requestDTO.getEmail(), null,
-                passwordEncoder.encode(requestDTO.getPassword()), null);
+        User user = new User(null, requestDTO.getUsername(), requestDTO.getEmail(), requestDTO.getFullName(),
+                passwordEncoder.encode(requestDTO.getPassword()));
         userRepo.save(user);
         String accessToken = "Bearer " + jwtService.generateAccessToken(requestDTO.getUsername());
         String refreshToken = "Bearer " + jwtService.generateRefreshToken(requestDTO.getUsername());
@@ -71,7 +71,7 @@ public class AuthenticationService {
     }
 
     public String guest(String username) {
-        User user = new User(null, username, null, null, null, null);
+        User user = new User(null, username, null, null, null);
         userRepo.save(user);
         String token = jwtService.generateToken(username, null, null);
 

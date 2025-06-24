@@ -1,14 +1,8 @@
 package exercise.Symptoms.dtos;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
-import exercise.Common.entities.TimeStamps;
-import exercise.User.entities.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import exercise.Symptoms.entities.Symptoms;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +19,19 @@ public class SymptomsDTO {
 
     private String sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
-    private Long ownerId;
+    private Long userId;
 
     private Timestamp createdAt;
     private Timestamp updatedAt;
+
+    public SymptomsDTO(Symptoms symptom) {
+        this.id = symptom.getId();
+        this.pulse = symptom.getPulse();
+        this.steps = symptom.getSteps();
+        this.sleep = symptom.getSleep();
+        this.sleepSession = symptom.getSleepSession();
+        this.createdAt = symptom.getCreatedAt();
+        this.updatedAt = symptom.getUpdatedAt();
+        this.userId = symptom.getUser() != null ? symptom.getUser().getId() : null;
+    }
 }

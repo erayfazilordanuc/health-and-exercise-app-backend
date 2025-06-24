@@ -31,20 +31,12 @@ import exercise.User.repositories.UserRepository;
 @Component
 public class SymptomsMapper {
 
-    @Autowired
-    private UserRepository userRepo;
-
-    // public Symptoms DTOToEntity(SymptomsDTO noteDTO, Symptoms note) {
-    // Symptoms noteEntity = new Symptoms(noteDTO.)
-
-    // return noteEntity;
-    // }
-
     public SymptomsDTO entityToDTO(Symptoms symptoms) {
-        SymptomsDTO symptomsDTO = new SymptomsDTO(symptoms.getId(), symptoms.getPulse(), symptoms.getSteps(),
+        SymptomsDTO symptomsDTO = new SymptomsDTO(symptoms.getId(), symptoms.getPulse(),
+                symptoms.getSteps(),
                 symptoms.getSleep(),
                 symptoms.getSleepSession(),
-                symptoms.getOwner().getId(), symptoms.getCreatedAt(), symptoms.getUpdatedAt());
+                symptoms.getUser().getId(), symptoms.getCreatedAt(), symptoms.getUpdatedAt());
 
         return symptomsDTO;
     }
