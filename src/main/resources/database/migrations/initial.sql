@@ -25,5 +25,9 @@ CREATE TABLE symptoms (
 );
 
 -- GRANT SELECT, INSERT, UPDATE, DELETE
--- ON TABLE public.users, public.symptoms
--- TO eray;
+--   ON TABLE
+--     public.users,
+--     public.users_id_seq,
+--     public.symptoms_id,
+--     public.symptoms_id_seq
+--   TO eray;
