@@ -43,6 +43,7 @@ public class SymptomsController {
   @Autowired
   public SymptomsRepository symptomsRepo;
 
+  // @Tag(name = "Symptoms - POST Operations")
   @PostMapping
   public Symptoms createSymptoms(@RequestBody CreateSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
@@ -56,6 +57,7 @@ public class SymptomsController {
     return symptoms;
   }
 
+  // @Tag(name = "Symptoms - GET Operations")
   @GetMapping("/{id}")
   public ResponseEntity<SymptomsDTO> getSymptomsById(@PathVariable Long id,
       @AuthenticationPrincipal User user) {
@@ -70,6 +72,7 @@ public class SymptomsController {
     return ResponseEntity.ok(dto);
   }
 
+  // @Tag(name = "Symptoms - GET Operations")
   @GetMapping("/user/{userId}")
   public List<Symptoms> getSymptomsByUserId(@PathVariable Long userId, @AuthenticationPrincipal User user) {
     if (!Objects.equals(user.getId(),

@@ -13,6 +13,7 @@ spring:
 springdoc:
   swagger-ui:
     enabled: true
+    operationsSorter: alpha
 
 jwt:
   secret:
