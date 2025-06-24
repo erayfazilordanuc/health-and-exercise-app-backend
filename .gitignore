@@ -127,3 +127,5 @@ docker-compose.*.yml
 # ============================
 ehthumbs.db
 Icon?
+
+main.sql
