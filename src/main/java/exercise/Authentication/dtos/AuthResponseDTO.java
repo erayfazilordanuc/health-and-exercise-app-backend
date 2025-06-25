@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
 
 @Getter
@@ -14,7 +15,7 @@ import exercise.User.entities.User;
 public class AuthResponseDTO {
 
     @NotEmpty
-    private User user;
+    private UserDTO userDTO;
 
     @NotEmpty
     private String accessToken;

@@ -45,8 +45,8 @@ public class SymptomsController {
 
   // @Tag(name = "Symptoms - GET Operations")
   @GetMapping("/user")
-  public List<Symptoms> getSymptomsByUserId(@AuthenticationPrincipal User user) {
-    List<Symptoms> symptoms = symptomsService.getSymptomsById(user); // TO DO THINK Burda da ResponseEntity dönmeli mi
+  public List<Symptoms> getAllSymptomsByUserId(@AuthenticationPrincipal User user) {
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user); // TO DO Burda da ResponseEntity dönmeli mi
     return symptoms;
   }
 

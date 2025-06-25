@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import exercise.Authentication.dtos.AuthResponseDTO;
 import exercise.Authentication.dtos.LoginRequestDTO;
 import exercise.Authentication.dtos.RegisterRequestDTO;
+import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
+import exercise.User.mappers.UserMapper;
 import exercise.User.repositories.UserRepository;
 import exercise.User.services.UserService;
 
@@ -49,7 +51,8 @@ public class AuthenticationService {
 
             User user = (User) authentication.getPrincipal();
 
-            AuthResponseDTO response = new AuthResponseDTO(user, accessToken, refreshToken);
+            UserDTO userDTO = new UserDTO(user);
+            AuthResponseDTO response = new AuthResponseDTO(userDTO, accessToken, refreshToken);
 
             return response;
         } else {
@@ -65,7 +68,8 @@ public class AuthenticationService {
         String accessToken = "Bearer " + jwtService.generateAccessToken(requestDTO.getUsername());
         String refreshToken = "Bearer " + jwtService.generateRefreshToken(requestDTO.getUsername());
 
-        AuthResponseDTO response = new AuthResponseDTO(user, accessToken, refreshToken);
+        UserDTO userDTO = new UserDTO(user);
+        AuthResponseDTO response = new AuthResponseDTO(userDTO, accessToken, refreshToken);
 
         return response;
     }
@@ -83,13 +87,14 @@ public class AuthenticationService {
             refreshToken = refreshToken.replaceFirst("^Bearer\\s+", "");
             String username = jwtService.extractUsername(refreshToken);
             User user = userRepo.findByUsername(username);
+            UserDTO userDTO = new UserDTO(user);
             UserDetails userDetails = userService.loadUserByUsername(username);
             boolean isValid = jwtService.validateToken(refreshToken, userDetails, "refresh");
 
             if (isValid) {
                 String newAccessToken = "Bearer " + jwtService.generateAccessToken(username);
                 String newRefreshToken = "Bearer " + jwtService.generateRefreshToken(username);
-                AuthResponseDTO response = new AuthResponseDTO(user, newAccessToken, newRefreshToken);
+                AuthResponseDTO response = new AuthResponseDTO(userDTO, newAccessToken, newRefreshToken);
                 return response;
             } else {
                 throw new RuntimeException("Invalid refresh token");

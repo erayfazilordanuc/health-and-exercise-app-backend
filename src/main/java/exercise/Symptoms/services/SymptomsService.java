@@ -52,7 +52,7 @@ public class SymptomsService {
         return ResponseEntity.ok(dto);
     }
 
-    public List<Symptoms> getSymptomsById(User user) {
+    public List<Symptoms> getAllSymptomsByUserId(User user) {
         List<Symptoms> symptoms = symptomsRepo.findByUserId(user.getId());
 
         return symptoms;
