@@ -19,13 +19,10 @@ public class CreateSymptomsDTO {
 
   private List<String> sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
-  private Long userId;
-
   public CreateSymptomsDTO(Symptoms symptom) {
     this.pulse = symptom.getPulse();
     this.steps = symptom.getSteps();
     this.sleep = symptom.getSleep();
     this.sleepSession = symptom.getSleepSession();
-    this.userId = symptom.getUser() != null ? symptom.getUser().getId() : null;
   }
 }

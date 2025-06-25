@@ -6,37 +6,39 @@ spring:
     name: Exercise
 
   datasource:
-    url: "${spring.datasource.url}"
-    username: "${spring.datasource.username}"
-    password: "${spring.datasource.password}"
+    url: ${spring.datasource.url}
+    username: ${spring.datasource.username}
+    password: ${spring.datasource.password}
 
-springdoc:
-  swagger-ui:
-    enabled: true
-    operationsSorter: alpha
+  jackson:
+    time-zone: Europe/Istanbul
 
-jwt:
-  secret:
-    key: "${jwt.secret.key}"
+  doc:
+    swagger-ui:
+      enabled: true
+      operations-sorter: alpha
 
 logging:
   level:
     jwt: DEBUG
     org:
       hibernate:
-        sql: debug
+        sql: DEBUG
         type:
           descriptor:
             sql:
-              BasicBinder: trace
+              BasicBinder: TRACE
       springframework:
-        web: debug
+        web: DEBUG
         security: TRACE
-        transaction: debug
+        transaction: DEBUG
+
+jwt:
+  secret:
+    key: ${jwt.secret.key}
 
 swagger:
   server:
     local:
       url: http://localhost:8080
     prod:
-      url: https://eray.ordanuc.com

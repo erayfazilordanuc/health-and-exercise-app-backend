@@ -58,4 +58,8 @@ public class Symptoms {
     @UpdateTimestamp
     @Column
     private Timestamp updatedAt;
+
+    public Symptoms(User user) {
+        this.user = user;
+    }
 }
