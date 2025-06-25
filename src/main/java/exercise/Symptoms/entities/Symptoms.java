@@ -1,6 +1,7 @@
 package exercise.Symptoms.entities;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -9,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import exercise.Symptoms.mappers.SleepSessionConverter;
 import exercise.User.entities.User;
 
 @Entity
@@ -39,8 +42,9 @@ public class Symptoms {
     private Integer steps; // steps count
     private Integer sleep; // sleep duration in minutes
 
+    @Convert(converter = SleepSessionConverter.class)
     @Column(columnDefinition = "TEXT")
-    private String sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
+    private List<String> sleepSession;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

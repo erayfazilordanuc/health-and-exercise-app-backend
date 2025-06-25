@@ -1,6 +1,7 @@
 package exercise.Symptoms.dtos;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import exercise.Symptoms.entities.Symptoms;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class CreateSymptomsDTO {
   private Integer steps; // steps count
   private Integer sleep; // sleep duration in minutes
 
-  private String sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
+  private List<String> sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
   private Long userId;
 
