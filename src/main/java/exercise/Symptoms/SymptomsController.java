@@ -30,7 +30,7 @@ import exercise.Symptoms.services.SymptomsService;
 import exercise.User.entities.User;
 
 @RestController
-@RequestMapping("api/symptoms")
+@RequestMapping("/api/symptoms")
 @Tags(value = @Tag(name = "Symptoms Operations"))
 public class SymptomsController {
 
@@ -38,72 +38,62 @@ public class SymptomsController {
   public SymptomsService symptomsService;
 
   // @Tag(name = "Symptoms - GET Operations")
-  @GetMapping("/{id}")
-  public ResponseEntity<SymptomsDTO> getSymptomsById(@PathVariable Long id,
+  @GetMapping("/id/{symptomsId}")
+  public ResponseEntity<SymptomsDTO> getSymptomsById(
+      @PathVariable Long symptomsId,
       @AuthenticationPrincipal User user) {
-    ResponseEntity<SymptomsDTO> response = symptomsService.getSymptomsById(id, user);
+    ResponseEntity<SymptomsDTO> response = symptomsService.getSymptomsById(symptomsId, user);
     return response;
   }
 
-  // @Tag(name = "Symptoms - GET Operations")
-  @GetMapping("/user/{id}")
-  public List<Symptoms> getAllSymptomsByUserId(@PathVariable Long id, @AuthenticationPrincipal User user) {
-    if (!Objects.equals(id, user.getId())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
-    }
-    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user); // TO DO Burda da ResponseEntity dönmeli mi
-    return symptoms;
-  }
-
-  @GetMapping("user/{id}/date/{date}")
-  public Symptoms getSymptomsByUserIdAndDate(
-      @PathVariable Long id,
-      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+  @GetMapping("/date/{date}")
+  public List<Symptoms> getSymptomsByUserIdAndDate(
+      @PathVariable(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
-    if (!Objects.equals(id, user.getId())) {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
-    }
-    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(user, date);
+    if (Objects.isNull(date))
+      return symptomsService.getAllSymptomsByUserId(user);
+    List<Symptoms> symptoms = symptomsService.getSymptomsByUserIdAndDate(user, date);
     return symptoms;
   }
 
   // @Tag(name = "Symptoms - POST Operations")
   @PostMapping
-  public Symptoms createSymptoms(@RequestBody CreateSymptomsDTO symptomsDTO,
+  public Symptoms createSymptoms(
+      @RequestBody CreateSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
-
     Symptoms symptoms = symptomsService.createSymptoms(symptomsDTO, user);
 
     return symptoms;
   }
 
-  @PutMapping("/{id}")
-  public Symptoms upsertSymptomsById(@PathVariable Long id, @RequestBody UpdateSymptomsDTO symptomsDTO,
+  @PutMapping("/id/{symptomsId}")
+  public Symptoms upsertSymptomsById(
+      @PathVariable Long symptomsId, @RequestBody UpdateSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
 
-    Symptoms symptoms = symptomsService.upsertSymptoms(id, symptomsDTO, user);
+    Symptoms symptoms = symptomsService.upsertSymptoms(symptomsId, symptomsDTO, user);
 
     return symptoms;
   }
 
   @PutMapping("/date/{date}")
   public Symptoms upsertSymptomsByUserIdAndDate(
-      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+      @PathVariable(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @RequestBody UpdateSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
     Symptoms symptoms = symptomsService.upsertSymptoms(date, symptomsDTO, user);
     return symptoms;
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("/id/{id}")
   public String deleteSymptomsById(@PathVariable Long id, @AuthenticationPrincipal User user) {
     String response = symptomsService.deleteSymptoms(id, user);
     return response;
   }
 
-  @DeleteMapping
-  public String deleteSymptomsByIds(@RequestBody List<Long> ids, @AuthenticationPrincipal User user) {
-    String response = symptomsService.deleteSymptoms(ids, user);
-    return response;
-  }
+  // @DeleteMapping
+  // public String deleteSymptomsByIds(@RequestBody List<Long> ids, @AuthenticationPrincipal User user) {
+  //   String response = symptomsService.deleteSymptoms(ids, user);
+  //   return response;
+  // }
 }

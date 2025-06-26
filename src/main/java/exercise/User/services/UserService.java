@@ -26,6 +26,12 @@ public class UserService implements UserDetailsService {
         return userDTO;
     }
 
+    public UserDTO getUserDTO(Long id) {
+        User user = userRepo.findById(id).get();
+        UserDTO userDTO = userMapper.entityToDTO(user);
+        return userDTO;
+    }
+
     public User updateUser(UpdateUserDTO newUserDTO, User user) {
         User updatedUser = userMapper.updateDTOToEntity(newUserDTO, user);
 
@@ -34,7 +40,23 @@ public class UserService implements UserDetailsService {
         return updatedUser;
     }
 
+    public User updateUser(UpdateUserDTO newUserDTO, Long id) {
+        User user = userRepo.findById(id).get();
+        User updatedUser = userMapper.updateDTOToEntity(newUserDTO, user);
+
+        userRepo.save(updatedUser);
+
+        return updatedUser;
+    }
+
     public String deleteUser(User user) {
+        userRepo.delete(user);
+
+        return "User \"" + user.getUsername() + "\" has been deleted";
+    }
+
+    public String deleteUser(Long id) {
+        User user = userRepo.findById(id).get();
         userRepo.delete(user);
 
         return "User \"" + user.getUsername() + "\" has been deleted";

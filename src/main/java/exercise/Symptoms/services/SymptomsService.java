@@ -58,9 +58,9 @@ public class SymptomsService {
         return symptoms;
     }
 
-    public Symptoms getSymptomsByUserIdAndDate(User user, LocalDate date) {
+    public List<Symptoms> getSymptomsByUserIdAndDate(User user, LocalDate date) {
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
-        Symptoms symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
+        List<Symptoms> symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
 
         return symptoms;
     }
@@ -118,8 +118,9 @@ public class SymptomsService {
         Symptoms symptoms = new Symptoms(user);
 
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
-        Symptoms existingSymptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
-        if (Objects.nonNull(existingSymptoms)) {
+        List<Symptoms> existingSymptomsList = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
+        if (existingSymptomsList.size() > 0) {
+            Symptoms existingSymptoms = existingSymptomsList.get(0);
             if (!Objects.equals(user.getId(), existingSymptoms.getUser().getId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
             }
