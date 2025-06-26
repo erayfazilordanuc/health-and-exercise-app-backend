@@ -22,9 +22,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
-import exercise.Symptoms.dtos.CreateSymptomsDTO;
 import exercise.Symptoms.dtos.SymptomsDTO;
-import exercise.Symptoms.dtos.UpdateSymptomsDTO;
+import exercise.Symptoms.dtos.UpsertSymptomsDTO;
 import exercise.Symptoms.entities.Symptoms;
 import exercise.Symptoms.services.SymptomsService;
 import exercise.User.entities.User;
@@ -64,7 +63,7 @@ public class SymptomsController {
   // @Tag(name = "Symptoms - POST Operations")
   @PostMapping
   public Symptoms createSymptoms(
-      @RequestBody CreateSymptomsDTO symptomsDTO,
+      @RequestBody UpsertSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
     Symptoms symptoms = symptomsService.createSymptoms(symptomsDTO, user);
 
@@ -73,7 +72,7 @@ public class SymptomsController {
 
   @PutMapping("/id/{id}")
   public Symptoms upsertSymptomsById(
-      @PathVariable Long id, @RequestBody UpdateSymptomsDTO symptomsDTO,
+      @PathVariable Long id, @RequestBody UpsertSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
 
     Symptoms symptoms = symptomsService.upsertSymptoms(id, symptomsDTO, user);
@@ -84,7 +83,7 @@ public class SymptomsController {
   @PutMapping("/date/{date}")
   public Symptoms upsertSymptomsByDate(
       @PathVariable(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-      @RequestBody UpdateSymptomsDTO symptomsDTO,
+      @RequestBody UpsertSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
     Symptoms symptoms = symptomsService.upsertSymptoms(date, symptomsDTO, user);
     return symptoms;

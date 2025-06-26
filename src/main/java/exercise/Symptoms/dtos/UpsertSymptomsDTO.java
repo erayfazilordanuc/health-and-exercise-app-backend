@@ -11,16 +11,16 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class UpdateSymptomsDTO {
+public class UpsertSymptomsDTO {
 
   private Integer pulse; // bpm
   private Integer steps; // steps count
   private Integer activeCaloriesBurned;
 
-  private Integer sleepHours; // sleep duration in minutes
+  private Integer sleepHours; // sleepHours duration in minutes
   private List<String> sleepSessions; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
-  public UpdateSymptomsDTO(Symptoms symptom) {
+  public UpsertSymptomsDTO(Symptoms symptom) {
     this.pulse = symptom.getPulse();
     this.steps = symptom.getSteps();
     this.sleepHours = symptom.getSleepHours();

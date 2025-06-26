@@ -13,9 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import exercise.Symptoms.dtos.CreateSymptomsDTO;
+import exercise.Symptoms.dtos.UpsertSymptomsDTO;
 import exercise.Symptoms.dtos.SymptomsDTO;
-import exercise.Symptoms.dtos.UpdateSymptomsDTO;
+import exercise.Symptoms.dtos.UpsertSymptomsDTO;
 import exercise.Symptoms.entities.Symptoms;
 import exercise.Symptoms.mappers.SymptomsMapper;
 import exercise.Symptoms.repositories.SymptomsRepository;
@@ -31,7 +31,7 @@ public class SymptomsService {
     @Autowired
     private SymptomsMapper symptomsMapper;
 
-    public Symptoms createSymptoms(CreateSymptomsDTO symptomsDTO, User user) {
+    public Symptoms createSymptoms(UpsertSymptomsDTO symptomsDTO, User user) {
         Symptoms newSymptoms = new Symptoms(null, symptomsDTO.getPulse(),
                 symptomsDTO.getSteps(), symptomsDTO.getActiveCaloriesBurned(),
                 symptomsDTO.getSleepHours(), symptomsDTO.getSleepSessions(), user, null, null);
@@ -65,29 +65,7 @@ public class SymptomsService {
         return symptoms;
     }
 
-    public Symptoms updateSymptoms(Long id, UpdateSymptomsDTO symptomsDTO, Long userId) {
-        Symptoms symptoms = symptomsRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Symptoms not found"));
-        ;
-
-        if (!Objects.equals(userId,
-                symptoms.getUser().getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
-        }
-
-        System.out.println(symptoms);
-
-        symptoms.setPulse(symptomsDTO.getPulse());
-        symptoms.setSteps(symptomsDTO.getSteps());
-        symptoms.setSleepHours(symptomsDTO.getSleepHours());
-        symptoms.setSleepSessions(symptomsDTO.getSleepSessions());
-
-        Symptoms savedSymptoms = symptomsRepo.save(symptoms);
-
-        return savedSymptoms;
-    }
-
-    public Symptoms upsertSymptoms(Long id, UpdateSymptomsDTO symptomsDTO, User user) {
+    public Symptoms upsertSymptoms(Long id, UpsertSymptomsDTO symptomsDTO, User user) {
         Optional<Symptoms> optionalSymptoms = symptomsRepo.findById(id);
 
         Symptoms symptoms = optionalSymptoms.orElseGet(() -> {
@@ -106,6 +84,7 @@ public class SymptomsService {
 
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
+        symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
         symptoms.setSleepHours(symptomsDTO.getSleepHours());
         symptoms.setSleepSessions(symptomsDTO.getSleepSessions());
 
@@ -114,7 +93,7 @@ public class SymptomsService {
         return savedSymptoms;
     }
 
-    public Symptoms upsertSymptoms(LocalDate date, UpdateSymptomsDTO symptomsDTO, User user) {
+    public Symptoms upsertSymptoms(LocalDate date, UpsertSymptomsDTO symptomsDTO, User user) {
         Symptoms symptoms = new Symptoms(user);
 
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
@@ -133,6 +112,7 @@ public class SymptomsService {
 
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
+        symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
         symptoms.setSleepHours(symptomsDTO.getSleepHours());
         symptoms.setSleepSessions(symptomsDTO.getSleepSessions());
 
