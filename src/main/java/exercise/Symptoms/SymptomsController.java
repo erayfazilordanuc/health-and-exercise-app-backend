@@ -38,21 +38,26 @@ public class SymptomsController {
   public SymptomsService symptomsService;
 
   // @Tag(name = "Symptoms - GET Operations")
-  @GetMapping("/id/{symptomsId}")
+  @GetMapping("/id/{id}")
   public ResponseEntity<SymptomsDTO> getSymptomsById(
-      @PathVariable Long symptomsId,
+      @PathVariable Long id,
       @AuthenticationPrincipal User user) {
-    ResponseEntity<SymptomsDTO> response = symptomsService.getSymptomsById(symptomsId, user);
+    ResponseEntity<SymptomsDTO> response = symptomsService.getSymptomsById(id, user);
     return response;
   }
 
-  @GetMapping("/date/{date}")
-  public List<Symptoms> getSymptomsByUserIdAndDate(
-      @PathVariable(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+  @GetMapping
+  public List<Symptoms> getSymptomsByUser(
       @AuthenticationPrincipal User user) {
-    if (Objects.isNull(date))
-      return symptomsService.getAllSymptomsByUserId(user);
-    List<Symptoms> symptoms = symptomsService.getSymptomsByUserIdAndDate(user, date);
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user.getId());
+    return symptoms;
+  }
+
+  @GetMapping("/date/{date}")
+  public Symptoms getSymptomsByDate(
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+      @AuthenticationPrincipal User user) {
+    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(user, date);
     return symptoms;
   }
 
@@ -66,18 +71,18 @@ public class SymptomsController {
     return symptoms;
   }
 
-  @PutMapping("/id/{symptomsId}")
+  @PutMapping("/id/{id}")
   public Symptoms upsertSymptomsById(
-      @PathVariable Long symptomsId, @RequestBody UpdateSymptomsDTO symptomsDTO,
+      @PathVariable Long id, @RequestBody UpdateSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
 
-    Symptoms symptoms = symptomsService.upsertSymptoms(symptomsId, symptomsDTO, user);
+    Symptoms symptoms = symptomsService.upsertSymptoms(id, symptomsDTO, user);
 
     return symptoms;
   }
 
   @PutMapping("/date/{date}")
-  public Symptoms upsertSymptomsByUserIdAndDate(
+  public Symptoms upsertSymptomsByDate(
       @PathVariable(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @RequestBody UpdateSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
@@ -90,10 +95,4 @@ public class SymptomsController {
     String response = symptomsService.deleteSymptoms(id, user);
     return response;
   }
-
-  // @DeleteMapping
-  // public String deleteSymptomsByIds(@RequestBody List<Long> ids, @AuthenticationPrincipal User user) {
-  //   String response = symptomsService.deleteSymptoms(ids, user);
-  //   return response;
-  // }
 }

@@ -52,15 +52,15 @@ public class SymptomsService {
         return ResponseEntity.ok(dto);
     }
 
-    public List<Symptoms> getAllSymptomsByUserId(User user) {
-        List<Symptoms> symptoms = symptomsRepo.findByUserId(user.getId());
+    public List<Symptoms> getAllSymptomsByUserId(Long id) {
+        List<Symptoms> symptoms = symptomsRepo.findByUserId(id);
 
         return symptoms;
     }
 
-    public List<Symptoms> getSymptomsByUserIdAndDate(User user, LocalDate date) {
+    public Symptoms getSymptomsByUserIdAndDate(User user, LocalDate date) {
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
-        List<Symptoms> symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
+        Symptoms symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
 
         return symptoms;
     }
@@ -118,9 +118,8 @@ public class SymptomsService {
         Symptoms symptoms = new Symptoms(user);
 
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
-        List<Symptoms> existingSymptomsList = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
-        if (existingSymptomsList.size() > 0) {
-            Symptoms existingSymptoms = existingSymptomsList.get(0);
+        Symptoms existingSymptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
+        if (Objects.nonNull(existingSymptoms)) {
             if (!Objects.equals(user.getId(), existingSymptoms.getUser().getId())) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
             }
