@@ -16,9 +16,10 @@ public class SymptomsDTO {
     private Long id;
     private Integer pulse; // bpm
     private Integer steps; // steps count
-    private Integer sleep; // sleep duration in minutes
+    private Integer activeCaloriesBurned;
 
-    private List<String> sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
+    private Integer sleepHours; // sleep duration in minutes
+    private List<String> sleepSessions; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
     private Long userId;
 
@@ -29,8 +30,8 @@ public class SymptomsDTO {
         this.id = symptom.getId();
         this.pulse = symptom.getPulse();
         this.steps = symptom.getSteps();
-        this.sleep = symptom.getSleep();
-        this.sleepSession = symptom.getSleepSession();
+        this.sleepHours = symptom.getSleepHours();
+        this.sleepSessions = symptom.getSleepSessions();
         this.createdAt = symptom.getCreatedAt();
         this.updatedAt = symptom.getUpdatedAt();
         this.userId = symptom.getUser() != null ? symptom.getUser().getId() : null;

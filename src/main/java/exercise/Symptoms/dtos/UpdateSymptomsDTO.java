@@ -15,14 +15,15 @@ public class UpdateSymptomsDTO {
 
   private Integer pulse; // bpm
   private Integer steps; // steps count
-  private Integer sleep; // sleep duration in minutes
+  private Integer activeCaloriesBurned;
 
-  private List<String> sleepSession; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
+  private Integer sleepHours; // sleep duration in minutes
+  private List<String> sleepSessions; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
   public UpdateSymptomsDTO(Symptoms symptom) {
     this.pulse = symptom.getPulse();
     this.steps = symptom.getSteps();
-    this.sleep = symptom.getSleep();
-    this.sleepSession = symptom.getSleepSession();
+    this.sleepHours = symptom.getSleepHours();
+    this.sleepSessions = symptom.getSleepSessions();
   }
 }

@@ -40,11 +40,12 @@ public class Symptoms {
 
     private Integer pulse; // bpm
     private Integer steps; // steps count
-    private Integer sleep; // sleep duration in minutes
+    private Integer activeCaloriesBurned;
+    private Integer sleepHours; // sleep duration in minutes
 
     @Convert(converter = SleepSessionConverter.class)
     @Column(columnDefinition = "TEXT")
-    private List<String> sleepSession;
+    private List<String> sleepSessions;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

@@ -11,7 +11,7 @@ public class RegisterRequestDTO {
     @NotEmpty
     private String username;
 
-    // @NotEmpty
+    // @NotEmpty It is not necessary due to email existence possibilities
     private String email;
 
     @NotEmpty

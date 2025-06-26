@@ -33,8 +33,8 @@ public class SymptomsService {
 
     public Symptoms createSymptoms(CreateSymptomsDTO symptomsDTO, User user) {
         Symptoms newSymptoms = new Symptoms(null, symptomsDTO.getPulse(),
-                symptomsDTO.getSteps(),
-                symptomsDTO.getSleep(), symptomsDTO.getSleepSession(), user, null, null);
+                symptomsDTO.getSteps(), symptomsDTO.getActiveCaloriesBurned(),
+                symptomsDTO.getSleepHours(), symptomsDTO.getSleepSessions(), user, null, null);
         Symptoms savedSymptoms = symptomsRepo.save(newSymptoms);
 
         return savedSymptoms;
@@ -58,6 +58,13 @@ public class SymptomsService {
         return symptoms;
     }
 
+    public Symptoms getSymptomsByUserIdAndDate(User user, LocalDate date) {
+        Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
+        Symptoms symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
+
+        return symptoms;
+    }
+
     public Symptoms updateSymptoms(Long id, UpdateSymptomsDTO symptomsDTO, Long userId) {
         Symptoms symptoms = symptomsRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Symptoms not found"));
@@ -65,15 +72,15 @@ public class SymptomsService {
 
         if (!Objects.equals(userId,
                 symptoms.getUser().getId())) {
-            throw new Error("This symptoms is not yours");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
         }
 
         System.out.println(symptoms);
 
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
-        symptoms.setSleep(symptomsDTO.getSleep());
-        symptoms.setSleepSession(symptomsDTO.getSleepSession());
+        symptoms.setSleepHours(symptomsDTO.getSleepHours());
+        symptoms.setSleepSessions(symptomsDTO.getSleepSessions());
 
         Symptoms savedSymptoms = symptomsRepo.save(symptoms);
 
@@ -91,7 +98,7 @@ public class SymptomsService {
 
         if (optionalSymptoms.isPresent()) {
             if (!Objects.equals(user.getId(), symptoms.getUser().getId())) {
-                throw new Error("This symptoms is not yours");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
             }
         }
 
@@ -99,8 +106,8 @@ public class SymptomsService {
 
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
-        symptoms.setSleep(symptomsDTO.getSleep());
-        symptoms.setSleepSession(symptomsDTO.getSleepSession());
+        symptoms.setSleepHours(symptomsDTO.getSleepHours());
+        symptoms.setSleepSessions(symptomsDTO.getSleepSessions());
 
         Symptoms savedSymptoms = symptomsRepo.save(symptoms);
 
@@ -126,8 +133,8 @@ public class SymptomsService {
 
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
-        symptoms.setSleep(symptomsDTO.getSleep());
-        symptoms.setSleepSession(symptomsDTO.getSleepSession());
+        symptoms.setSleepHours(symptomsDTO.getSleepHours());
+        symptoms.setSleepSessions(symptomsDTO.getSleepSessions());
 
         Symptoms savedSymptoms = symptomsRepo.save(symptoms);
 

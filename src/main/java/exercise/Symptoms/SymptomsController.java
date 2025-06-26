@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
@@ -44,9 +46,24 @@ public class SymptomsController {
   }
 
   // @Tag(name = "Symptoms - GET Operations")
-  @GetMapping("/user")
-  public List<Symptoms> getAllSymptomsByUserId(@AuthenticationPrincipal User user) {
+  @GetMapping("/user/{id}")
+  public List<Symptoms> getAllSymptomsByUserId(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    if (!Objects.equals(id, user.getId())) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
+    }
     List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user); // TO DO Burda da ResponseEntity dönmeli mi
+    return symptoms;
+  }
+
+  @GetMapping("user/{id}/date/{date}")
+  public Symptoms getSymptomsByUserIdAndDate(
+      @PathVariable Long id,
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+      @AuthenticationPrincipal User user) {
+    if (!Objects.equals(id, user.getId())) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
+    }
+    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(user, date);
     return symptoms;
   }
 
@@ -69,9 +86,9 @@ public class SymptomsController {
     return symptoms;
   }
 
-  @PutMapping("/date")
-  public Symptoms upsertSymptomsByDate(
-      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+  @PutMapping("/date/{date}")
+  public Symptoms upsertSymptomsByUserIdAndDate(
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @RequestBody UpdateSymptomsDTO symptomsDTO,
       @AuthenticationPrincipal User user) {
     Symptoms symptoms = symptomsService.upsertSymptoms(date, symptomsDTO, user);
