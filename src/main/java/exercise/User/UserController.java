@@ -36,13 +36,13 @@ public class UserController {
     @GetMapping("/me")
     @Cacheable("user")
     @Transactional(readOnly = true)
-    public UserDTO getMe(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public UserDTO getMe(@AuthenticationPrincipal User user) {
         UserDTO userDTO = userService.getUserDTO(user);
         return userDTO;
     }
 
     @PutMapping("/me")
-    public String updateMe(@PathVariable Long id, @RequestBody UpdateUserDTO newUser,
+    public String updateMe(@RequestBody UpdateUserDTO newUser,
             @AuthenticationPrincipal User user) throws Exception {
         User updatedUser = userService.updateUser(newUser, user);
 
@@ -50,7 +50,7 @@ public class UserController {
     }
 
     @DeleteMapping("/me")
-    public String deleteMe(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    public String deleteMe(@AuthenticationPrincipal User user) {
         String response = userService.deleteUser(user);
 
         return response;
