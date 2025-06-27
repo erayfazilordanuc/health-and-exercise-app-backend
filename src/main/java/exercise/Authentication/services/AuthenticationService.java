@@ -1,5 +1,7 @@
 package exercise.Authentication.services;
 
+import java.util.Objects;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,9 +64,15 @@ public class AuthenticationService {
 
     public AuthResponseDTO register(RegisterRequestDTO requestDTO) {
         // TO DO check email pattern
+        String role = "ROLE_USER";
+
+        if (Objects.equals(requestDTO.getUsername(), "erayfazilordanuc"))
+            role = "ROLE_ADMIN";
+
         User user = new User(null, requestDTO.getUsername(), requestDTO.getEmail(), requestDTO.getFullName(),
-                passwordEncoder.encode(requestDTO.getPassword()));
+                passwordEncoder.encode(requestDTO.getPassword()), role);
         userRepo.save(user);
+
         String accessToken = "Bearer " + jwtService.generateAccessToken(requestDTO.getUsername());
         String refreshToken = "Bearer " + jwtService.generateRefreshToken(requestDTO.getUsername());
 
@@ -72,14 +80,6 @@ public class AuthenticationService {
         AuthResponseDTO response = new AuthResponseDTO(userDTO, accessToken, refreshToken);
 
         return response;
-    }
-
-    public String guest(String username) {
-        User user = new User(null, username, null, null, null);
-        userRepo.save(user);
-        String token = jwtService.generateToken(username, null, null);
-
-        return "Bearer " + token;
     }
 
     public AuthResponseDTO refreshAccessToken(String refreshToken) {

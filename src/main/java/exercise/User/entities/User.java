@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
@@ -47,15 +48,18 @@ public class User implements UserDetails {
     @Column
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String fullName;
 
-    @Column
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private String role = "ROLE_USER";
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override
@@ -76,5 +80,17 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public User(Long id,
+            String username,
+            String email,
+            String fullName,
+            String password) {
+        this.id = id;
+        this.username = username;
+        this.email = email;
+        this.fullName = fullName;
+        this.password = password;
     }
 }

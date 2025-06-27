@@ -52,8 +52,8 @@ public class SymptomsService {
         return ResponseEntity.ok(dto);
     }
 
-    public List<Symptoms> getAllSymptomsByUserId(Long id) {
-        List<Symptoms> symptoms = symptomsRepo.findByUserId(id);
+    public List<Symptoms> getAllSymptomsByUserId(Long userId) {
+        List<Symptoms> symptoms = symptomsRepo.findByUserId(userId);
 
         return symptoms;
     }
@@ -61,6 +61,13 @@ public class SymptomsService {
     public Symptoms getSymptomsByUserIdAndDate(User user, LocalDate date) {
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
         Symptoms symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
+
+        return symptoms;
+    }
+
+    public Symptoms getSymptomsByUserIdAndDate(Long userId, LocalDate date) {
+        Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
+        Symptoms symptoms = symptomsRepo.findByUserIdAndDate(userId, startOfDay);
 
         return symptoms;
     }

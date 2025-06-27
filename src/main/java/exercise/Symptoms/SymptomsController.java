@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -93,5 +94,21 @@ public class SymptomsController {
   public String deleteSymptomsById(@PathVariable Long id, @AuthenticationPrincipal User user) {
     String response = symptomsService.deleteSymptoms(id, user);
     return response;
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/user/id/{id}")
+  public List<Symptoms> getByUserId(@PathVariable Long id) {
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(id);
+    return symptoms;
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/user/id/{id}/date/{date}")
+  public Symptoms getSymptomsByUserIdAndDate(
+      @PathVariable Long id,
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(id, date);
+    return symptoms;
   }
 }

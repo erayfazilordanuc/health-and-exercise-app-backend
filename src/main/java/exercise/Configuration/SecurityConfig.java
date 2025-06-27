@@ -39,13 +39,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(new CorsConfig()))
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/user", "/api/note", "/api/note/**").authenticated()
-                // .requestMatchers("/auth/user/**").hasAuthority("ROLE_USER")
-                // .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
-                .anyRequest().permitAll() // Give permission to all other endpoints
+                        .requestMatchers("/api/users/**", "/api/symptoms/**").authenticated()
+                        // .requestMatchers("/api/symptoms/**").hasAuthority("ROLE_ADMIN")
+                        .anyRequest().permitAll() // Give permission to all other endpoints
                 )
                 .sessionManagement(sess -> sess
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // No sessions
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // No sessions
                 )
                 .authenticationProvider(authenticationProvider()) // Custom authentication provider
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class); // Add JWT filter
