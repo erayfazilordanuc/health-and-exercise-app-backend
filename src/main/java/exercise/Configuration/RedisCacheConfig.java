@@ -12,28 +12,29 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-@Configuration
-public class RedisCacheConfig {
+// Redis can be used for future implementations
+// @Configuration
+// public class RedisCacheConfig {
 
-        @Bean
-        public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-                Duration DEFAULT_DURATION_TIME = Duration.ofMinutes(5);
+// @Bean
+// public CacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+// Duration DEFAULT_DURATION_TIME = Duration.ofMinutes(5);
 
-                RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration
-                                .defaultCacheConfig()
-                                .disableCachingNullValues()
-                                .serializeKeysWith(
-                                                RedisSerializationContext.SerializationPair.fromSerializer(
-                                                                new StringRedisSerializer()))
-                                .serializeValuesWith(
-                                                RedisSerializationContext.SerializationPair.fromSerializer(
-                                                                new JdkSerializationRedisSerializer(
-                                                                                getClass().getClassLoader())))
-                                .entryTtl(DEFAULT_DURATION_TIME);
+// RedisCacheConfiguration redisCacheConfiguration = RedisCacheConfiguration
+// .defaultCacheConfig()
+// .disableCachingNullValues()
+// .serializeKeysWith(
+// RedisSerializationContext.SerializationPair.fromSerializer(
+// new StringRedisSerializer()))
+// .serializeValuesWith(
+// RedisSerializationContext.SerializationPair.fromSerializer(
+// new JdkSerializationRedisSerializer(
+// getClass().getClassLoader())))
+// .entryTtl(DEFAULT_DURATION_TIME);
 
-                return RedisCacheManagerBuilder
-                                .fromConnectionFactory(connectionFactory)
-                                .withCacheConfiguration("user", redisCacheConfiguration)
-                                .build();
-        }
-}
+// return RedisCacheManagerBuilder
+// .fromConnectionFactory(connectionFactory)
+// .withCacheConfiguration("user", redisCacheConfiguration)
+// .build();
+// }
+// }

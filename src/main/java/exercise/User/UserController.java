@@ -27,20 +27,22 @@ import exercise.User.services.UserService;
 
 @RestController
 @RequestMapping("api/users")
-@Tags(value = @Tag(name = "User Operations"))
+// @Tags(value = @Tag(name = "Users Operations"))
 public class UserController {
 
     @Autowired
     public UserService userService;
 
+    @Tag(name = "Users - GET Operations")
     @GetMapping("/me")
-    @Cacheable("user")
+    // @Cacheable("user") // Is related to RedisCache
     @Transactional(readOnly = true)
     public UserDTO getMe(@AuthenticationPrincipal User user) {
         UserDTO userDTO = userService.getUserDTO(user);
         return userDTO;
     }
 
+    @Tag(name = "Users - PUT Operations")
     @PutMapping("/me")
     public String updateMe(@RequestBody UpdateUserDTO newUser,
             @AuthenticationPrincipal User user) throws Exception {
@@ -49,6 +51,7 @@ public class UserController {
         return "User " + updatedUser.getId() + " updated";
     }
 
+    @Tag(name = "Users - DELETE Operations")
     @DeleteMapping("/me")
     public String deleteMe(@AuthenticationPrincipal User user) {
         String response = userService.deleteUser(user);
@@ -56,6 +59,7 @@ public class UserController {
         return response;
     }
 
+    @Tag(name = "Admin Operations")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/id/{id}")
     @Transactional(readOnly = true)

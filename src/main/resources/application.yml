@@ -18,6 +18,18 @@ spring:
       enabled: true
       operations-sorter: alpha
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${spring.mail.username}
+    password: ${spring.mail.username}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 logging:
   level:
     jwt: DEBUG
@@ -36,6 +48,11 @@ logging:
 jwt:
   secret:
     key: ${jwt.secret.key}
+
+auth:
+  admin:
+    usernames: ${auth.admin.usernames}
+    emails: ${auth.admin.emails}
 
 swagger:
   server:

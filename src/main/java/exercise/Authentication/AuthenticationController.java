@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import exercise.Authentication.dtos.AuthResponseDTO;
 import exercise.Authentication.dtos.LoginRequestDTO;
 import exercise.Authentication.dtos.RegisterRequestDTO;
+import exercise.Authentication.dtos.TwoStepLoginRequestDTO;
+import exercise.Authentication.dtos.TwoStepRegisterRequestDTO;
 import exercise.Authentication.services.AuthenticationService;
 
 @RestController
@@ -24,13 +26,23 @@ public class AuthenticationController {
     private AuthenticationService authenticationService;
 
     @PostMapping("/login")
-    public AuthResponseDTO login(@Valid @RequestBody LoginRequestDTO requestDTO) {
-        return authenticationService.login(requestDTO);
+    public AuthResponseDTO login(@Valid @RequestBody LoginRequestDTO loginDTO) {
+        return authenticationService.login(loginDTO);
     }
 
     @PostMapping("/register")
-    public AuthResponseDTO register(@Valid @RequestBody RegisterRequestDTO requestDTO) {
-        return authenticationService.register(requestDTO);
+    public AuthResponseDTO register(@Valid @RequestBody RegisterRequestDTO registerDTO) {
+        return authenticationService.register(registerDTO);
+    }
+
+    @PostMapping("/admin/login")
+    public AuthResponseDTO loginAdmin(@Valid @RequestBody TwoStepLoginRequestDTO loginDTO) {
+        return authenticationService.loginAdmin(loginDTO); // loginAdmin lazım
+    }
+
+    @PostMapping("/admin/register")
+    public AuthResponseDTO registerAdmin(@Valid @RequestBody TwoStepRegisterRequestDTO requestDTO) {
+        return authenticationService.registerAdmin(requestDTO);
     }
 
     // @PostMapping("/guest")

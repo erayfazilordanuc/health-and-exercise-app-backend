@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import exercise.User.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -24,19 +25,22 @@ public class JWTService {
     @Value("${jwt.secret.key}")
     private String SECRET;
 
-    public String generateAccessToken(String username) {
-        return generateToken(username, "access", 1000 * 60 * 60);
+    public String generateAccessToken(User user) {
+        return generateToken(user, "access", 1000 * 60 * 60);
     }
 
-    public String generateRefreshToken(String username) {
-        return generateToken(username, "refresh", 1000 * 60 * 60 * 24 * 7);
+    public String generateRefreshToken(User user) {
+        return generateToken(user, "refresh", 1000 * 60 * 60 * 24 * 7);
     }
 
     // Generate token with given user name
-    public String generateToken(String username, String tokenType, Integer milliseconds) {
+    public String generateToken(User user, String tokenType, Integer milliseconds) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+        claims.put("fullName", user.getFullName());
+        claims.put("email", user.getEmail());
         claims.put("tokenType", tokenType);
-        return createToken(claims, username, milliseconds);
+        return createToken(claims, user.getUsername(), milliseconds);
     }
 
     // Create a JWT token with specified claims and subject (user name)

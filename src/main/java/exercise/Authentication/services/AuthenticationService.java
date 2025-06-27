@@ -1,11 +1,20 @@
 package exercise.Authentication.services;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +26,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import exercise.Authentication.dtos.AuthResponseDTO;
 import exercise.Authentication.dtos.LoginRequestDTO;
 import exercise.Authentication.dtos.RegisterRequestDTO;
+import exercise.Authentication.dtos.TwoStepLoginRequestDTO;
+import exercise.Authentication.dtos.TwoStepRegisterRequestDTO;
+import exercise.Common.email.entities.EmailDetails;
+import exercise.Common.email.services.EmailService;
 import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
 import exercise.User.mappers.UserMapper;
@@ -41,17 +54,33 @@ public class AuthenticationService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public AuthResponseDTO login(LoginRequestDTO requestDTO) {
-        requestDTO.setUsername(requestDTO.getUsername());
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private CacheManager cacheManager;
+
+    private Cache cache() {
+        return cacheManager.getCache("adminCodes");
+    }
+
+    @Value("${auth.admin.usernames}")
+    private Set<String> adminUsernames;
+
+    @Value("${auth.admin.emails}")
+    private Set<String> adminEmails;
+
+    public AuthResponseDTO login(LoginRequestDTO loginDTO) {
+        loginDTO.setUsername(loginDTO.getUsername());
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(requestDTO.getUsername(), requestDTO.getPassword()));
+                new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
 
         if (authentication.isAuthenticated()) {
-            String accessToken = "Bearer " + jwtService.generateAccessToken(requestDTO.getUsername());
-            String refreshToken = "Bearer " + jwtService.generateRefreshToken(requestDTO.getUsername());
-
             User user = (User) authentication.getPrincipal();
+
+            String accessToken = "Bearer " + jwtService.generateAccessToken(user);
+            String refreshToken = "Bearer " + jwtService.generateRefreshToken(user);
 
             UserDTO userDTO = new UserDTO(user);
             AuthResponseDTO response = new AuthResponseDTO(userDTO, accessToken, refreshToken);
@@ -62,24 +91,84 @@ public class AuthenticationService {
         }
     }
 
-    public AuthResponseDTO register(RegisterRequestDTO requestDTO) {
-        // TO DO check email pattern
-        String role = "ROLE_USER";
-
-        if (Objects.equals(requestDTO.getUsername(), "erayfazilordanuc"))
-            role = "ROLE_ADMIN";
-
-        User user = new User(null, requestDTO.getUsername(), requestDTO.getEmail(), requestDTO.getFullName(),
-                passwordEncoder.encode(requestDTO.getPassword()), role);
+    public AuthResponseDTO registerUserAndGenerateAuthResponseDTO(RegisterRequestDTO registerDTO,
+            String role) {
+        User user = new User(null, registerDTO.getUsername(), registerDTO.getEmail(),
+                registerDTO.getFullName(),
+                passwordEncoder.encode(registerDTO.getPassword()), role);
         userRepo.save(user);
 
-        String accessToken = "Bearer " + jwtService.generateAccessToken(requestDTO.getUsername());
-        String refreshToken = "Bearer " + jwtService.generateRefreshToken(requestDTO.getUsername());
+        String accessToken = "Bearer " +
+                jwtService.generateAccessToken(user);
+        String refreshToken = "Bearer " +
+                jwtService.generateRefreshToken(user);
 
         UserDTO userDTO = new UserDTO(user);
-        AuthResponseDTO response = new AuthResponseDTO(userDTO, accessToken, refreshToken);
+        AuthResponseDTO responseDTO = new AuthResponseDTO(userDTO, accessToken, refreshToken);
 
+        return responseDTO;
+    }
+
+    public AuthResponseDTO register(RegisterRequestDTO requestDTO) {
+        if (adminUsernames.contains(requestDTO.getUsername()))
+            throw new RuntimeException("This username is unselectable");
+        AuthResponseDTO response = registerUserAndGenerateAuthResponseDTO(requestDTO, "ROLE_USER");
         return response;
+    }
+
+    public AuthResponseDTO loginAdmin(TwoStepLoginRequestDTO requestDTO) {
+        EmailDetails email = new EmailDetails("fazilordanuc@gmail.com", "123456", "Doğrulama Kodu", null);
+        emailService.sendSimpleMail(email);
+        // LoginRequestDTO loginDTO = requestDTO.getLoginDTO();
+        // loginDTO.setUsername(loginDTO.getUsername());
+
+        // Authentication authentication = authenticationManager.authenticate(
+        // new UsernamePasswordAuthenticationToken(loginDTO.getUsername(),
+        // loginDTO.getPassword()));
+
+        // if (authentication.isAuthenticated()) {
+        // User user = (User) authentication.getPrincipal();
+
+        // String accessToken = "Bearer " + jwtService.generateAccessToken(user);
+        // String refreshToken = "Bearer " + jwtService.generateRefreshToken(user);
+
+        // UserDTO userDTO = new UserDTO(user);
+        // AuthResponseDTO response = new AuthResponseDTO(userDTO, accessToken,
+        // refreshToken);
+
+        // return response;
+        // } else {
+        // throw new UsernameNotFoundException("Invalid username-email or password");
+        // }
+        return null;
+    }
+
+    public AuthResponseDTO registerAdmin(TwoStepRegisterRequestDTO requestDTO) {
+        RegisterRequestDTO registerDTO = requestDTO.getRegisterDTO();
+
+        if (adminUsernames.contains(registerDTO.getUsername())) {
+            if (!registerDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+                throw new RuntimeException("Invalid email pattern");
+            }
+
+            if (adminEmails.contains(registerDTO.getEmail())) {
+                if (Objects.isNull(requestDTO.getCode())) {
+                    String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
+                    cache().put(registerDTO.getUsername(), code);
+                    EmailDetails email = new EmailDetails(registerDTO.getEmail(), code, "Doğrulama Kodu", null);
+                    emailService.sendSimpleMail(email);
+                    return null;
+                } else {
+                    String cachedCode = cache().get(registerDTO.getUsername(), String.class);
+                    if (requestDTO.getCode().equals(cachedCode)) {
+                        AuthResponseDTO response = registerUserAndGenerateAuthResponseDTO(registerDTO, "ROLE_ADMIN");
+                        return response;
+                    }
+                }
+            }
+        }
+
+        throw new BadCredentialsException("Invalid admin credentials");
     }
 
     public AuthResponseDTO refreshAccessToken(String refreshToken) {
@@ -92,8 +181,8 @@ public class AuthenticationService {
             boolean isValid = jwtService.validateToken(refreshToken, userDetails, "refresh");
 
             if (isValid) {
-                String newAccessToken = "Bearer " + jwtService.generateAccessToken(username);
-                String newRefreshToken = "Bearer " + jwtService.generateRefreshToken(username);
+                String newAccessToken = "Bearer " + jwtService.generateAccessToken(user);
+                String newRefreshToken = "Bearer " + jwtService.generateRefreshToken(user);
                 AuthResponseDTO response = new AuthResponseDTO(userDTO, newAccessToken, newRefreshToken);
                 return response;
             } else {
