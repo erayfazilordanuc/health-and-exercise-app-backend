@@ -64,19 +64,20 @@ public class UserController {
         return userDTO;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/id/{id}")
-    public String updateById(@PathVariable Long id, @RequestBody UpdateUserDTO newUser) throws Exception {
-        User updatedUser = userService.updateUser(newUser, id);
+    // @PreAuthorize("hasRole('ADMIN')")
+    // @PutMapping("/id/{id}")
+    // public String updateById(@PathVariable Long id, @RequestBody UpdateUserDTO
+    // newUser) throws Exception {
+    // User updatedUser = userService.updateUser(newUser, id);
 
-        return "User " + updatedUser.getId() + " updated";
-    }
+    // return "User " + updatedUser.getId() + " updated";
+    // }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/id/{id}")
-    public String deleteById(@PathVariable Long id) {
-        String response = userService.deleteUser(id);
+    // @PreAuthorize("hasRole('ADMIN')")
+    // @DeleteMapping("/id/{id}")
+    // public String deleteById(@PathVariable Long id) {
+    // String response = userService.deleteUser(id);
 
-        return response;
-    }
+    // return response;
+    // }
 }
