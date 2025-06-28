@@ -26,6 +26,8 @@ public class UserDTO {
 
     private String fullName;
 
+    private String role;
+
     private List<SymptomsDTO> symptomList = new ArrayList<>();
 
     public UserDTO(User user) {
@@ -33,5 +35,6 @@ public class UserDTO {
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.fullName = user.getFullName();
+        this.role = user.getRole();
     }
 }
