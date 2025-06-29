@@ -31,13 +31,14 @@ import exercise.User.entities.User;
 
 @RestController
 @RequestMapping("/api/symptoms")
-// @Tags(value = @Tag(name = "Symptoms Operations"))
+@Tags(value = @Tag(name = "Symptoms Operations"))
 public class SymptomsController {
 
   @Autowired
   public SymptomsService symptomsService;
 
-  @Tag(name = "Symptoms - GET Operations")
+  @Tag(name = "Admin Operations")
+  // @Tag(name = "Symptoms - GET Operations")
   @GetMapping("/id/{id}")
   public ResponseEntity<SymptomsDTO> getSymptomsById(
       @PathVariable Long id,
@@ -50,7 +51,6 @@ public class SymptomsController {
     return response;
   }
 
-  @Tag(name = "Symptoms - GET Operations")
   @GetMapping
   public List<Symptoms> getSymptomsByUser(
       @AuthenticationPrincipal User user) {
@@ -58,7 +58,6 @@ public class SymptomsController {
     return symptoms;
   }
 
-  @Tag(name = "Symptoms - GET Operations")
   @GetMapping("/date/{date}")
   public Symptoms getSymptomsByDate(
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -67,7 +66,6 @@ public class SymptomsController {
     return symptoms;
   }
 
-  @Tag(name = "Symptoms - POST Operations")
   @PostMapping
   public Symptoms createSymptoms(
       @RequestBody UpsertSymptomsDTO symptomsDTO,
@@ -77,7 +75,6 @@ public class SymptomsController {
     return symptoms;
   }
 
-  @Tag(name = "Symptoms - PUT Operations")
   @PutMapping("/id/{id}")
   public Symptoms upsertSymptomsById(
       @PathVariable Long id, @RequestBody UpsertSymptomsDTO symptomsDTO,
@@ -88,7 +85,6 @@ public class SymptomsController {
     return symptoms;
   }
 
-  @Tag(name = "Symptoms - PUT Operations")
   @PutMapping("/date/{date}")
   public Symptoms upsertSymptomsByDate(
       @PathVariable(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -98,7 +94,6 @@ public class SymptomsController {
     return symptoms;
   }
 
-  @Tag(name = "Symptoms - DELETE Operations")
   @DeleteMapping("/id/{id}")
   public String deleteSymptomsById(@PathVariable Long id, @AuthenticationPrincipal User user) {
     String response = symptomsService.deleteSymptoms(id, user);

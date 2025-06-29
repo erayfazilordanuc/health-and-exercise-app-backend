@@ -1,0 +1,42 @@
+package exercise.Group;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import exercise.Group.dtos.GroupDTO;
+import exercise.Group.entities.Group;
+import exercise.Group.services.GroupService;
+
+@RestController
+@RequestMapping("api/groups")
+@Tags(value = @Tag(name = "Groups Operations"))
+public class GroupController {
+
+  @Autowired
+  public GroupService groupService;
+
+  @GetMapping("/id/{id}")
+  // @Cacheable("user") // Is related to RedisCache
+  @Transactional(readOnly = true)
+  public Group getById(@PathVariable Long id) {
+    Group group = groupService.getGroupById(id);
+    return group;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PostMapping
+  @Transactional(readOnly = true)
+  public Group create(@RequestBody GroupDTO grouptDTO) {
+    Group group = groupService.createGroup(grouptDTO);
+    return group;
+  }
+}

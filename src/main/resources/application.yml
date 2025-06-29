@@ -16,7 +16,7 @@ spring:
   doc:
     swagger-ui:
       enabled: true
-      operations-sorter: alpha
+      operations-sorter: method
 
   mail:
     host: smtp.gmail.com
