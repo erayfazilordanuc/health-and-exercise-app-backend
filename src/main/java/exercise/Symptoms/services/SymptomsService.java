@@ -58,6 +58,14 @@ public class SymptomsService {
         return symptoms;
     }
 
+    public ResponseEntity<SymptomsDTO> getSymptomsById(Long id) {
+        Symptoms symptoms = symptomsRepo.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Symptoms not found"));
+
+        SymptomsDTO dto = symptomsMapper.entityToDTO(symptoms);
+        return ResponseEntity.ok(dto);
+    }
+
     public Symptoms getSymptomsByUserIdAndDate(User user, LocalDate date) {
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
         Symptoms symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);

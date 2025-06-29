@@ -42,6 +42,10 @@ public class SymptomsController {
   public ResponseEntity<SymptomsDTO> getSymptomsById(
       @PathVariable Long id,
       @AuthenticationPrincipal User user) {
+    if (user.getRole().equals("ROLE_ADMIN")) {
+      return symptomsService.getSymptomsById(id);
+    }
+
     ResponseEntity<SymptomsDTO> response = symptomsService.getSymptomsById(id, user);
     return response;
   }
