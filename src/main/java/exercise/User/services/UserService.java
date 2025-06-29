@@ -1,5 +1,7 @@
 package exercise.User.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -30,6 +32,12 @@ public class UserService implements UserDetailsService {
         User user = userRepo.findById(id).get();
         UserDTO userDTO = userMapper.entityToDTO(user);
         return userDTO;
+    }
+
+    public List<UserDTO> getUsersByGroupId(Long id) {
+        List<User> users = userRepo.findByGroupId(id);
+        List<UserDTO> userDTOs = users.stream().map(u -> userMapper.entityToDTO(u)).toList();
+        return userDTOs;
     }
 
     public User updateUser(UpdateUserDTO newUserDTO, User user) {

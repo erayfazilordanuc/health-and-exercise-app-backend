@@ -35,11 +35,13 @@ public class AuthenticationController {
         return authenticationService.register(registerDTO);
     }
 
+    @Tag(name = "Admin Operations")
     @PostMapping("/admin/login")
     public AuthResponseDTO loginAdmin(@Valid @RequestBody TwoStepLoginRequestDTO loginDTO) {
         return authenticationService.loginAdmin(loginDTO); // loginAdmin lazım
     }
 
+    @Tag(name = "Admin Operations")
     @PostMapping("/admin/register")
     public AuthResponseDTO registerAdmin(@Valid @RequestBody TwoStepRegisterRequestDTO requestDTO) {
         return authenticationService.registerAdmin(requestDTO);

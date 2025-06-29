@@ -30,11 +30,14 @@ public class UserDTO {
 
     private List<SymptomsDTO> symptomList = new ArrayList<>();
 
+    private Long groupId;
+
     public UserDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.fullName = user.getFullName();
         this.role = user.getRole();
+        this.groupId = user.getGroupId();
     }
 }

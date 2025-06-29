@@ -68,6 +68,15 @@ public class UserController {
         return userDTO;
     }
 
+    @Tag(name = "Admin Operations")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/group/id/{id}")
+    @Transactional(readOnly = true)
+    public UserDTO getByGroupId(@PathVariable Long id) {
+        UserDTO userDTO = userService.getUserDTO(id);
+        return userDTO;
+    }
+
     // @PreAuthorize("hasRole('ADMIN')")
     // @PutMapping("/id/{id}")
     // public String updateById(@PathVariable Long id, @RequestBody UpdateUserDTO
