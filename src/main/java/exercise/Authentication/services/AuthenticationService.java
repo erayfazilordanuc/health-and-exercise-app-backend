@@ -70,7 +70,7 @@ public class AuthenticationService {
     @Value("${auth.admin.emails}")
     private Set<String> adminEmails;
 
-    public AuthResponseDTO login(LoginRequestDTO loginDTO) {
+    public AuthResponseDTO loginUserAndGenerateAuthResponseDTO(LoginRequestDTO loginDTO) {
         loginDTO.setUsername(loginDTO.getUsername());
 
         Authentication authentication = authenticationManager.authenticate(
@@ -117,30 +117,25 @@ public class AuthenticationService {
     }
 
     public AuthResponseDTO loginAdmin(TwoStepLoginRequestDTO requestDTO) {
-        EmailDetails email = new EmailDetails("fazilordanuc@gmail.com", "123456", "Doğrulama Kodu", null);
-        emailService.sendSimpleMail(email);
-        // LoginRequestDTO loginDTO = requestDTO.getLoginDTO();
-        // loginDTO.setUsername(loginDTO.getUsername());
+        LoginRequestDTO loginDTO = requestDTO.getLoginDTO();
+        User user = userRepo.findByUsername(loginDTO.getUsername());
+        if (user.getRole().equals("ROLE_ADMIN")) {
+            if (Objects.isNull(requestDTO.getCode())) {
+                String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
+                cache().put(loginDTO.getUsername(), code);
+                EmailDetails email = new EmailDetails(user.getEmail(), code, "Doğrulama Kodu", null);
+                emailService.sendSimpleMail(email);
+                return null;
+            } else {
+                String cachedCode = cache().get(loginDTO.getUsername(), String.class);
+                if (requestDTO.getCode().equals(cachedCode)) {
+                    AuthResponseDTO response = loginUserAndGenerateAuthResponseDTO(loginDTO);
+                    return response;
+                }
+            }
+        }
 
-        // Authentication authentication = authenticationManager.authenticate(
-        // new UsernamePasswordAuthenticationToken(loginDTO.getUsername(),
-        // loginDTO.getPassword()));
-
-        // if (authentication.isAuthenticated()) {
-        // User user = (User) authentication.getPrincipal();
-
-        // String accessToken = "Bearer " + jwtService.generateAccessToken(user);
-        // String refreshToken = "Bearer " + jwtService.generateRefreshToken(user);
-
-        // UserDTO userDTO = new UserDTO(user);
-        // AuthResponseDTO response = new AuthResponseDTO(userDTO, accessToken,
-        // refreshToken);
-
-        // return response;
-        // } else {
-        // throw new UsernameNotFoundException("Invalid username-email or password");
-        // }
-        return null;
+        throw new BadCredentialsException("Invalid admin credentials");
     }
 
     public AuthResponseDTO registerAdmin(TwoStepRegisterRequestDTO requestDTO) {
