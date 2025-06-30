@@ -7,7 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import exercise.Group.dtos.CreateGoupDTO;
+import exercise.Group.dtos.CreateGroupDTO;
 import exercise.Group.dtos.GroupDTO;
 import exercise.Group.entities.Group;
 import exercise.Group.mappers.GroupMapper;
@@ -41,7 +41,7 @@ public class GroupService {
         return group;
     }
 
-    public Group createGroup(CreateGoupDTO createGroupDTO) {
+    public Group createGroup(CreateGroupDTO createGroupDTO) {
         Group existGroup = groupRepo.findByAdminId(createGroupDTO.getAdminId());
         if (Objects.isNull(existGroup))
             throw new RuntimeException("An admin can own only one group.");

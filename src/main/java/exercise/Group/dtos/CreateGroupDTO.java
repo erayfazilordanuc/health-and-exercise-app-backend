@@ -10,7 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateGoupDTO {
+public class CreateGroupDTO {
 
   private Long id;
 

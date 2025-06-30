@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import exercise.Group.dtos.CreateGoupDTO;
+import exercise.Group.dtos.CreateGroupDTO;
 import exercise.Group.dtos.GroupDTO;
 import exercise.Group.entities.Group;
 import exercise.Group.services.GroupService;
@@ -48,7 +48,7 @@ public class GroupController {
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
-  public Group create(@RequestBody CreateGoupDTO createGroupDTO, @AuthenticationPrincipal User user) {
+  public Group create(@RequestBody CreateGroupDTO createGroupDTO, @AuthenticationPrincipal User user) {
     if (!Objects.isNull(createGroupDTO.getAdminId())) {
       if (!createGroupDTO.getAdminId().equals(user.getId())) {
         throw new RuntimeException("You can not create group for someone else");
