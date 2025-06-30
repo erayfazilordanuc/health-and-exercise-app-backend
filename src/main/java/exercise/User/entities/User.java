@@ -81,11 +81,13 @@ public class User implements UserDetails {
             String username,
             String email,
             String fullName,
-            String password) {
+            String password,
+            Long groupId) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.fullName = fullName;
         this.password = password;
+        this.groupId = groupId;
     }
 }
