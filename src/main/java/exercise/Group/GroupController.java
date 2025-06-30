@@ -9,6 +9,7 @@ import java.util.Objects;
 import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,7 @@ public class GroupController {
   }
 
   @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public Group create(@RequestBody CreateGoupDTO createGroupDTO, @AuthenticationPrincipal User user) {
     if (!Objects.isNull(createGroupDTO.getAdminId())) {
