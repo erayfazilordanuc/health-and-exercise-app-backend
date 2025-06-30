@@ -3,6 +3,8 @@ package exercise.Group;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,9 +26,13 @@ public class GroupController {
   @Autowired
   public GroupService groupService;
 
+  @GetMapping
+  public List<Group> getAll() {
+    List<Group> groups = groupService.getAll();
+    return groups;
+  }
+
   @GetMapping("/id/{id}")
-  // @Cacheable("user") // Is related to RedisCache
-  @Transactional(readOnly = true)
   public Group getById(@PathVariable Long id) {
     Group group = groupService.getGroupById(id);
     return group;

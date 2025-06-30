@@ -1,5 +1,6 @@
 package exercise.Group.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ public class GroupService {
 
     @Autowired
     private GroupMapper groupMapper;
+
+    public List<Group> getAll() {
+        List<Group> groups = groupRepo.findAll();
+        return groups;
+    }
 
     public Group getGroupById(Long id) {
         Optional<Group> optionalGroup = groupRepo.findById(id);
