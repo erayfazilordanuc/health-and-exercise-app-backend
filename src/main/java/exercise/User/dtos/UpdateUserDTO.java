@@ -26,10 +26,13 @@ public class UpdateUserDTO {
 
     private String password;
 
+    private Long groupId;
+
     public UpdateUserDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.fullName = user.getFullName();
+        this.groupId = user.getGroupId();
     }
 }
