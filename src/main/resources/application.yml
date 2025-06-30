@@ -13,10 +13,10 @@ spring:
   jackson:
     time-zone: Europe/Istanbul
 
-  doc:
-    swagger-ui:
-      enabled: true
-      operations-sorter: method
+springdoc:
+  swagger-ui:
+    enabled: true
+    operations-sorter: method
 
   mail:
     host: smtp.gmail.com
