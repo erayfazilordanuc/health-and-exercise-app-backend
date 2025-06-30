@@ -24,6 +24,7 @@ import exercise.Group.dtos.CreateGroupDTO;
 import exercise.Group.dtos.GroupDTO;
 import exercise.Group.entities.Group;
 import exercise.Group.services.GroupService;
+import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
 
 @RestController
@@ -53,8 +54,8 @@ public class GroupController {
   }
 
   @GetMapping("/id/{id}/admin")
-  public ResponseEntity<User> getGroupAdmin(@PathVariable Long id) {
-    User admin = groupService.getAdmin(id);
+  public ResponseEntity<UserDTO> getGroupAdmin(@PathVariable Long id) {
+    UserDTO admin = groupService.getAdmin(id);
     return ResponseEntity.ok(admin);
   }
 

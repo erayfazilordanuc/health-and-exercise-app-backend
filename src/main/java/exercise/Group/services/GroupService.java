@@ -12,6 +12,7 @@ import exercise.Group.dtos.GroupDTO;
 import exercise.Group.entities.Group;
 import exercise.Group.mappers.GroupMapper;
 import exercise.Group.repositories.GroupRepository;
+import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
 
@@ -47,10 +48,11 @@ public class GroupService {
         return count;
     }
 
-    public User getAdmin(Long groupId) {
+    public UserDTO getAdmin(Long groupId) {
         Group group = groupRepo.findById(groupId).get();
         User user = userRepo.findById(group.getAdminId()).get();
-        return user;
+        UserDTO userDTO = new UserDTO(user);
+        return userDTO;
     }
 
     public Group createGroup(CreateGroupDTO createGroupDTO) {
