@@ -57,7 +57,7 @@ public class GroupService {
 
     public Group createGroup(CreateGroupDTO createGroupDTO) {
         Group existGroup = groupRepo.findByAdminId(createGroupDTO.getAdminId());
-        if (Objects.isNull(existGroup))
+        if (Objects.nonNull(existGroup))
             throw new RuntimeException("An admin can own only one group.");
         Group newGroup = groupMapper.DTOToEntity(createGroupDTO);
         Group savedGroup = groupRepo.save(newGroup);
