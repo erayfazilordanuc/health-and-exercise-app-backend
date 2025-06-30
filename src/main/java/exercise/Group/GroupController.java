@@ -9,6 +9,7 @@ import java.util.Objects;
 import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +44,12 @@ public class GroupController {
   public Group getById(@PathVariable Long id) {
     Group group = groupService.getGroupById(id);
     return group;
+  }
+
+  @GetMapping("/id/{id}/size")
+  public ResponseEntity<Integer> getGroupSize(@PathVariable Long id) {
+    Integer count = groupService.countMembers(id);
+    return ResponseEntity.ok(count);
   }
 
   @Tag(name = "Admin Operations")
