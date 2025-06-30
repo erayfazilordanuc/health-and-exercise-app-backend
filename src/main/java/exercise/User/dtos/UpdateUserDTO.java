@@ -24,7 +24,7 @@ public class UpdateUserDTO {
 
     private String fullName;
 
-    private String password;
+    // private String password;
 
     private Long groupId;
 

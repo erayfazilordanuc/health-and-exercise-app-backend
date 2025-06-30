@@ -32,7 +32,7 @@ public class UserMapper {
 
     public User updateDTOToEntity(UpdateUserDTO userDTO, User user) {
         User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(), userDTO.getFullName(),
-                passwordEncoder.encode(userDTO.getPassword()));
+                /* passwordEncoder.encode(userDTO.getPassword()) */user.getPassword());
 
         return userEntity;
     }
