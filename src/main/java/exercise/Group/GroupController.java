@@ -54,7 +54,6 @@ public class GroupController {
     }
     createGroupDTO.setAdminId(user.getId());
     Group group = groupService.createGroup(createGroupDTO);
-    
     return group;
   }
 }

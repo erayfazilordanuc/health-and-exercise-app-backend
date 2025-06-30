@@ -1,6 +1,7 @@
 package exercise.Group.services;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class GroupService {
     }
 
     public Group createGroup(CreateGoupDTO createGroupDTO) {
+        Group existGroup = groupRepo.findByAdminId(createGroupDTO.getAdminId());
+        if (Objects.isNull(existGroup))
+            throw new RuntimeException("An admin can own only one group.");
         Group newGroup = groupMapper.DTOToEntity(createGroupDTO);
         Group savedGroup = groupRepo.save(newGroup);
         User user = userRepo.findById(createGroupDTO.getAdminId()).get();

@@ -13,4 +13,6 @@ import exercise.Symptoms.entities.Symptoms;
 
 @Repository
 public interface GroupRepository extends JpaRepository<Group, Long> {
+
+  public Group findByAdminId(Long adminId);
 }
