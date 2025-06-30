@@ -58,6 +58,13 @@ public class UserController {
         return response;
     }
 
+    @GetMapping("/group/id/{id}")
+    @Transactional(readOnly = true)
+    public List<UserDTO> getByGroupId(@PathVariable Long id) {
+        List<UserDTO> userDTOs = userService.getUsersByGroupId(id);
+        return userDTOs;
+    }
+
     @Tag(name = "Admin Operations")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/id/{id}")
@@ -65,15 +72,6 @@ public class UserController {
     public UserDTO getById(@PathVariable Long id) {
         UserDTO userDTO = userService.getUserDTO(id);
         return userDTO;
-    }
-
-    @Tag(name = "Admin Operations")
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/group/id/{id}")
-    @Transactional(readOnly = true)
-    public List<UserDTO> getByGroupId(@PathVariable Long id) {
-        List<UserDTO> userDTOs = userService.getUsersByGroupId(id);
-        return userDTOs;
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
