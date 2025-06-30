@@ -40,7 +40,6 @@ public class GroupController {
 
   @Tag(name = "Admin Operations")
   @PostMapping
-  @Transactional(readOnly = true)
   public Group create(@RequestBody GroupDTO grouptDTO) {
     Group group = groupService.createGroup(grouptDTO);
     return group;
