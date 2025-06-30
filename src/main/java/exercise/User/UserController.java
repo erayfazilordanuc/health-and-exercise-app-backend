@@ -3,6 +3,7 @@ package exercise.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,9 +71,9 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/group/id/{id}")
     @Transactional(readOnly = true)
-    public UserDTO getByGroupId(@PathVariable Long id) {
-        UserDTO userDTO = userService.getUserDTO(id);
-        return userDTO;
+    public List<UserDTO> getByGroupId(@PathVariable Long id) {
+        List<UserDTO> userDTOs = userService.getUsersByGroupId(id);
+        return userDTOs;
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
