@@ -71,9 +71,6 @@ public class AuthenticationService {
     private Set<String> adminEmails;
 
     public AuthResponseDTO loginUserAndGenerateAuthResponseDTO(LoginRequestDTO loginDTO) {
-        if (!adminUsernames.contains(loginDTO.getUsername()))
-            throw new RuntimeException("You can not login as admin with this method");
-
         loginDTO.setUsername(loginDTO.getUsername());
 
         Authentication authentication = authenticationManager.authenticate(
@@ -92,6 +89,13 @@ public class AuthenticationService {
         } else {
             throw new UsernameNotFoundException("Invalid username-email or password");
         }
+    }
+
+    public AuthResponseDTO login(LoginRequestDTO loginDTO) {
+        if (adminUsernames.contains(loginDTO.getUsername()))
+            throw new RuntimeException("You can not login as admin with this method");
+        AuthResponseDTO response = loginUserAndGenerateAuthResponseDTO(loginDTO);
+        return response;
     }
 
     public AuthResponseDTO registerUserAndGenerateAuthResponseDTO(RegisterRequestDTO registerDTO,
