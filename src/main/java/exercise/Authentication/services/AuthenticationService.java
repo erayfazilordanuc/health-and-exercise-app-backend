@@ -71,7 +71,7 @@ public class AuthenticationService {
     private Set<String> adminEmails;
 
     public AuthResponseDTO loginUserAndGenerateAuthResponseDTO(LoginRequestDTO loginDTO) {
-        if (adminUsernames.contains(loginDTO.getUsername()))
+        if (!adminUsernames.contains(loginDTO.getUsername()))
             throw new RuntimeException("You can not login as admin with this method");
 
         loginDTO.setUsername(loginDTO.getUsername());
