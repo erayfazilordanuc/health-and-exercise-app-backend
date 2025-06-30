@@ -13,6 +13,9 @@ import lombok.Setter;
 public class GroupDTO {
 
   @NotNull
+  private Long id;
+
+  @NotNull
   private String name;
 
   @NotNull

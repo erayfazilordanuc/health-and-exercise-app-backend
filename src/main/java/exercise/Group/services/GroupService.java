@@ -66,4 +66,14 @@ public class GroupService {
         userRepo.save(user);
         return savedGroup;
     }
+
+    public Group updateGroup(GroupDTO groupDTO) {
+        Optional<Group> optionalGroup = groupRepo.findById(groupDTO.getId());
+        if (!optionalGroup.isPresent())
+            throw new RuntimeException("Group not found");
+        Group group = optionalGroup.get();
+        group.setName(groupDTO.getName());
+        Group savedGroup = groupRepo.save(group);
+        return savedGroup;
+    }
 }

@@ -72,4 +72,12 @@ public class GroupController {
     Group group = groupService.createGroup(createGroupDTO);
     return group;
   }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping
+  public Group update(@RequestBody GroupDTO groupDTO) {
+    Group group = groupService.updateGroup(groupDTO);
+    return group;
+  }
 }

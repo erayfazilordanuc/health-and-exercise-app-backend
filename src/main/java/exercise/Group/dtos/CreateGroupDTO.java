@@ -12,8 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CreateGroupDTO {
 
-  private Long id;
-
   @NotNull
   private String name;
 
