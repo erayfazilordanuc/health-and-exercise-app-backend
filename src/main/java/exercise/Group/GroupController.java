@@ -4,8 +4,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.util.List;
+import java.util.Objects;
+
+import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,9 +18,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import exercise.Group.dtos.CreateGoupDTO;
 import exercise.Group.dtos.GroupDTO;
 import exercise.Group.entities.Group;
 import exercise.Group.services.GroupService;
+import exercise.User.entities.User;
 
 @RestController
 @RequestMapping("api/groups")
@@ -40,8 +46,15 @@ public class GroupController {
 
   @Tag(name = "Admin Operations")
   @PostMapping
-  public Group create(@RequestBody GroupDTO grouptDTO) {
-    Group group = groupService.createGroup(grouptDTO);
+  public Group create(@RequestBody CreateGoupDTO createGroupDTO, @AuthenticationPrincipal User user) {
+    if (!Objects.isNull(createGroupDTO.getAdminId())) {
+      if (!createGroupDTO.getAdminId().equals(user.getId())) {
+        throw new RuntimeException("You can not create group for someone else");
+      }
+    }
+    createGroupDTO.setAdminId(user.getId());
+    Group group = groupService.createGroup(createGroupDTO);
+    
     return group;
   }
 }
