@@ -52,6 +52,12 @@ public class GroupController {
     return ResponseEntity.ok(count);
   }
 
+  @GetMapping("/id/{id}/admin")
+  public ResponseEntity<User> getGroupAdmin(@PathVariable Long id) {
+    User admin = groupService.getAdmin(id);
+    return ResponseEntity.ok(admin);
+  }
+
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping

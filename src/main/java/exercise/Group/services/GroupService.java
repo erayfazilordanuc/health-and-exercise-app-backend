@@ -47,6 +47,12 @@ public class GroupService {
         return count;
     }
 
+    public User getAdmin(Long groupId) {
+        Group group = groupRepo.findById(groupId).get();
+        User user = userRepo.findById(group.getAdminId()).get();
+        return user;
+    }
+
     public Group createGroup(CreateGroupDTO createGroupDTO) {
         Group existGroup = groupRepo.findByAdminId(createGroupDTO.getAdminId());
         if (Objects.isNull(existGroup))

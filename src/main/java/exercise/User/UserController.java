@@ -57,10 +57,12 @@ public class UserController {
         return response;
     }
 
+    @Tag(name = "Admin Operations")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/id/{id}")
     @Transactional(readOnly = true)
-    public UserDTO getById(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        UserDTO userDTO = userService.getPublicUserDTO(id, user);
+    public UserDTO getById(@PathVariable Long id) {
+        UserDTO userDTO = userService.getUserDTO(id);
         return userDTO;
     }
 
