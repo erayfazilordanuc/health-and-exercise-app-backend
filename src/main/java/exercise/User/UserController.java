@@ -44,11 +44,11 @@ public class UserController {
     }
 
     @PutMapping("/me")
-    public String updateMe(@RequestBody UpdateUserDTO newUser,
+    public UserDTO updateMe(@RequestBody UpdateUserDTO newUser,
             @AuthenticationPrincipal User user) throws Exception {
-        User updatedUser = userService.updateUser(newUser, user);
+        UserDTO updatedUserDTO = userService.updateUserAndGetDTO(newUser, user);
 
-        return "User " + updatedUser.getId() + " updated";
+        return updatedUserDTO;
     }
 
     @DeleteMapping("/me")

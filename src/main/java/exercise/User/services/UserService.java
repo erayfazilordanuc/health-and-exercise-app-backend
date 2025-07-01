@@ -50,6 +50,12 @@ public class UserService implements UserDetailsService {
         return userDTOs;
     }
 
+    public UserDTO updateUserAndGetDTO(UpdateUserDTO newUserDTO, User user) {
+        User updatedUser = updateUser(newUserDTO, user);
+        UserDTO userDTO = new UserDTO(updatedUser);
+        return userDTO;
+    }
+
     public User updateUser(UpdateUserDTO newUserDTO, User user) {
         User updatedUser = userMapper.updateDTOToEntity(newUserDTO, user);
 
