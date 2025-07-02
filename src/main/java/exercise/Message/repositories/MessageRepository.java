@@ -16,6 +16,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
   public List<Message> findByRoomId(Long roomId);
 
+  @Query("SELECT COALESCE(MAX(m.roomId), 0) FROM Message m")
+  Long findLastRoomId();
+
   public List<Message> findBySender(String sender);
 
   public List<Message> findByReceiver(String receiver);

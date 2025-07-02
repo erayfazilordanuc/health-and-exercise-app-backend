@@ -35,6 +35,15 @@ public class MessageService {
         return messages.size() > 0;
     }
 
+    public Long isRoomExistBySenderAndReceiver(String sender, String receiver) {
+        List<Message> messages = messageRepo.findBySenderAndReceiver(sender, receiver);
+        return messages.size() > 0 ? messages.get(0).getRoomId() : 0;
+    }
+
+    public Long getLastRoomId() {
+        return messageRepo.findLastRoomId();
+    }
+
     public Message getMessageById(Long id) {
         Optional<Message> optionalMessage = messageRepo.findById(id);
         if (!optionalMessage.isPresent()) {
@@ -60,7 +69,7 @@ public class MessageService {
     }
 
     public List<Message> getMessagesBySenderAndReceiver(String sender, String receiver) {
-        List<Message> messages = messageRepo.findByReceiver(receiver);
+        List<Message> messages = messageRepo.findBySenderAndReceiver(sender, receiver);
         return messages;
     }
 }

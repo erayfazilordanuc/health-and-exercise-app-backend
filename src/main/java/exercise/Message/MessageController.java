@@ -4,18 +4,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.util.List;
-import java.util.Objects;
-
-import javax.management.RuntimeErrorException;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import exercise.Message.dtos.MessageDTO;
 import exercise.Message.entities.Message;
 import exercise.Message.services.MessageService;
-import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
 
 @RestController
@@ -42,9 +34,21 @@ public class MessageController {
   }
 
   @GetMapping("/exists/room/id/{id}")
-  public boolean isRoomExist(@PathVariable Long id) {
+  public Boolean isRoomExist(@PathVariable Long id) {
     Boolean isRoomExist = messageService.isRoomExist(id);
     return isRoomExist;
+  }
+
+  @GetMapping("/exists/room/sender/{sender}/receiver/{receiver}")
+  public Long isRoomExistBySenderAndReceiver(@PathVariable String sender, @PathVariable String receiver) {
+    Long isRoomExist = messageService.isRoomExistBySenderAndReceiver(sender, receiver);
+    return isRoomExist;
+  }
+
+  @GetMapping("/room/next-id")
+  public Long getNextRoomId() {
+    Long lastRoomId = messageService.getLastRoomId();
+    return lastRoomId + 1;
   }
 
   @GetMapping("/id/{id}")
