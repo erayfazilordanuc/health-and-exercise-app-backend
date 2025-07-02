@@ -35,7 +35,7 @@ public class MessageController {
   @Autowired
   public MessageService messageService;
 
-  @GetMapping("/id/{id}")
+  @PutMapping("/id/{id}")
   public Message save(@RequestBody MessageDTO messageDTO) {
     Message message = messageService.save(messageDTO);
     return message;
