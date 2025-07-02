@@ -36,32 +36,59 @@ public class MessageController {
   public MessageService messageService;
 
   @PutMapping("/id/{id}")
-  public Message save(@RequestBody MessageDTO messageDTO) {
+  public Message save(@RequestBody MessageDTO messageDTO, @AuthenticationPrincipal User user) {
     Message message = messageService.save(messageDTO);
     return message;
   }
 
+  @GetMapping("/exists/room/id/{id}")
+  public boolean isRoomExist(@PathVariable Long id) {
+    Boolean isRoomExist = messageService.isRoomExist(id);
+    return isRoomExist;
+  }
+
   @GetMapping("/id/{id}")
-  public Message getById(@PathVariable Long id) {
+  public Message getById(@PathVariable Long id, @AuthenticationPrincipal User user) {
     Message message = messageService.getMessageById(id);
+    if (!(message.getSender().equals(user.getUsername()) || message.getReceiver()
+        .equals(user.getUsername()))) {
+      throw new RuntimeException("You can not get someone else's message");
+    }
     return message;
   }
 
   @GetMapping("/room/id/{id}")
-  public List<Message> getByRoomId(@PathVariable Long id) {
+  public List<Message> getByRoomId(@PathVariable Long id, @AuthenticationPrincipal User user) {
     List<Message> messages = messageService.getMessagesByRoomId(id);
+    if (messages.size() > 0 && !(messages.get(0).getSender().equals(user.getUsername()) || messages.get(0).getReceiver()
+        .equals(user.getUsername()))) {
+      throw new RuntimeException("You can not get someone else's messages");
+    }
     return messages;
   }
 
-  @GetMapping("/sender/{sender}")
-  public List<Message> getBySender(@PathVariable String sender) {
-    List<Message> messages = messageService.getMessagesBySender(sender);
-    return messages;
-  }
+  // @GetMapping("/sender/{sender}")
+  // public List<Message> getBySender(@PathVariable String sender,
+  // @AuthenticationPrincipal User user) {
+  // List<Message> messages = messageService.getMessagesBySender(sender);
+  // return messages;
+  // }
 
-  @GetMapping("/receiver/{receiver}")
-  public List<Message> getByReceiver(@PathVariable String receiver) {
-    List<Message> messages = messageService.getMessagesBySender(receiver);
+  // @GetMapping("/receiver/{receiver}")
+  // public List<Message> getByReceiver(@PathVariable String receiver,
+  // @AuthenticationPrincipal User user) {
+  // List<Message> messages = messageService.getMessagesByReceiver(receiver);
+  // return messages;
+  // }
+
+  @GetMapping("/sender/{sender}/receiver/{receiver}")
+  public List<Message> getBySenderAndReceiver(@PathVariable String sender, @PathVariable String receiver,
+      @AuthenticationPrincipal User user) {
+    List<Message> messages = messageService.getMessagesBySenderAndReceiver(sender, receiver);
+    if (messages.size() > 0 && !(messages.get(0).getSender().equals(user.getUsername()) || messages.get(0).getReceiver()
+        .equals(user.getUsername()))) {
+      throw new RuntimeException("You can not get someone else's messages");
+    }
     return messages;
   }
 }

@@ -24,13 +24,15 @@ public class MessageService {
     @Autowired
     private MessageMapper messageMapper;
 
-    @Autowired
-    private UserRepository userRepo;
-
     public Message save(MessageDTO messageDTO) {
         Message message = new Message(messageDTO);
         Message savedMessage = messageRepo.save(message);
         return savedMessage;
+    }
+
+    public Boolean isRoomExist(Long id) {
+        List<Message> messages = messageRepo.findByRoomId(id);
+        return messages.size() > 0;
     }
 
     public Message getMessageById(Long id) {
@@ -53,6 +55,11 @@ public class MessageService {
     }
 
     public List<Message> getMessagesByReceiver(String receiver) {
+        List<Message> messages = messageRepo.findByReceiver(receiver);
+        return messages;
+    }
+
+    public List<Message> getMessagesBySenderAndReceiver(String sender, String receiver) {
         List<Message> messages = messageRepo.findByReceiver(receiver);
         return messages;
     }
