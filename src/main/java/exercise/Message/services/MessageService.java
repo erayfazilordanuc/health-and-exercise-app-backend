@@ -1,8 +1,11 @@
 package exercise.Message.services;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,8 +40,13 @@ public class MessageService {
     }
 
     public Long isRoomExistBySenderAndReceiver(String sender, String receiver) {
-        List<Message> messages = messageRepo.findBySenderAndReceiver(sender, receiver);
-        return messages.size() > 0 ? messages.get(0).getRoomId() : 0;
+        // Sender ve receiver yer değiştirip iki kez sorgu yapılır
+        // ki iki kullanıcının odası bulunsun
+        List<Message> messagesPrimary = messageRepo.findBySenderAndReceiver(sender, receiver);
+        if (messagesPrimary.size() > 0)
+            return messagesPrimary.get(0).getRoomId();
+        List<Message> messagesSecondary = messageRepo.findBySenderAndReceiver(receiver, sender);
+        return messagesSecondary.size() > 0 ? messagesSecondary.get(0).getRoomId() : 0;
     }
 
     public Long getLastRoomId() {
@@ -70,8 +78,13 @@ public class MessageService {
     }
 
     public List<Message> getMessagesBySenderAndReceiver(String sender, String receiver) {
-        List<Message> messages = messageRepo.findBySenderAndReceiver(sender, receiver);
-        return messages;
+        List<Message> messagesPrimary = messageRepo.findBySenderAndReceiver(sender, receiver);
+        List<Message> messagesSecondary = messageRepo.findBySenderAndReceiver(receiver, sender);
+
+        List<Message> combinedSortedMessages = Stream.concat(messagesPrimary.stream(), messagesSecondary.stream())
+                .sorted(Comparator.comparing(Message::getCreatedAt))
+                .collect(Collectors.toList());
+        return combinedSortedMessages;
     }
 
     public void delete(Long id, User user) {
