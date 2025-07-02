@@ -30,7 +30,7 @@ import exercise.User.entities.User;
 
 @RestController
 @RequestMapping("api/groups")
-@Tags(value = @Tag(name = "Groups Operations"))
+@Tags(value = @Tag(name = "Group Operations"))
 public class GroupController {
 
   @Autowired

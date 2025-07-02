@@ -28,7 +28,7 @@ import exercise.User.services.UserService;
 
 @RestController
 @RequestMapping("api/users")
-@Tags(value = @Tag(name = "Users Operations"))
+@Tags(value = @Tag(name = "User Operations"))
 public class UserController {
 
     @Autowired
