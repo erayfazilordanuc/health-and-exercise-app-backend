@@ -1,5 +1,7 @@
 package exercise.Message.dtos;
 
+import java.sql.Timestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,4 +31,6 @@ public class MessageDTO {
 
   @NotNull
   private Long roomId;
+
+  private Timestamp createdAt;
 }

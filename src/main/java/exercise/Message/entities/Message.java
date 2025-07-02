@@ -1,8 +1,10 @@
 package exercise.Message.entities;
 
+import java.sql.Timestamp;
 import java.util.Objects;
 
 import org.checkerframework.checker.units.qual.C;
+import org.hibernate.annotations.CreationTimestamp;
 
 import exercise.Message.dtos.MessageDTO;
 import jakarta.persistence.Column;
@@ -40,6 +42,10 @@ public class Message {
     @Column(nullable = false)
     private Long roomId;
 
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Timestamp createdAt;
+
     public Message(
             MessageDTO messageDTO) {
         this.id = Objects.isNull(messageDTO.getId()) ? null : messageDTO.getId();
@@ -47,5 +53,6 @@ public class Message {
         this.sender = messageDTO.getSender();
         this.receiver = messageDTO.getReceiver();
         this.roomId = messageDTO.getRoomId();
+        this.createdAt = Objects.isNull(messageDTO.getCreatedAt()) ? null : messageDTO.getCreatedAt();
     }
 }
