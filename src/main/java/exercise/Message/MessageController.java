@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -27,7 +29,7 @@ public class MessageController {
   @Autowired
   public MessageService messageService;
 
-  @PutMapping("/id/{id}")
+  @PutMapping
   public Message save(@RequestBody MessageDTO messageDTO, @AuthenticationPrincipal User user) {
     Message message = messageService.save(messageDTO);
     return message;
@@ -95,4 +97,11 @@ public class MessageController {
     }
     return messages;
   }
+
+  @DeleteMapping("/id/{id}")
+  public ResponseEntity<?> save(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    messageService.delete(id, user);
+    return ResponseEntity.ok().build();
+  }
+
 }

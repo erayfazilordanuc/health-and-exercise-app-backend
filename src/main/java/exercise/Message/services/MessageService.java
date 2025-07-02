@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import exercise.Message.dtos.MessageDTO;
@@ -71,5 +72,19 @@ public class MessageService {
     public List<Message> getMessagesBySenderAndReceiver(String sender, String receiver) {
         List<Message> messages = messageRepo.findBySenderAndReceiver(sender, receiver);
         return messages;
+    }
+
+    public void delete(Long id, User user) {
+        Optional<Message> optionalMessage = messageRepo.findById(id);
+        if (!optionalMessage.isPresent()) {
+            throw new RuntimeException("Message not found with this id");
+        } else {
+            Message message = optionalMessage.get();
+            if (!(message.getSender().equals(user.getUsername()) || message.getReceiver()
+                    .equals(user.getUsername()))) {
+                throw new RuntimeException("You can not get someone else's message");
+            }
+            messageRepo.delete(message);
+        }
     }
 }
