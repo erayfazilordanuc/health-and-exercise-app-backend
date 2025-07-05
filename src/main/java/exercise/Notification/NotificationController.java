@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import exercise.Notification.dtos.NotificationDTO;
 import exercise.Notification.entities.FCMTokenDTO;
 import exercise.Notification.services.NotificationService;
 import exercise.User.entities.User;
@@ -30,5 +31,11 @@ public class NotificationController {
         if (!token.getUserId().equals(user.getId()))
             throw new BadCredentialsException("You can not create fcm token for someone else");
         return notificationService.createFCMToken(token);
+    }
+
+    @PostMapping("/send")
+    public ResponseEntity<?> sendNotification(@RequestBody NotificationDTO notificationDTO,
+            @AuthenticationPrincipal User user) {
+        return null;
     }
 }
