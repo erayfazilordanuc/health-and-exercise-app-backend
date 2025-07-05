@@ -2,6 +2,8 @@ package exercise.Notification.services;
 
 import java.util.List;
 
+import javax.management.RuntimeErrorException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -67,6 +69,9 @@ public class NotificationService {
     List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
 
     Long roomId = messageService.isRoomExistBySenderAndReceiver(sender.getUsername(), receiver.getUsername());
+
+    if (roomId == 0)
+      throw new RuntimeException("Room not found");
 
     fcmTokens.stream().forEach(token -> {
       try {
