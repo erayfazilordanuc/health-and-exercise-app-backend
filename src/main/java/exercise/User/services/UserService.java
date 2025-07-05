@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import exercise.User.dtos.UserDTO;
+import exercise.Notification.repositories.FCMTokenRepository;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.mappers.UserMapper;
@@ -22,6 +23,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private FCMTokenRepository fcmTokenRepo;
 
     public UserDTO getUserDTO(User user) {
         UserDTO userDTO = userMapper.entityToDTO(user);
