@@ -1,5 +1,7 @@
 package exercise.Notification.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -62,28 +64,30 @@ public class NotificationService {
 
   public ResponseEntity<?> sendNotification(NotificationDTO notificationDTO, User sender) {
     User receiver = userRepo.findByUsername(notificationDTO.getReceiver());
-    FCMToken fcmToken = fcmTokenRepo.findByUserId(receiver.getId());
+    List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
 
     Long roomId = messageService.isRoomExistBySenderAndReceiver(sender.getUsername(), receiver.getUsername());
 
-    try {
-      Message message = Message.builder()
-          .setToken(fcmToken.getToken())
-          .setNotification(Notification.builder()
-              .setTitle(receiver.getFullName() + " kullanıcısından gelen mesaj")
-              .setBody(notificationDTO.getMessage())
-              .build())
-          .putData("screen", "Chat")
-          .putData("roomId", roomId.toString())
-          .putData("sender", sender.getUsername())
-          .build();
+    fcmTokens.stream().forEach(token -> {
+      try {
+        Message message = Message.builder()
+            .setToken(token.getToken())
+            .setNotification(Notification.builder()
+                .setTitle(receiver.getFullName() + " kullanıcısından gelen mesaj")
+                .setBody(notificationDTO.getMessage())
+                .build())
+            .putData("screen", "Chat")
+            .putData("roomId", roomId.toString())
+            .putData("sender", sender.getUsername())
+            .build();
 
-      String response = FirebaseMessaging.getInstance().send(message);
-      System.out.println("✅ Successfully sent message: " + response);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new RuntimeException("❌ Error sending FCM message", e);
-    }
+        String response = FirebaseMessaging.getInstance().send(message);
+        System.out.println("✅ Successfully sent notification message to token " + token.getToken() + ": " + response);
+      } catch (Exception e) {
+        System.err.println("❌ Failed to send notification to token " + token.getToken());
+        e.printStackTrace();
+      }
+    });
 
     return ResponseEntity.ok("Notification sent");
   }
