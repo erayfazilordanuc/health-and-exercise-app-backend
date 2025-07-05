@@ -38,7 +38,7 @@ public class NotificationController {
     @PostMapping("/send")
     public ResponseEntity<?> sendNotification(@RequestBody NotificationDTO notificationDTO,
             @AuthenticationPrincipal User user) {
-        ResponseEntity response = notificationService.sendNotification(notificationDTO);
+        ResponseEntity response = notificationService.sendNotification(notificationDTO, user);
         return response;
     }
 }

@@ -9,6 +9,7 @@ import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import com.google.firebase.messaging.Notification;
 
+import exercise.Message.services.MessageService;
 import exercise.Notification.dtos.NotificationDTO;
 import exercise.Notification.entities.FCMToken;
 import exercise.Notification.entities.FCMTokenDTO;
@@ -24,6 +25,9 @@ public class NotificationService {
 
   @Autowired
   private UserRepository userRepo;
+
+  @Autowired
+  public MessageService messageService;
 
   public ResponseEntity<?> createFCMToken(FCMTokenDTO tokenDTO) {
     boolean isValid = testSend(tokenDTO.getToken());
@@ -56,18 +60,22 @@ public class NotificationService {
     }
   }
 
-  public ResponseEntity<?> sendNotification(NotificationDTO notificationDTO) {
-    User user = userRepo.findByUsername(notificationDTO.getReceiver());
-    FCMToken fcmToken = fcmTokenRepo.findByUserId(user.getId());
+  public ResponseEntity<?> sendNotification(NotificationDTO notificationDTO, User sender) {
+    User receiver = userRepo.findByUsername(notificationDTO.getReceiver());
+    FCMToken fcmToken = fcmTokenRepo.findByUserId(receiver.getId());
+
+    Long roomId = messageService.isRoomExistBySenderAndReceiver(sender.getUsername(), receiver.getUsername());
 
     try {
       Message message = Message.builder()
           .setToken(fcmToken.getToken())
           .setNotification(Notification.builder()
-              .setTitle(user.getFullName() + "")
+              .setTitle(receiver.getFullName() + " kullanıcısından gelen mesaj")
               .setBody(notificationDTO.getMessage())
               .build())
-          // .putData("extraKey", "extraValue") // opsiyonel data payload
+          .putData("screen", "Chat")
+          .putData("roomId", roomId.toString())
+          .putData("sender", sender.getUsername())
           .build();
 
       String response = FirebaseMessaging.getInstance().send(message);
