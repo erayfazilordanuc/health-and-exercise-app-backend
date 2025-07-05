@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.rpc.context.AttributeContext.Response;
+
 import exercise.Notification.dtos.NotificationDTO;
 import exercise.Notification.entities.FCMTokenDTO;
 import exercise.Notification.services.NotificationService;
@@ -36,6 +38,7 @@ public class NotificationController {
     @PostMapping("/send")
     public ResponseEntity<?> sendNotification(@RequestBody NotificationDTO notificationDTO,
             @AuthenticationPrincipal User user) {
-        return null;
+        ResponseEntity response = notificationService.sendNotification(notificationDTO);
+        return response;
     }
 }

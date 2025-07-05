@@ -77,6 +77,6 @@ public class NotificationService {
       throw new RuntimeException("❌ Error sending FCM message", e);
     }
 
-    return null;
+    return ResponseEntity.ok("Notification sent");
   }
 }
