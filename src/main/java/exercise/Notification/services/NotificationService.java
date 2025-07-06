@@ -1,6 +1,7 @@
 package exercise.Notification.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
 
@@ -15,6 +16,7 @@ import com.google.firebase.messaging.Notification;
 
 import exercise.Message.services.MessageService;
 import exercise.Notification.dtos.NotificationDTO;
+import exercise.Notification.entities.DeleteFCMTokenDTO;
 import exercise.Notification.entities.FCMToken;
 import exercise.Notification.entities.FCMTokenDTO;
 import exercise.Notification.repositories.FCMTokenRepository;
@@ -95,5 +97,15 @@ public class NotificationService {
     });
 
     return ResponseEntity.ok("Notification sent");
+  }
+
+  public ResponseEntity<?> deleteFCMToken(DeleteFCMTokenDTO tokenDTO) {
+    List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(tokenDTO.getUserId());
+    List<FCMToken> tokensToDelete = fcmTokens.stream()
+        .filter(token -> tokenDTO.getPlatform().equalsIgnoreCase(token.getPlatform()))
+        .collect(Collectors.toList());
+
+    fcmTokenRepo.deleteAll(tokensToDelete);
+    return ResponseEntity.ok("Tokens deleted");
   }
 }

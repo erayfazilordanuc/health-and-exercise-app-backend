@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.rpc.context.AttributeContext.Response;
 
 import exercise.Notification.dtos.NotificationDTO;
+import exercise.Notification.entities.DeleteFCMTokenDTO;
 import exercise.Notification.entities.FCMTokenDTO;
 import exercise.Notification.services.NotificationService;
 import exercise.User.entities.User;
@@ -40,5 +42,13 @@ public class NotificationController {
             @AuthenticationPrincipal User user) {
         ResponseEntity response = notificationService.sendNotification(notificationDTO, user);
         return response;
+    }
+
+    @DeleteMapping("/user/fcm-token")
+    public ResponseEntity<?> deleteFcmTokenByUserAndPlatform(@RequestBody DeleteFCMTokenDTO tokenDTO,
+            @AuthenticationPrincipal User user) {
+        if (!tokenDTO.getUserId().equals(user.getId()))
+            throw new BadCredentialsException("You can not create fcm token for someone else");
+        return notificationService.deleteFCMToken(tokenDTO);
     }
 }
