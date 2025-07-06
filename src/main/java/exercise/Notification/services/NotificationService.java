@@ -80,7 +80,7 @@ public class NotificationService {
         Message message = Message.builder()
             .setToken(token.getToken())
             .setNotification(Notification.builder()
-                .setTitle(receiver.getFullName() + " kullanıcısından gelen mesaj")
+                .setTitle(receiver.getFullName()/* + " kullanıcısından gelen mesaj" */)
                 .setBody(notificationDTO.getMessage())
                 .build())
             .putData("screen", "Chat")
