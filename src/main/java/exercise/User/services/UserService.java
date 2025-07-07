@@ -45,7 +45,7 @@ public class UserService implements UserDetailsService {
         }
 
         if (user.getRole().equals("ROLE_ADMIN")) {
-            return userMapper.entityToDTO(user);
+            return userMapper.entityToDTO(targetUser);
         }
 
         return null;
@@ -58,7 +58,7 @@ public class UserService implements UserDetailsService {
         }
 
         if (user.getRole().equals("ROLE_ADMIN")) {
-            return userMapper.entityToDTO(user);
+            return userMapper.entityToDTO(targetUser);
         }
 
         return null;
