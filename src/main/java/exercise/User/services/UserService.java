@@ -38,14 +38,30 @@ public class UserService implements UserDetailsService {
         return userDTO;
     }
 
-    public UserDTO getPublicUserDTO(Long id, User requestUser) {
-        User user = userRepo.findById(id).get();
+    public UserDTO getPublicUserDTO(Long id, User user) {
+        User targetUser = userRepo.findById(id).get();
         if (user.getRole().equals("ROLE_USER")) {
-            if (requestUser.getRole().equals("ROLE_USER"))
-                throw new RuntimeException("You can not view other user's info");
+            return new UserDTO(targetUser);
         }
-        UserDTO userDTO = userMapper.entityToDTO(user);
-        return userDTO;
+
+        if (user.getRole().equals("ROLE_ADMIN")) {
+            return userMapper.entityToDTO(user);
+        }
+
+        return null;
+    }
+
+    public UserDTO getPublicUserDTO(String username, User user) {
+        User targetUser = userRepo.findByUsername(username);
+        if (user.getRole().equals("ROLE_USER")) {
+            return new UserDTO(targetUser);
+        }
+
+        if (user.getRole().equals("ROLE_ADMIN")) {
+            return userMapper.entityToDTO(user);
+        }
+
+        return null;
     }
 
     public List<UserDTO> getUsersByGroupId(Long id) {

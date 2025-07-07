@@ -61,12 +61,29 @@ public class UserController {
         return userDTOs;
     }
 
-    @Tag(name = "Admin Operations")
-    @PreAuthorize("hasRole('ADMIN')")
+    // @Tag(name = "Admin Operations")
+    // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/id/{id}")
     @Transactional(readOnly = true)
-    public UserDTO getById(@PathVariable Long id) {
-        UserDTO userDTO = userService.getUserDTO(id);
+    public UserDTO getById(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        UserDTO userDTO = userService.getPublicUserDTO(id, user);
+        if (user.getRole().equals("ROLE_USER")) {
+            userDTO.setEmail(null);
+            userDTO.setGroupId(null);
+            userDTO.setRole(null);
+        }
+        return userDTO;
+    }
+
+    @GetMapping("/{username}")
+    @Transactional(readOnly = true)
+    public UserDTO getByUsername(@PathVariable String username, @AuthenticationPrincipal User user) {
+        UserDTO userDTO = userService.getPublicUserDTO(username, user);
+        if (user.getRole().equals("ROLE_USER")) {
+            userDTO.setEmail(null);
+            userDTO.setGroupId(null);
+            userDTO.setRole(null);
+        }
         return userDTO;
     }
 
