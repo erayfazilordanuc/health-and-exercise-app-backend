@@ -41,8 +41,8 @@ public class MessageController {
     return isRoomExist;
   }
 
-  @GetMapping("/exists/room/sender/{sender}/receiver/{receiver}")
-  public Long isRoomExistBySenderAndReceiver(@PathVariable String sender, @PathVariable String receiver) {
+  @GetMapping("/room/sender/{sender}/receiver/{receiver}")
+  public Long getRoomBySenderAndReceiver(@PathVariable String sender, @PathVariable String receiver) {
     Long isRoomExist = messageService.isRoomExistBySenderAndReceiver(sender, receiver);
     return isRoomExist;
   }
