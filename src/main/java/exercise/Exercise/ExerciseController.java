@@ -25,7 +25,7 @@ public class ExerciseController {
   @Autowired
   private ExerciseService exerciseService;
 
-  // @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public Exercise createExercise(@ModelAttribute CreateExerciseDTO exerciseDTO) throws IOException {
     Exercise exercise = exerciseService.create(exerciseDTO);
