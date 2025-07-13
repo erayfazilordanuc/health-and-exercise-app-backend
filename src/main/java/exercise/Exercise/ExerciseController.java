@@ -2,6 +2,7 @@ package exercise.Exercise;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import exercise.Exercise.dtos.CreateExerciseDTO;
@@ -21,6 +22,7 @@ public class ExerciseController {
   @Autowired
   private ExerciseService exerciseService;
 
+  // TO DO add preAuthorization
   // @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public Exercise createExercise(@ModelAttribute CreateExerciseDTO exerciseDTO) throws IOException {
@@ -49,5 +51,11 @@ public class ExerciseController {
   public ResponseEntity<Void> deleteExercise(@PathVariable Long id) throws IOException {
     exerciseService.delete(id);
     return ResponseEntity.noContent().build();
+  }
+
+  // @PreAuthorize("hasRole('ADMIN')")
+  @DeleteMapping("/object")
+  public void deleteObject(@PathVariable String objectUrl) throws IOException {
+    exerciseService.deleteObject(objectUrl);
   }
 }

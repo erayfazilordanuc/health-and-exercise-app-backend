@@ -53,7 +53,8 @@ public class ExerciseService {
     return savedExercise;
   }
 
-  public Exercise uploadVideo(Long exerciseId, MultipartFile[] videoFiles) {
+  public Exercise uploadObject(Long exerciseId, MultipartFile[] objectFiles) {
+    // TO DO video ise videos, image ise images keyi altına kaydetsin
     // Set<String> existingFileNames = existExercise.getVideos().stream()
     // .map(video -> {
     // String url = video.getVideoUrl();
@@ -78,7 +79,7 @@ public class ExerciseService {
     return null;
   }
 
-  public Exercise deleteVideo(Long exerciseId, String videoUrl) {
+  public Exercise deleteObject(Long exerciseId, String objectUrl) {
     // Set<String> existingFileNames = existExercise.getVideos().stream()
     // .map(video -> {
     // String url = video.getVideoUrl();
@@ -127,5 +128,9 @@ public class ExerciseService {
         });
 
     exerciseRepo.delete(exercise);
+  }
+
+  public void deleteObject(String objectUrl) throws IOException {
+    s3Service.deleteObject(objectUrl);
   }
 }
