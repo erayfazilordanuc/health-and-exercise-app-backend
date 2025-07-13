@@ -54,6 +54,13 @@ auth:
     usernames: ${auth.admin.usernames}
     emails: ${auth.admin.emails}
 
+aws:
+  accessKeyId: ${aws.accessKeyId}
+  secretKey: ${aws.secretKey}
+  region: ${aws.region}
+  s3:
+    bucket: ${aws.s3.bucket}
+
 swagger:
   server:
     local:

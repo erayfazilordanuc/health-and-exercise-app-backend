@@ -32,6 +32,8 @@ public class UserDTO {
 
     private Long groupId;
 
+    private Integer points;
+
     public UserDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
@@ -39,5 +41,6 @@ public class UserDTO {
         this.fullName = user.getFullName();
         this.role = user.getRole();
         this.groupId = user.getGroupId();
+        this.points = user.getPoints();
     }
 }

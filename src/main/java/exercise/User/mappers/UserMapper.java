@@ -24,14 +24,15 @@ public class UserMapper {
 
     public User DTOToEntity(UserDTO userDTO, User user) {
         User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(), userDTO.getFullName(),
-                passwordEncoder.encode(user.getPassword()), userDTO.getGroupId());
+                passwordEncoder.encode(user.getPassword()), userDTO.getGroupId(), userDTO.getPoints());
 
         return userEntity;
     }
 
     public User updateDTOToEntity(UpdateUserDTO userDTO, User user) {
         User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(), userDTO.getFullName(),
-                /* passwordEncoder.encode(userDTO.getPassword()) */user.getPassword(), userDTO.getGroupId());
+                /* passwordEncoder.encode(userDTO.getPassword()) */user.getPassword(), userDTO.getGroupId(),
+                userDTO.getPoints());
 
         return userEntity;
     }

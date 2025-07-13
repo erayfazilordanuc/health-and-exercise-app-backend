@@ -52,6 +52,9 @@ public class User implements UserDetails {
     @Column
     private Long groupId;
 
+    @Column
+    private Integer points;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role));
@@ -82,12 +85,13 @@ public class User implements UserDetails {
             String email,
             String fullName,
             String password,
-            Long groupId) {
+            Long groupId, Integer points) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.fullName = fullName;
         this.password = password;
         this.groupId = groupId;
+        this.points = points;
     }
 }

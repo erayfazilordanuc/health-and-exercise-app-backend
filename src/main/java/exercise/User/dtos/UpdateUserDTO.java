@@ -28,11 +28,14 @@ public class UpdateUserDTO {
 
     private Long groupId;
 
+    private Integer points;
+
     public UpdateUserDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
         this.fullName = user.getFullName();
         this.groupId = user.getGroupId();
+        this.points = user.getPoints();
     }
 }
