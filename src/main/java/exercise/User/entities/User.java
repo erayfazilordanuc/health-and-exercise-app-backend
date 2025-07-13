@@ -10,11 +10,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import exercise.Exercise.entities.Achievement;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -52,8 +55,8 @@ public class User implements UserDetails {
     @Column
     private Long groupId;
 
-    @Column
-    private Integer points;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Achievement> achievements;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -85,13 +88,13 @@ public class User implements UserDetails {
             String email,
             String fullName,
             String password,
-            Long groupId, Integer points) {
+            Long groupId, List<Achievement> achievements) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.fullName = fullName;
         this.password = password;
         this.groupId = groupId;
-        this.points = points;
+        this.achievements = achievements;
     }
 }

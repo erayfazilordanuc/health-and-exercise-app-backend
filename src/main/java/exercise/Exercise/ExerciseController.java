@@ -2,20 +2,16 @@ package exercise.Exercise;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.entities.Exercise;
-import exercise.Exercise.repositories.ExerciseRepository;
 import exercise.Exercise.services.ExerciseService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/exercises")
@@ -25,7 +21,7 @@ public class ExerciseController {
   @Autowired
   private ExerciseService exerciseService;
 
-  @PreAuthorize("hasRole('ADMIN')")
+  // @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public Exercise createExercise(@ModelAttribute CreateExerciseDTO exerciseDTO) throws IOException {
     Exercise exercise = exerciseService.create(exerciseDTO);

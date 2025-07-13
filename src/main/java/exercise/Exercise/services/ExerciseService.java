@@ -1,27 +1,20 @@
 package exercise.Exercise.services;
 
 import java.io.IOException;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.entities.Exercise;
+import exercise.Exercise.entities.ExerciseVideo;
 import exercise.Exercise.repositories.ExerciseRepository;
-import exercise.User.dtos.UserDTO;
-import exercise.User.entities.User;
-import exercise.User.repositories.UserRepository;
 
 @Service
 public class ExerciseService {
@@ -33,13 +26,81 @@ public class ExerciseService {
   private S3Service s3Service;
 
   public Exercise create(CreateExerciseDTO exerciseDTO) throws IOException {
-    String videoUrl = s3Service.uploadObject(exerciseDTO.getVideoFile(), "videos");
-
-    Exercise newExercise = new Exercise(null, exerciseDTO.getName(), videoUrl,
-        exerciseDTO.getPoint(), null, null);
-
+    Exercise newExercise = new Exercise(null, exerciseDTO.getName(), exerciseDTO.getDescription(),
+        exerciseDTO.getPoint(), null, null, null);
     Exercise savedExercise = exerciseRepo.save(newExercise);
+
+    List<ExerciseVideo> videos = Arrays.stream(exerciseDTO.getVideoFiles())
+        .map(file -> {
+          try {
+            String videoUrl = s3Service.uploadObject(file, "videos");
+            return new ExerciseVideo(null, videoUrl, savedExercise);
+          } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+          }
+        })
+        .collect(Collectors.toList());
+    savedExercise.setVideos(videos);
+
+    Exercise savedExerciseWithVideo = exerciseRepo.save(savedExercise);
+
+    return savedExerciseWithVideo;
+  }
+
+  public Exercise update(Exercise updatedExercise) {
+    Exercise savedExercise = exerciseRepo.save(updatedExercise);
     return savedExercise;
+  }
+
+  public Exercise uploadVideo(Long exerciseId, MultipartFile[] videoFiles) {
+    // Set<String> existingFileNames = existExercise.getVideos().stream()
+    // .map(video -> {
+    // String url = video.getVideoUrl();
+    // return url.substring(url.lastIndexOf('/') + 1);
+    // })
+    // .collect(Collectors.toSet());
+
+    // List<ExerciseVideo> videos = Arrays.stream(exerciseDTO
+    // .getVideoFiles())
+    // .map(file -> {
+    // String originalFilename = file.getOriginalFilename();
+    // if (!existingFileNames.contains(originalFilename)) {
+    // String videoUrl = s3Service.uploadObject(file, "videos");
+    // return new ExerciseVideo(null, videoUrl, existExercise);
+    // }
+    // })
+    // .collect(Collectors.toList());
+
+    // Exercise newExercise = new Exercise(exerciseDTO);
+
+    // Exercise savedExercise = exerciseRepo.save(exerciseDTO);
+    return null;
+  }
+
+  public Exercise deleteVideo(Long exerciseId, String videoUrl) {
+    // Set<String> existingFileNames = existExercise.getVideos().stream()
+    // .map(video -> {
+    // String url = video.getVideoUrl();
+    // return url.substring(url.lastIndexOf('/') + 1);
+    // })
+    // .collect(Collectors.toSet());
+
+    // List<ExerciseVideo> videos = Arrays.stream(exerciseDTO
+    // .getVideoFiles())
+    // .map(file -> {
+    // String originalFilename = file.getOriginalFilename();
+    // if (!existingFileNames.contains(originalFilename)) {
+    // String videoUrl = s3Service.uploadObject(file, "videos");
+    // return new ExerciseVideo(null, videoUrl, existExercise);
+    // }
+    // })
+    // .collect(Collectors.toList());
+
+    // Exercise newExercise = new Exercise(exerciseDTO);
+
+    // Exercise savedExercise = exerciseRepo.save(exerciseDTO);
+    return null;
   }
 
   public List<Exercise> getAll() {
@@ -52,19 +113,19 @@ public class ExerciseService {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found"));
   }
 
-  public Exercise update(Exercise updatedExercise) {
-    Exercise savedExercise = exerciseRepo.save(updatedExercise);
-    return savedExercise;
-  }
-
   public void delete(Long id) throws IOException {
     Exercise exercise = exerciseRepo.findById(id)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + id));
 
-    // S3'ten videoyu sil
-    s3Service.deleteObject(exercise.getVideoUrl());
+    exercise.getVideos().stream()
+        .forEach(video -> {
+          try {
+            s3Service.deleteObject(video.getVideoUrl());
+          } catch (IOException e) {
+            e.printStackTrace();
+          }
+        });
 
-    // DB'den kaydı sil
     exerciseRepo.delete(exercise);
   }
 }

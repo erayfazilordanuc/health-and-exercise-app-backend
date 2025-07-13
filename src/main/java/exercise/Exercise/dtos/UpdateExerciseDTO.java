@@ -14,14 +14,16 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateExerciseDTO {
+public class UpdateExerciseDTO {
+
+  @NotNull
+  private Long id;
 
   @NotNull
   private String name;
 
   private String description;
 
-  @NotNull
   private Integer point;
 
   @NotNull

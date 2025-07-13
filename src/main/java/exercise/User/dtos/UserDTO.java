@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import exercise.Exercise.dtos.AchievementDTO;
+import exercise.Exercise.entities.Achievement;
 import exercise.Symptoms.dtos.SymptomsDTO;
 import exercise.Symptoms.entities.Symptoms;
 import exercise.User.entities.User;
@@ -32,7 +34,7 @@ public class UserDTO {
 
     private Long groupId;
 
-    private Integer points;
+    private List<AchievementDTO> achievements = new ArrayList<>();
 
     public UserDTO(User user) {
         this.id = user.getId();
@@ -41,6 +43,5 @@ public class UserDTO {
         this.fullName = user.getFullName();
         this.role = user.getRole();
         this.groupId = user.getGroupId();
-        this.points = user.getPoints();
     }
 }

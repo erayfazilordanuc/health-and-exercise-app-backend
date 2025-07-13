@@ -33,7 +33,6 @@ public class UserController {
     // @Tag(name = "Users - GET Operations")
     @GetMapping("/me")
     // @Cacheable("user") // Is related to RedisCache
-    @Transactional(readOnly = true)
     public UserDTO getMe(@AuthenticationPrincipal User user) {
         UserDTO userDTO = userService.getUserDTO(user);
         return userDTO;
@@ -80,7 +79,9 @@ public class UserController {
     public UserDTO getByUsername(@PathVariable String username, @AuthenticationPrincipal User user) {
         UserDTO userDTO = userService.getPublicUserDTO(username, user);
         if (user.getRole().equals("ROLE_USER")) {
-            userDTO.setEmail(null);
+            if (userDTO.getRole().equals("ROLE_USER")) {
+                userDTO.setEmail(null);
+            }
             userDTO.setGroupId(null);
             userDTO.setRole(null);
         }
