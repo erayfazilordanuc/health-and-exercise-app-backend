@@ -10,6 +10,11 @@ spring:
     username: ${spring.datasource.username}
     password: ${spring.datasource.password}
 
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
   jackson:
     time-zone: Europe/Istanbul
 

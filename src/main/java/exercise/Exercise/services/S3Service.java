@@ -24,6 +24,7 @@ import exercise.User.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
@@ -36,7 +37,7 @@ public class S3Service {
   private String bucket;
 
   public String uploadObject(MultipartFile file, String folder) throws IOException {
-    String key = folder + file.getOriginalFilename();
+    String key = folder + "/" + file.getOriginalFilename();
 
     s3Client.putObject(
         PutObjectRequest.builder()
@@ -49,4 +50,14 @@ public class S3Service {
     return "https://" + bucket + ".s3.eu-central-1.amazonaws.com/" + key;
   }
 
+  public void deleteObject(String objectUrl) throws IOException {
+    String bucketUrl = "https://" + bucket + ".s3.eu-central-1.amazonaws.com/";
+    String key = objectUrl.replace(bucketUrl, "");
+
+    s3Client.deleteObject(
+        DeleteObjectRequest.builder()
+            .bucket(bucket)
+            .key(key)
+            .build());
+  }
 }
