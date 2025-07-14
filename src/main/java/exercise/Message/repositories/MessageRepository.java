@@ -24,4 +24,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
   public List<Message> findByReceiver(String receiver);
 
   public List<Message> findBySenderAndReceiver(String sender, String receiver);
+
+  @Query("SELECT m FROM Message m WHERE (m.sender = :sender AND m.receiver = :receiver) OR (m.sender = :receiver AND m.receiver = :sender) ORDER BY m.createdAt DESC")
+  List<Message> findBySenderAndReceiverOrderByCreatedAtDesc(String sender, String receiver);
 }

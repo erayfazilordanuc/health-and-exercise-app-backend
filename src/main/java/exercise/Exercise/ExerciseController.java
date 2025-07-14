@@ -33,11 +33,6 @@ public class ExerciseController {
     return exercise;
   }
 
-  @PostMapping("/{id}/achievement")
-  public Achievement completeExercise(@PathVariable Long id, @AuthenticationPrincipal User user) {
-    return null;
-  }
-
   @GetMapping
   public List<Exercise> getAllExercises() {
     return exerciseService.getAll();
@@ -61,12 +56,14 @@ public class ExerciseController {
     return ResponseEntity.noContent().build();
   }
 
+  // @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/{id}/objects")
   public ResponseEntity<Exercise> uploadObjectToExercise(@RequestBody Exercise updatedExercise) {
     Exercise exercise = exerciseService.update(updatedExercise);
     return ResponseEntity.ok(exercise);
   }
 
+  // @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}/objects/{objectUrl}")
   public ResponseEntity<Void> deleteObjectFromExercise(@PathVariable Long id,
       @PathVariable String objectUrl) throws IOException {
@@ -79,4 +76,10 @@ public class ExerciseController {
   public void deleteObject(@PathVariable String objectUrl) throws IOException {
     exerciseService.deleteObject(objectUrl);
   }
+
+  @PostMapping("/{id}/achievement")
+  public Achievement completeExercise(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    return null;
+  }
+
 }

@@ -87,6 +87,11 @@ public class MessageService {
         return combinedSortedMessages;
     }
 
+    public Message getLastMessageBySenderAndReceiver(String sender, String receiver) {
+        List<Message> messages = messageRepo.findBySenderAndReceiverOrderByCreatedAtDesc(sender, receiver);
+        return messages.isEmpty() ? null : messages.get(0);
+    }
+
     public void delete(Long id, User user) {
         Optional<Message> optionalMessage = messageRepo.findById(id);
         if (!optionalMessage.isPresent()) {

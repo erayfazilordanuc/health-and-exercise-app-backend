@@ -98,6 +98,17 @@ public class MessageController {
     return messages;
   }
 
+  @GetMapping("/sender/{sender}/receiver/{receiver}/last")
+  public Message getLastBySenderAndReceiver(@PathVariable String sender, @PathVariable String receiver,
+      @AuthenticationPrincipal User user) {
+    Message lastMessage = messageService.getLastMessageBySenderAndReceiver(sender, receiver);
+    if (!(lastMessage.getSender().equals(user.getUsername()) || lastMessage.getReceiver()
+        .equals(user.getUsername()))) {
+      throw new RuntimeException("You can not get someone else's messages");
+    }
+    return lastMessage;
+  }
+
   @DeleteMapping("/id/{id}")
   public ResponseEntity<?> save(@PathVariable Long id, @AuthenticationPrincipal User user) {
     messageService.delete(id, user);
