@@ -57,19 +57,19 @@ public class UserMapper {
                                 userDTO.getFullName(),
                                 /* passwordEncoder.encode(userDTO.getPassword()) */user.getPassword(),
                                 userDTO.getGroupId(),
-                                null);
+                                user.getAchievements());
 
-                List<Achievement> achievements = userDTO.getAchievementDTOs().stream()
-                                .map(aDto -> {
-                                        Achievement achievement = new Achievement();
-                                        achievement.setId(aDto.getId());
-                                        achievement.setUser(userEntity);
-                                        achievement.setExercise(exerciseRepo.findById(aDto.getExerciseId())
-                                                        .orElseThrow(() -> new RuntimeException("Exercise not found")));
-                                        return achievement;
-                                })
-                                .collect(Collectors.toList());
-                userEntity.setAchievements(achievements);
+                // List<Achievement> achievements = userDTO.getAchievementDTOs().stream()
+                // .map(aDto -> {
+                // Achievement achievement = new Achievement();
+                // achievement.setId(aDto.getId());
+                // achievement.setUser(userEntity);
+                // achievement.setExercise(exerciseRepo.findById(aDto.getExerciseId())
+                // .orElseThrow(() -> new RuntimeException("Exercise not found")));
+                // return achievement;
+                // })
+                // .collect(Collectors.toList());
+                // userEntity.setAchievements(achievements);
 
                 return userEntity;
         }

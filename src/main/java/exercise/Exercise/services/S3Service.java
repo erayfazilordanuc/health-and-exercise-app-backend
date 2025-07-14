@@ -36,8 +36,8 @@ public class S3Service {
   @Value("${aws.s3.bucket}")
   private String bucket;
 
-  public String uploadObject(MultipartFile file, String folder) throws IOException {
-    String key = folder + "/" + file.getOriginalFilename();
+  public String uploadObject(Long exerciseId, MultipartFile file, String folder) throws IOException {
+    String key = folder + "/" + exerciseId + "_" + file.getOriginalFilename();
 
     s3Client.putObject(
         PutObjectRequest.builder()

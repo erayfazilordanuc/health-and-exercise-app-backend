@@ -3,6 +3,7 @@ package exercise.Exercise.services;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,8 +34,9 @@ public class ExerciseService {
     List<ExerciseVideo> videos = Arrays.stream(exerciseDTO.getVideoFiles())
         .map(file -> {
           try {
-            String videoUrl = s3Service.uploadObject(file, "videos");
-            return new ExerciseVideo(null, videoUrl, savedExercise);
+            // TO DO burada videos a kaydetmesin herşeyi
+            String fileUrl = s3Service.uploadObject(savedExercise.getId(), file, "videos");
+            return new ExerciseVideo(null, fileUrl, savedExercise);
           } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -53,55 +55,58 @@ public class ExerciseService {
     return savedExercise;
   }
 
-  public Exercise uploadObject(Long exerciseId, MultipartFile[] objectFiles) {
-    // TO DO video ise videos, image ise images keyi altına kaydetsin
-    // Set<String> existingFileNames = existExercise.getVideos().stream()
-    // .map(video -> {
-    // String url = video.getVideoUrl();
-    // return url.substring(url.lastIndexOf('/') + 1);
-    // })
-    // .collect(Collectors.toSet());
+  public Exercise uploadObjectToExercise(Long exerciseId, MultipartFile[] objectFiles) throws IOException {
+    Exercise exercise = exerciseRepo.findById(exerciseId)
+        .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
-    // List<ExerciseVideo> videos = Arrays.stream(exerciseDTO
-    // .getVideoFiles())
-    // .map(file -> {
-    // String originalFilename = file.getOriginalFilename();
-    // if (!existingFileNames.contains(originalFilename)) {
-    // String videoUrl = s3Service.uploadObject(file, "videos");
-    // return new ExerciseVideo(null, videoUrl, existExercise);
-    // }
-    // })
-    // .collect(Collectors.toList());
+    Set<String> existingFileNames = exercise.getVideos().stream()
+        .map(video -> {
+          String url = video.getVideoUrl();
+          return url.substring(url.lastIndexOf('/') + 1);
+        })
+        .collect(Collectors.toSet());
 
-    // Exercise newExercise = new Exercise(exerciseDTO);
+    for (MultipartFile file : objectFiles) {
+      String originalFilename = file.getOriginalFilename();
+      if (originalFilename != null && existingFileNames.contains(originalFilename)) {
+        System.out.println("File already exists: " + originalFilename);
+        continue;
+      }
 
-    // Exercise savedExercise = exerciseRepo.save(exerciseDTO);
-    return null;
+      String fileUrl = s3Service.uploadObject(exerciseId, file, "videos");
+
+      ExerciseVideo newVideo = new ExerciseVideo(null, fileUrl, exercise);
+
+      exercise.getVideos().add(newVideo);
+    }
+
+    return exerciseRepo.save(exercise);
   }
 
-  public Exercise deleteObject(Long exerciseId, String objectUrl) {
-    // Set<String> existingFileNames = existExercise.getVideos().stream()
-    // .map(video -> {
-    // String url = video.getVideoUrl();
-    // return url.substring(url.lastIndexOf('/') + 1);
-    // })
-    // .collect(Collectors.toSet());
+  public Exercise deleteObjectFromExercise(Long exerciseId, String objectUrl) throws IOException {
+    Exercise exercise = exerciseRepo.findById(exerciseId)
+        .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
-    // List<ExerciseVideo> videos = Arrays.stream(exerciseDTO
-    // .getVideoFiles())
-    // .map(file -> {
-    // String originalFilename = file.getOriginalFilename();
-    // if (!existingFileNames.contains(originalFilename)) {
-    // String videoUrl = s3Service.uploadObject(file, "videos");
-    // return new ExerciseVideo(null, videoUrl, existExercise);
-    // }
-    // })
-    // .collect(Collectors.toList());
+    Set<String> existingFileNames = exercise.getVideos().stream()
+        .map(video -> {
+          String url = video.getVideoUrl();
+          return url.substring(url.lastIndexOf('/') + 1);
+        })
+        .collect(Collectors.toSet());
 
-    // Exercise newExercise = new Exercise(exerciseDTO);
+    if (existingFileNames.contains(objectUrl)) {
+      s3Service.deleteObject(objectUrl);
+    }
 
-    // Exercise savedExercise = exerciseRepo.save(exerciseDTO);
-    return null;
+    List<ExerciseVideo> updatedVideos = exercise.getVideos().stream()
+        .filter(video -> {
+          return !video.getVideoUrl().equals(objectUrl);
+        })
+        .collect(Collectors.toList());
+
+    exercise.setVideos(updatedVideos);
+
+    return exerciseRepo.save(exercise);
   }
 
   public List<Exercise> getAll() {

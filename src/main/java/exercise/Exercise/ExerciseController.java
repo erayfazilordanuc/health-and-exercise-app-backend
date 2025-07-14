@@ -3,11 +3,14 @@ package exercise.Exercise;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import exercise.Exercise.dtos.CreateExerciseDTO;
+import exercise.Exercise.entities.Achievement;
 import exercise.Exercise.entities.Exercise;
 import exercise.Exercise.services.ExerciseService;
+import exercise.User.entities.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
@@ -30,6 +33,11 @@ public class ExerciseController {
     return exercise;
   }
 
+  @PostMapping("/{id}/achievement")
+  public Achievement completeExercise(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    return null;
+  }
+
   @GetMapping
   public List<Exercise> getAllExercises() {
     return exerciseService.getAll();
@@ -49,6 +57,19 @@ public class ExerciseController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteExercise(@PathVariable Long id) throws IOException {
+    exerciseService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/{id}/objects")
+  public ResponseEntity<Exercise> uploadObjectToExercise(@RequestBody Exercise updatedExercise) {
+    Exercise exercise = exerciseService.update(updatedExercise);
+    return ResponseEntity.ok(exercise);
+  }
+
+  @DeleteMapping("/{id}/objects/{objectUrl}")
+  public ResponseEntity<Void> deleteObjectFromExercise(@PathVariable Long id,
+      @PathVariable String objectUrl) throws IOException {
     exerciseService.delete(id);
     return ResponseEntity.noContent().build();
   }
