@@ -1,5 +1,6 @@
 package exercise.Exercise.dtos;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -30,4 +31,6 @@ public class ExerciseDTO {
   private List<ExerciseVideo> videos;
 
   private Long admin_id;
+
+  private Timestamp createdAt;
 }

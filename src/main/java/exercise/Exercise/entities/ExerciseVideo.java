@@ -1,5 +1,9 @@
 package exercise.Exercise.entities;
 
+import java.sql.Timestamp;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -35,4 +39,8 @@ public class ExerciseVideo {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "exercise_id")
   private Exercise exercise;
+
+  @CreationTimestamp
+  @Column(updatable = false)
+  private Timestamp createdAt;
 }

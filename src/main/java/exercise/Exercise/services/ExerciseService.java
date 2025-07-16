@@ -88,7 +88,7 @@ public class ExerciseService {
     if (!existExercise.getAdmin().getId().equals(user.getId()))
       throw new RuntimeException("You can not delete exercise for someone else");
 
-    ExerciseVideo newVideo = new ExerciseVideo(null, videoUrl, existExercise);
+    ExerciseVideo newVideo = new ExerciseVideo(null, videoUrl, existExercise, null);
 
     List<String> videoUrls = existExercise.getVideos().stream().map(ExerciseVideo::getVideoUrl)
         .collect(Collectors.toList());
