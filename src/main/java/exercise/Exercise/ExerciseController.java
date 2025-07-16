@@ -47,7 +47,7 @@ public class ExerciseController {
   // TO DO add preAuthorization
   // @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
-  public ExerciseDTO createExercise(@ModelAttribute CreateExerciseDTO exerciseDTO,
+  public ExerciseDTO createExercise(@RequestBody CreateExerciseDTO exerciseDTO,
       @AuthenticationPrincipal User user) throws IOException {
     ExerciseDTO savedExerciseDTO = exerciseService.create(exerciseDTO, user);
     return savedExerciseDTO;
