@@ -18,6 +18,7 @@ public class ExerciseMapper {
         exercise.getPoint(),
         exercise.getVideos(),
         exercise.getAdmin().getId(),
-        exercise.getCreatedAt());
+        exercise.getCreatedAt(),
+        exercise.getUpdatedAt());
   }
 }

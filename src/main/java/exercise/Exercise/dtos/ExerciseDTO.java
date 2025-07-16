@@ -30,7 +30,8 @@ public class ExerciseDTO {
 
   private List<ExerciseVideo> videos;
 
-  private Long admin_id;
+  private Long adminId;
 
   private Timestamp createdAt;
+  private Timestamp updatedAt;
 }
