@@ -45,8 +45,8 @@ public class ExerciseService {
         .toList();
   }
 
-  public Exercise getById(Long id) {
-    return exerciseRepo.findById(id)
+  public ExerciseDTO getById(Long id) {
+    return exerciseRepo.findById(id).map(exerciseMapper::entityToDto)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found"));
   }
 

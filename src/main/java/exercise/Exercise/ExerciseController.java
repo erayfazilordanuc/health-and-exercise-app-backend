@@ -34,8 +34,8 @@ public class ExerciseController {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Exercise> getExerciseById(@PathVariable Long id) {
-    Exercise exercise = exerciseService.getById(id);
+  public ResponseEntity<ExerciseDTO> getExerciseById(@PathVariable Long id) {
+    ExerciseDTO exercise = exerciseService.getById(id);
     return ResponseEntity.ok(exercise);
   }
 
