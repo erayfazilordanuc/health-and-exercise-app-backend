@@ -1,6 +1,7 @@
 package exercise.Exercise.services;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -13,9 +14,15 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import exercise.Exercise.dtos.CreateExerciseDTO;
+import exercise.Exercise.dtos.ExerciseDTO;
+import exercise.Exercise.dtos.UpdateExerciseDTO;
 import exercise.Exercise.entities.Exercise;
 import exercise.Exercise.entities.ExerciseVideo;
+import exercise.Exercise.mappers.ExerciseMapper;
 import exercise.Exercise.repositories.ExerciseRepository;
+import exercise.User.entities.User;
+import exercise.User.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ExerciseService {
@@ -24,66 +31,84 @@ public class ExerciseService {
   private ExerciseRepository exerciseRepo;
 
   @Autowired
+  private UserRepository userRepo;
+
+  @Autowired
   private S3Service s3Service;
 
-  public Exercise create(CreateExerciseDTO exerciseDTO) throws IOException {
+  @Autowired
+  private ExerciseMapper exerciseMapper;
+
+  public List<ExerciseDTO> getAll() {
+    return exerciseRepo.findAll().stream()
+        .map(exerciseMapper::entityToDto)
+        .toList();
+  }
+
+  public Exercise getById(Long id) {
+    return exerciseRepo.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found"));
+  }
+
+  @Transactional
+  public ExerciseDTO create(CreateExerciseDTO exerciseDTO, User admin) throws IOException {
+    User adminWithAchievements = userRepo.findById(admin.getId()).get();
     Exercise newExercise = new Exercise(null, exerciseDTO.getName(), exerciseDTO.getDescription(),
-        exerciseDTO.getPoint(), null, null, null);
+        exerciseDTO.getPoint(), null, adminWithAchievements, null, null);
+
     Exercise savedExercise = exerciseRepo.save(newExercise);
 
-    List<ExerciseVideo> videos = Arrays.stream(exerciseDTO.getVideoFiles())
-        .map(file -> {
-          try {
-            // TO DO burada videos a kaydetmesin herşeyi
-            String fileUrl = s3Service.uploadObject(savedExercise.getId(), file, "videos");
-            return new ExerciseVideo(null, fileUrl, savedExercise);
-          } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-          }
-        })
-        .collect(Collectors.toList());
-    savedExercise.setVideos(videos);
+    ExerciseDTO savedExerciseDTO = exerciseMapper.entityToDto(savedExercise);
 
-    Exercise savedExerciseWithVideo = exerciseRepo.save(savedExercise);
-
-    return savedExerciseWithVideo;
+    return savedExerciseDTO;
   }
 
-  public Exercise update(Exercise updatedExercise) {
-    Exercise savedExercise = exerciseRepo.save(updatedExercise);
-    return savedExercise;
-  }
-
-  public Exercise uploadObjectToExercise(Long exerciseId, MultipartFile[] objectFiles) throws IOException {
-    Exercise exercise = exerciseRepo.findById(exerciseId)
+  public ExerciseDTO update(Long exerciseId, UpdateExerciseDTO updatedExerciseDTO, User user) {
+    Exercise existExercise = exerciseRepo.findById(exerciseId)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
-    Set<String> existingFileNames = exercise.getVideos().stream()
-        .map(video -> {
-          String url = video.getVideoUrl();
-          return url.substring(url.lastIndexOf('/') + 1);
-        })
-        .collect(Collectors.toSet());
+    if (!existExercise.getAdmin().getId().equals(user.getId()))
+      throw new RuntimeException("You can not delete exercise for someone else");
 
-    for (MultipartFile file : objectFiles) {
-      String originalFilename = file.getOriginalFilename();
-      if (originalFilename != null && existingFileNames.contains(originalFilename)) {
-        System.out.println("File already exists: " + originalFilename);
-        continue;
-      }
+    existExercise.setName(updatedExerciseDTO.getName());
+    existExercise.setDescription(updatedExerciseDTO.getDescription());
+    existExercise.setPoint(updatedExerciseDTO.getPoint());
 
-      String fileUrl = s3Service.uploadObject(exerciseId, file, "videos");
+    Exercise savedExercise = exerciseRepo.save(existExercise);
 
-      ExerciseVideo newVideo = new ExerciseVideo(null, fileUrl, exercise);
+    ExerciseDTO savedExerciseDTO = exerciseMapper.entityToDto(savedExercise);
 
-      exercise.getVideos().add(newVideo);
+    return savedExerciseDTO;
+  }
+
+  public ExerciseDTO addVideo(Long exerciseId, String videoUrl, User user) {
+    Exercise existExercise = exerciseRepo.findById(exerciseId)
+        .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
+
+    if (!existExercise.getAdmin().getId().equals(user.getId()))
+      throw new RuntimeException("You can not delete exercise for someone else");
+
+    ExerciseVideo newVideo = new ExerciseVideo(null, videoUrl, existExercise);
+
+    List<String> videoUrls = existExercise.getVideos().stream().map(ExerciseVideo::getVideoUrl)
+        .collect(Collectors.toList());
+
+    if (videoUrls.contains(newVideo.getVideoUrl())) {
+      new RuntimeException("Video is already exist in exercise");
     }
 
-    return exerciseRepo.save(exercise);
+    Exercise savedExercise = exerciseRepo.save(existExercise);
+
+    ExerciseDTO savedExerciseDTO = exerciseMapper.entityToDto(savedExercise);
+
+    return savedExerciseDTO;
   }
 
-  public Exercise deleteObjectFromExercise(Long exerciseId, String objectUrl) throws IOException {
+  public String getPresignedUrl(Long exerciseId, String fileName, String folder) {
+    return s3Service.generatePresignedUploadUrl(exerciseId, fileName, folder, Duration.ofMinutes(15));
+  }
+
+  public Exercise deleteVideo(Long exerciseId, String videoUrl) throws IOException {
     Exercise exercise = exerciseRepo.findById(exerciseId)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
@@ -94,13 +119,13 @@ public class ExerciseService {
         })
         .collect(Collectors.toSet());
 
-    if (existingFileNames.contains(objectUrl)) {
-      s3Service.deleteObject(objectUrl);
+    if (existingFileNames.contains(videoUrl)) {
+      s3Service.deleteObject(videoUrl);
     }
 
     List<ExerciseVideo> updatedVideos = exercise.getVideos().stream()
         .filter(video -> {
-          return !video.getVideoUrl().equals(objectUrl);
+          return !video.getVideoUrl().equals(videoUrl);
         })
         .collect(Collectors.toList());
 
@@ -109,17 +134,7 @@ public class ExerciseService {
     return exerciseRepo.save(exercise);
   }
 
-  public List<Exercise> getAll() {
-    List<Exercise> exercises = exerciseRepo.findAll();
-    return exercises;
-  }
-
-  public Exercise getById(Long id) {
-    return exerciseRepo.findById(id)
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found"));
-  }
-
-  public void delete(Long id) throws IOException {
+  public void delete(Long id, User user) throws IOException {
     Exercise exercise = exerciseRepo.findById(id)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + id));
 
@@ -133,9 +148,5 @@ public class ExerciseService {
         });
 
     exerciseRepo.delete(exercise);
-  }
-
-  public void deleteObject(String objectUrl) throws IOException {
-    s3Service.deleteObject(objectUrl);
   }
 }

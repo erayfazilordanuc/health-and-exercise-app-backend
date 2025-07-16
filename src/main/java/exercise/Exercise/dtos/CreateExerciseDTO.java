@@ -23,8 +23,4 @@ public class CreateExerciseDTO {
 
   @NotNull
   private Integer point;
-
-  @NotNull
-  @NotEmpty
-  private MultipartFile[] videoFiles;
 }

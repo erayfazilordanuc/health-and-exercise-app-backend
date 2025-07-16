@@ -7,8 +7,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import exercise.Exercise.dtos.CreateExerciseDTO;
+import exercise.Exercise.dtos.ExerciseDTO;
+import exercise.Exercise.dtos.UpdateExerciseDTO;
 import exercise.Exercise.entities.Achievement;
 import exercise.Exercise.entities.Exercise;
+import exercise.Exercise.entities.ExerciseVideo;
 import exercise.Exercise.services.ExerciseService;
 import exercise.User.entities.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,16 +28,8 @@ public class ExerciseController {
   @Autowired
   private ExerciseService exerciseService;
 
-  // TO DO add preAuthorization
-  // @PreAuthorize("hasRole('ADMIN')")
-  @PostMapping
-  public Exercise createExercise(@ModelAttribute CreateExerciseDTO exerciseDTO) throws IOException {
-    Exercise exercise = exerciseService.create(exerciseDTO);
-    return exercise;
-  }
-
   @GetMapping
-  public List<Exercise> getAllExercises() {
+  public List<ExerciseDTO> getAllExercises() {
     return exerciseService.getAll();
   }
 
@@ -44,42 +39,59 @@ public class ExerciseController {
     return ResponseEntity.ok(exercise);
   }
 
-  @PutMapping("/{id}")
-  public ResponseEntity<Exercise> updateExercise(@RequestBody Exercise updatedExercise) {
-    Exercise exercise = exerciseService.update(updatedExercise);
-    return ResponseEntity.ok(exercise);
-  }
-
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteExercise(@PathVariable Long id) throws IOException {
-    exerciseService.delete(id);
-    return ResponseEntity.noContent().build();
-  }
-
-  // @PreAuthorize("hasRole('ADMIN')")
-  @PostMapping("/{id}/objects")
-  public ResponseEntity<Exercise> uploadObjectToExercise(@RequestBody Exercise updatedExercise) {
-    Exercise exercise = exerciseService.update(updatedExercise);
-    return ResponseEntity.ok(exercise);
-  }
-
-  // @PreAuthorize("hasRole('ADMIN')")
-  @DeleteMapping("/{id}/objects/{objectUrl}")
-  public ResponseEntity<Void> deleteObjectFromExercise(@PathVariable Long id,
-      @PathVariable String objectUrl) throws IOException {
-    exerciseService.delete(id);
-    return ResponseEntity.noContent().build();
-  }
-
-  // @PreAuthorize("hasRole('ADMIN')")
-  @DeleteMapping("/object")
-  public void deleteObject(@PathVariable String objectUrl) throws IOException {
-    exerciseService.deleteObject(objectUrl);
-  }
-
   @PostMapping("/{id}/achievement")
   public Achievement completeExercise(@PathVariable Long id, @AuthenticationPrincipal User user) {
     return null;
   }
 
+  // TO DO add preAuthorization
+  // @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping
+  public ExerciseDTO createExercise(@ModelAttribute CreateExerciseDTO exerciseDTO,
+      @AuthenticationPrincipal User user) throws IOException {
+    ExerciseDTO savedExerciseDTO = exerciseService.create(exerciseDTO, user);
+    return savedExerciseDTO;
+  }
+
+  // @PreAuthorize("hasRole('ADMIN')")
+  @PutMapping("/{id}")
+  public ResponseEntity<ExerciseDTO> updateExercise(@PathVariable Long id,
+      @RequestBody UpdateExerciseDTO updateExerciseDTO,
+      @AuthenticationPrincipal User user) {
+    ExerciseDTO savedExerciseDTO = exerciseService.update(id, updateExerciseDTO, user);
+    return ResponseEntity.ok(savedExerciseDTO);
+  }
+
+  // @PreAuthorize("hasRole('ADMIN')")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deleteExercise(@PathVariable Long id,
+      @AuthenticationPrincipal User user) throws IOException {
+    exerciseService.delete(id, user);
+    return ResponseEntity.noContent().build();
+  }
+
+  @GetMapping("/{id}/videos/presign")
+  public String presignVideo(@PathVariable("id") Long exerciseId,
+      @RequestParam String fileName,
+      @AuthenticationPrincipal User user) {
+    return exerciseService.getPresignedUrl(exerciseId, fileName, "videos");
+  }
+
+  // @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/{id}/videos")
+  public ResponseEntity<ExerciseDTO> addVideoToExercise(@PathVariable Long exerciseId,
+      @RequestBody String videoUrl,
+      @AuthenticationPrincipal User user) {
+    ExerciseDTO exerciseDTO = exerciseService.addVideo(exerciseId, videoUrl, user);
+    return ResponseEntity.ok(exerciseDTO);
+  }
+
+  // @PreAuthorize("hasRole('ADMIN')")
+  @DeleteMapping("/{id}/videos/url/{videoUrl}")
+  public ResponseEntity<Void> deleteVideoFromExercise(@PathVariable Long exerciseId,
+      @PathVariable String videoUrl,
+      @AuthenticationPrincipal User user) throws IOException {
+    exerciseService.deleteVideo(exerciseId, videoUrl);
+    return ResponseEntity.noContent().build();
+  }
 }

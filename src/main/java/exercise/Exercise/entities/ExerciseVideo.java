@@ -34,6 +34,5 @@ public class ExerciseVideo {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "exercise_id")
-  @JsonIgnore
   private Exercise exercise;
 }

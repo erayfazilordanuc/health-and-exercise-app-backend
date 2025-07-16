@@ -1,7 +1,10 @@
 package exercise.Exercise.dtos;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
+import exercise.Exercise.entities.ExerciseVideo;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -14,13 +17,17 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateExerciseDTO {
+public class ExerciseDTO {
 
-  @NotNull
+  private Long id;
+
   private String name;
 
   private String description;
 
-  @NotNull
   private Integer point;
+
+  private List<ExerciseVideo> videos;
+
+  private Long admin_id;
 }
