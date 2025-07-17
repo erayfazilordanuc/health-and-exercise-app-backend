@@ -54,7 +54,7 @@ public class S3Service {
         .bucket(bucket)
         .key(key)
         .contentType(guessContentType(fileName))
-        .acl(ObjectCannedACL.PUBLIC_READ)
+        // .acl(ObjectCannedACL.PUBLIC_READ)
         .build();
 
     PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
