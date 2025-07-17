@@ -87,7 +87,7 @@ public class ExerciseController {
   }
 
   // @PreAuthorize("hasRole('ADMIN')")
-  @DeleteMapping("/{id}/videos/url/{videoUrl}")
+  @DeleteMapping("/{exerciseId}/videos/url/{videoUrl}")
   public ResponseEntity<Void> deleteVideoFromExercise(@PathVariable Long exerciseId,
       @PathVariable String videoUrl,
       @AuthenticationPrincipal User user) throws IOException {
