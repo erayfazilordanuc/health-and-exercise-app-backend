@@ -90,12 +90,18 @@ public class ExerciseService {
 
     ExerciseVideo newVideo = new ExerciseVideo(null, videoUrl, existExercise, null);
 
-    List<String> videoUrls = existExercise.getVideos().stream().map(ExerciseVideo::getVideoUrl)
+    List<ExerciseVideo> exerciseVideos = existExercise.getVideos();
+
+    List<String> videoUrls = exerciseVideos.stream().map(ExerciseVideo::getVideoUrl)
         .collect(Collectors.toList());
 
     if (videoUrls.contains(newVideo.getVideoUrl())) {
-      new RuntimeException("Video is already exist in exercise");
+      throw new RuntimeException("Video is already exist in exercise");
     }
+
+    exerciseVideos.add(newVideo);
+
+    existExercise.setVideos(exerciseVideos);
 
     Exercise savedExercise = exerciseRepo.save(existExercise);
 
