@@ -39,6 +39,7 @@ public class ExerciseService {
   @Autowired
   private ExerciseMapper exerciseMapper;
 
+  // TO DO burada exerciseDTO içindeki exerciseVideos artık exerciseVideoDTO olarak dönsün
   public List<ExerciseDTO> getAll() {
     return exerciseRepo.findAll().stream()
         .map(exerciseMapper::entityToDto)

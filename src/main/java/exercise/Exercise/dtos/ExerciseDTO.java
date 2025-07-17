@@ -28,7 +28,7 @@ public class ExerciseDTO {
 
   private Integer point;
 
-  private List<ExerciseVideo> videos;
+  private List<ExerciseVideoDTO> videos;
 
   private Long adminId;
 
