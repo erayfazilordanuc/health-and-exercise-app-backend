@@ -78,7 +78,7 @@ public class ExerciseController {
   }
 
   // @PreAuthorize("hasRole('ADMIN')")
-  @PostMapping("/{id}/videos")
+  @PostMapping("/{exerciseId}/videos")
   public ResponseEntity<ExerciseDTO> addVideoToExercise(@PathVariable Long exerciseId,
       @RequestBody String videoUrl,
       @AuthenticationPrincipal User user) {
