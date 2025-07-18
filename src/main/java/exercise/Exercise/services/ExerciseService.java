@@ -39,7 +39,8 @@ public class ExerciseService {
   @Autowired
   private ExerciseMapper exerciseMapper;
 
-  // TO DO burada exerciseDTO içindeki exerciseVideos artık exerciseVideoDTO olarak dönsün
+  // TO DO burada exerciseDTO içindeki exerciseVideos artık exerciseVideoDTO
+  // olarak dönsün
   public List<ExerciseDTO> getAll() {
     return exerciseRepo.findAll().stream()
         .map(exerciseMapper::entityToDto)
@@ -69,7 +70,7 @@ public class ExerciseService {
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
     if (!existExercise.getAdmin().getId().equals(user.getId()))
-      throw new RuntimeException("You can not delete exercise for someone else");
+      throw new RuntimeException("You can not update exercise for someone else");
 
     existExercise.setName(updatedExerciseDTO.getName());
     existExercise.setDescription(updatedExerciseDTO.getDescription());
@@ -87,7 +88,7 @@ public class ExerciseService {
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
     if (!existExercise.getAdmin().getId().equals(user.getId()))
-      throw new RuntimeException("You can not delete exercise for someone else");
+      throw new RuntimeException("You can not add video to an exercise for someone else");
 
     ExerciseVideo newVideo = new ExerciseVideo(null, videoUrl, existExercise, null);
 
@@ -115,9 +116,12 @@ public class ExerciseService {
     return s3Service.generatePresignedUploadUrl(exerciseId, fileName, folder, Duration.ofMinutes(15));
   }
 
-  public Exercise deleteVideo(Long exerciseId, String videoUrl) throws IOException {
+  public Exercise deleteVideo(Long exerciseId, String videoUrl, User user) throws IOException {
     Exercise exercise = exerciseRepo.findById(exerciseId)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
+
+    if (!exercise.getAdmin().getId().equals(user.getId()))
+      throw new RuntimeException("You can not delete video from an exercise for someone else");
 
     Set<String> existingFileNames = exercise.getVideos().stream()
         .map(video -> {
@@ -144,6 +148,9 @@ public class ExerciseService {
   public void delete(Long id, User user) throws IOException {
     Exercise exercise = exerciseRepo.findById(id)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + id));
+
+    if (!exercise.getAdmin().getId().equals(user.getId()))
+      throw new RuntimeException("You can not delete exercise for someone else");
 
     exercise.getVideos().stream()
         .forEach(video -> {

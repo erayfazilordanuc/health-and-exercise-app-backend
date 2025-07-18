@@ -89,11 +89,11 @@ public class ExerciseController {
   }
 
   // @PreAuthorize("hasRole('ADMIN')")
-  @DeleteMapping("/{exerciseId}/videos/url/{videoUrl}")
+  @DeleteMapping("/{exerciseId}/videos")
   public ResponseEntity<Void> deleteVideoFromExercise(@PathVariable Long exerciseId,
-      @PathVariable String videoUrl,
+      @RequestParam String videoUrl,
       @AuthenticationPrincipal User user) throws IOException {
-    exerciseService.deleteVideo(exerciseId, videoUrl);
+    exerciseService.deleteVideo(exerciseId, videoUrl, user);
     return ResponseEntity.noContent().build();
   }
 }
