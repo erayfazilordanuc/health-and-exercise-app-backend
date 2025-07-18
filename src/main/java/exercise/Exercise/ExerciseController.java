@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
+import exercise.Exercise.dtos.NewVideoDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
 import exercise.Exercise.entities.Achievement;
 import exercise.Exercise.entities.Exercise;
@@ -80,9 +81,10 @@ public class ExerciseController {
   // @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/{exerciseId}/videos")
   public ResponseEntity<ExerciseDTO> addVideoToExercise(@PathVariable Long exerciseId,
-      @RequestBody String videoUrl,
+      @RequestBody NewVideoDTO newVideoDTO,
       @AuthenticationPrincipal User user) {
-    ExerciseDTO exerciseDTO = exerciseService.addVideo(exerciseId, videoUrl, user);
+    String cleanedUrl = newVideoDTO.getVideoUrl().replaceAll("^\"|\"$", "");
+    ExerciseDTO exerciseDTO = exerciseService.addVideo(exerciseId, cleanedUrl, user);
     return ResponseEntity.ok(exerciseDTO);
   }
 

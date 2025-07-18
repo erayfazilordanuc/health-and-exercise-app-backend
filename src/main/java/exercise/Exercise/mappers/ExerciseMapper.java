@@ -1,6 +1,8 @@
 package exercise.Exercise.mappers;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Component;
 
@@ -14,7 +16,8 @@ import exercise.Exercise.mappers.ExerciseMapper;
 public class ExerciseMapper {
 
   public ExerciseDTO entityToDto(Exercise exercise) {
-    List<ExerciseVideoDTO> videoDTOs = exercise.getVideos()
+    List<ExerciseVideoDTO> videoDTOs = Optional.ofNullable(exercise.getVideos())
+        .orElse(Collections.emptyList())
         .stream()
         .map(v -> new ExerciseVideoDTO(
             v.getId(),
