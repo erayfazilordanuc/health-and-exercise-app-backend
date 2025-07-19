@@ -45,8 +45,7 @@ public class ExerciseController {
     return null;
   }
 
-  // TO DO add preAuthorization
-  // @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ExerciseDTO createExercise(@RequestBody CreateExerciseDTO exerciseDTO,
       @AuthenticationPrincipal User user) throws IOException {
@@ -54,7 +53,7 @@ public class ExerciseController {
     return savedExerciseDTO;
   }
 
-  // @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{id}")
   public ResponseEntity<ExerciseDTO> updateExercise(@PathVariable Long id,
       @RequestBody UpdateExerciseDTO updateExerciseDTO,
@@ -63,7 +62,7 @@ public class ExerciseController {
     return ResponseEntity.ok(savedExerciseDTO);
   }
 
-  // @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteExercise(@PathVariable Long id,
       @AuthenticationPrincipal User user) throws IOException {
@@ -78,7 +77,7 @@ public class ExerciseController {
     return exerciseService.getPresignedUrl(exerciseId, fileName, "videos");
   }
 
-  // @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/{exerciseId}/videos")
   public ResponseEntity<ExerciseDTO> addVideoToExercise(@PathVariable Long exerciseId,
       @RequestBody NewVideoDTO newVideoDTO,
@@ -88,7 +87,7 @@ public class ExerciseController {
     return ResponseEntity.ok(exerciseDTO);
   }
 
-  // @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{exerciseId}/videos")
   public ResponseEntity<Void> deleteVideoFromExercise(@PathVariable Long exerciseId,
       @RequestParam String videoUrl,
