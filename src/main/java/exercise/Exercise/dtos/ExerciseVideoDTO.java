@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import org.hibernate.annotations.CreationTimestamp;
 
 import exercise.Exercise.entities.Exercise;
+import exercise.Exercise.entities.ExerciseVideo;
 import jakarta.persistence.Column;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -29,4 +30,11 @@ public class ExerciseVideoDTO {
   private Long exerciseId;
 
   private Timestamp createdAt;
+
+  public ExerciseVideoDTO(ExerciseVideo video) {
+    this.id = video.getId();
+    this.videoUrl = video.getVideoUrl();
+    this.exerciseId = video.getExercise().getId();
+    this.createdAt = video.getCreatedAt();
+  }
 }

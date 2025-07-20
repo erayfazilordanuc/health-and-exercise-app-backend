@@ -39,7 +39,7 @@ public class UserMapper {
                                         Achievement a = new Achievement();
                                         a.setId(dto.getId());
                                         a.setUser(user);
-                                        a.setExercise(exerciseRepo.findById(dto.getExerciseId()).get());
+                                        a.setExercise(exerciseRepo.findById(dto.getExerciseDTO().getId()).get());
                                         return a;
                                 })
                                 .collect(Collectors.toList());

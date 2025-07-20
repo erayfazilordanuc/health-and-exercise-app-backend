@@ -18,14 +18,14 @@ public class AchievementDTO {
 
   private Long userId;
 
-  private Long exerciseId;
+  private ExerciseDTO exerciseDTO;
 
   private Timestamp createdAt;
 
   public AchievementDTO(Achievement achievement) {
     this.id = achievement.getId();
     this.userId = achievement.getUser().getId();
-    this.exerciseId = achievement.getExercise().getId();
+    this.exerciseDTO = new ExerciseDTO(achievement.getExercise());
     this.createdAt = achievement.getCreatedAt();
   }
 }
