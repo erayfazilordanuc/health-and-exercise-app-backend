@@ -3,11 +3,13 @@ package exercise.User.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import exercise.User.dtos.UserDTO;
 import exercise.Exercise.dtos.AchievementDTO;
@@ -80,15 +82,9 @@ public class UserService implements UserDetailsService {
         return userDTO;
     }
 
-    @Transactional
     public List<AchievementDTO> getAchievements(Long userId) {
-        User userEntity = userRepo.findById(userId).get();
-        return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
-    }
-
-    @Transactional
-    public List<AchievementDTO> getAchievementsByUserId(Long userId) {
-        User userEntity = userRepo.findById(userId).get();
+        User userEntity = userRepo.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
     }
 
