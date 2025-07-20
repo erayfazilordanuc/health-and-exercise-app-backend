@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import exercise.User.dtos.UserDTO;
+import exercise.Exercise.dtos.AchievementDTO;
+import exercise.Exercise.entities.Achievement;
 import exercise.Notification.repositories.FCMTokenRepository;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
@@ -76,6 +78,12 @@ public class UserService implements UserDetailsService {
         User updatedUser = updateUser(newUserDTO, user);
         UserDTO userDTO = new UserDTO(updatedUser);
         return userDTO;
+    }
+
+    @Transactional
+    public List<AchievementDTO> getAchievements(Long userId) {
+        User userEntity = userRepo.findById(userId).get();
+        return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
     }
 
     public User updateUser(UpdateUserDTO newUserDTO, User user) {

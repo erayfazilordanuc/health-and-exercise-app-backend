@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import exercise.User.dtos.UserDTO;
+import exercise.Exercise.dtos.AchievementDTO;
+import exercise.Exercise.entities.Achievement;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.services.UserService;
@@ -36,6 +38,11 @@ public class UserController {
     public UserDTO getMe(@AuthenticationPrincipal User user) {
         UserDTO userDTO = userService.getUserDTO(user);
         return userDTO;
+    }
+
+    @GetMapping("/me/achievements")
+    public List<AchievementDTO> getAchievement(@AuthenticationPrincipal User user) {
+        return userService.getAchievements(user.getId());
     }
 
     @PutMapping("/me")
@@ -86,6 +93,13 @@ public class UserController {
             userDTO.setRole(null);
         }
         return userDTO;
+    }
+
+    @GetMapping("/{id}/achievements")
+    public List<Achievement> getAchievementByUserId(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        // isteği atan admin değil ise ve seçtiği id kendisininki ile aynı değilse hata
+        // ver
+        return null;
     }
 
     // @PreAuthorize("hasRole('ADMIN')")

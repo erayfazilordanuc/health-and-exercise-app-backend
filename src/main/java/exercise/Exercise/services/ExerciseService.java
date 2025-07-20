@@ -13,12 +13,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.google.api.gax.rpc.AlreadyExistsException;
+
+import exercise.Exercise.dtos.AchievementDTO;
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
+import exercise.Exercise.entities.Achievement;
 import exercise.Exercise.entities.Exercise;
 import exercise.Exercise.entities.ExerciseVideo;
 import exercise.Exercise.mappers.ExerciseMapper;
+import exercise.Exercise.repositories.AchievementRepository;
 import exercise.Exercise.repositories.ExerciseRepository;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
@@ -32,6 +37,9 @@ public class ExerciseService {
 
   @Autowired
   private UserRepository userRepo;
+
+  @Autowired
+  private AchievementRepository achievementRepo;
 
   @Autowired
   private S3Service s3Service;
@@ -81,6 +89,28 @@ public class ExerciseService {
     ExerciseDTO savedExerciseDTO = exerciseMapper.entityToDto(savedExercise);
 
     return savedExerciseDTO;
+  }
+
+  public List<AchievementDTO> completeExercise(Long id, Long userId) {
+    Exercise exercise = exerciseRepo.findById(id)
+        .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + id));
+
+    achievementRepo.findByUserIdAndExerciseId(userId, id)
+        .ifPresent(a -> {
+          throw new RuntimeException("Achievement already exists for user " + userId + " and exercise " + id);
+        });
+
+    User userEntity = userRepo.findById(userId).get();
+
+    Achievement newAchievement = new Achievement(null, userEntity, exercise, null);
+
+    List<Achievement> existAchievements = userEntity.getAchievements();
+    existAchievements.add(newAchievement);
+
+    userEntity.setAchievements(existAchievements);
+    userRepo.save(userEntity);
+
+    return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
   }
 
   public ExerciseDTO addVideo(Long exerciseId, String videoUrl, User user) {

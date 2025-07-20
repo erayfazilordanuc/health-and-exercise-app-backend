@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import exercise.Exercise.dtos.AchievementDTO;
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
 import exercise.Exercise.dtos.NewVideoDTO;
@@ -41,8 +42,9 @@ public class ExerciseController {
   }
 
   @PostMapping("/{id}/achievement")
-  public Achievement completeExercise(@PathVariable Long id, @AuthenticationPrincipal User user) {
-    return null;
+  public List<AchievementDTO> completeExercise(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    List<AchievementDTO> achievements = exerciseService.completeExercise(id, user.getId());
+    return achievements;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
