@@ -96,8 +96,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}/achievements")
-    public List<AchievementDTO> getAchievementByUserId(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        return userService.getAchievementsByUserId(user.getId());
+    public List<AchievementDTO> getAchievementByUserId(@PathVariable Long id) {
+        return userService.getAchievementsByUserId(id);
     }
 
     // @PreAuthorize("hasRole('ADMIN')")
