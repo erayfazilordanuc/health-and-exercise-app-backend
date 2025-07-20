@@ -96,10 +96,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}/achievements")
-    public List<Achievement> getAchievementByUserId(@PathVariable Long id, @AuthenticationPrincipal User user) {
-        // isteği atan admin değil ise ve seçtiği id kendisininki ile aynı değilse hata
-        // ver
-        return null;
+    public List<AchievementDTO> getAchievementByUserId(@PathVariable Long id, @AuthenticationPrincipal User user) {
+        return userService.getAchievementsByUserId(user.getId());
     }
 
     // @PreAuthorize("hasRole('ADMIN')")

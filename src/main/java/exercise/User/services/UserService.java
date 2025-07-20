@@ -86,6 +86,12 @@ public class UserService implements UserDetailsService {
         return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
     }
 
+    @Transactional
+    public List<AchievementDTO> getAchievementsByUserId(Long userId) {
+        User userEntity = userRepo.findById(userId).get();
+        return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
+    }
+
     public User updateUser(UpdateUserDTO newUserDTO, User user) {
         User updatedUser = userMapper.updateDTOToEntity(newUserDTO, user);
 
