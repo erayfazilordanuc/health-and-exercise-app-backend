@@ -1,6 +1,10 @@
 package exercise.Authentication.dtos;
 
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,15 +12,21 @@ import lombok.Setter;
 @Setter
 public class RegisterRequestDTO {
 
-    @NotEmpty
+    @NotNull
     private String username;
 
-    // @NotEmpty It is not necessary due to email existence possibilities
+    // @NotNull It is not necessary due to email existence possibilities
     private String email;
 
-    @NotEmpty
+    @NotNull
     private String fullName;
 
-    @NotEmpty
+    @NotNull
+    private LocalDate birthDate;
+
+    @NotNull
     private String password;
+
+    @NotNull
+    private String gender;
 }

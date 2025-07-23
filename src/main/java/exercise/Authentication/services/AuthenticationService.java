@@ -101,8 +101,8 @@ public class AuthenticationService {
     public AuthResponseDTO registerUserAndGenerateAuthResponseDTO(RegisterRequestDTO registerDTO,
             String role) {
         User user = new User(null, registerDTO.getUsername(), registerDTO.getEmail(),
-                registerDTO.getFullName(),
-                passwordEncoder.encode(registerDTO.getPassword()), role, null, null);
+                registerDTO.getFullName(), registerDTO.getBirthDate(),
+                passwordEncoder.encode(registerDTO.getPassword()), registerDTO.getGender(), role, null, null);
         userRepo.save(user);
 
         String accessToken = "Bearer " +
