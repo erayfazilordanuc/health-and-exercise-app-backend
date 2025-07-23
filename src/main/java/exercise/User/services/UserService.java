@@ -13,8 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import exercise.User.dtos.UserDTO;
 import exercise.Exercise.dtos.AchievementDTO;
-import exercise.Exercise.entities.Achievement;
-import exercise.Notification.repositories.FCMTokenRepository;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.mappers.UserMapper;
@@ -28,9 +26,6 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserMapper userMapper;
-
-    @Autowired
-    private FCMTokenRepository fcmTokenRepo;
 
     @Transactional(readOnly = true)
     public UserDTO getUserDTO(User user) {

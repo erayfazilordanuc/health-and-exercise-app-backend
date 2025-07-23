@@ -6,14 +6,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import exercise.Exercise.dtos.AchievementDTO;
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
+import exercise.Exercise.dtos.ExerciseProgressDTO;
 import exercise.Exercise.dtos.NewVideoDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
-import exercise.Exercise.entities.Achievement;
-import exercise.Exercise.entities.Exercise;
-import exercise.Exercise.entities.ExerciseVideo;
 import exercise.Exercise.services.ExerciseService;
 import exercise.User.entities.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,6 +27,9 @@ public class ExerciseController {
   @Autowired
   private ExerciseService exerciseService;
 
+  // @Autowired
+  // private UserService userService;
+
   @GetMapping
   public List<ExerciseDTO> getAllExercises() {
     return exerciseService.getAll();
@@ -41,11 +41,50 @@ public class ExerciseController {
     return ResponseEntity.ok(exercise);
   }
 
-  @PostMapping("/{id}/achievement")
-  public List<AchievementDTO> completeExercise(@PathVariable Long id, @AuthenticationPrincipal User user) {
-    List<AchievementDTO> achievements = exerciseService.completeExercise(id, user.getId());
-    return achievements;
+  @GetMapping("/daily")
+  public void getTodaysExercise() {
   }
+
+  @GetMapping("/weekly-schedule")
+  public void getExerciseWeeklySchedule() {
+    // Schedule'lar sabit kayıtlı olabilir
+  }
+
+  @GetMapping("/monthly-schedule")
+  public void getExerciseMonthlySchedule() {
+    // ne dönmeli?
+    // pair vs.
+  }
+
+  @PostMapping("/{id}/progress/{progressRatio}")
+  public List<ExerciseProgressDTO> progressExerciseById(@PathVariable Long id, @PathVariable Integer progressRatio,
+      @AuthenticationPrincipal User user) {
+    return null;
+  }
+
+  @GetMapping("/daily/progress")
+  public List<ExerciseProgressDTO> getTodaysTotalExerciseProgressByUserId(@AuthenticationPrincipal User user) {
+    return null;
+  }
+
+  @GetMapping("/{id}/progress")
+  public List<ExerciseProgressDTO> getExerciseProgressById(@PathVariable Long id,
+      @AuthenticationPrincipal User user) {
+    return null;
+  }
+
+  // @PostMapping("/{id}/achievement")
+  // public List<AchievementDTO> completeExercise(@PathVariable Long id,
+  // @AuthenticationPrincipal User user) {
+  // List<AchievementDTO> achievements = exerciseService.completeExercise(id,
+  // user.getId());
+  // return achievements;
+  // }
+
+  // @GetMapping("/{id}/achievements")
+  // public List<AchievementDTO> getAchievementByUserId(@PathVariable Long id) {
+  // return userService.getAchievements(id);
+  // }
 
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping

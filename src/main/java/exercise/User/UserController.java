@@ -6,13 +6,11 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import exercise.User.dtos.UserDTO;
 import exercise.Exercise.dtos.AchievementDTO;
-import exercise.Exercise.entities.Achievement;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.services.UserService;
@@ -88,12 +85,7 @@ public class UserController {
         }
         return userDTO;
     }
-
-    @GetMapping("/{id}/achievements")
-    public List<AchievementDTO> getAchievementByUserId(@PathVariable Long id) {
-        return userService.getAchievements(id);
-    }
-
+    
     // @PreAuthorize("hasRole('ADMIN')")
     // @PutMapping("/id/{id}")
     // public String updateById(@PathVariable Long id, @RequestBody UpdateUserDTO
