@@ -27,6 +27,7 @@ import exercise.Group.entities.Group;
 import exercise.Group.services.GroupService;
 import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
+import exercise.User.services.UserService;
 
 @RestController
 @RequestMapping("api/groups")
@@ -35,6 +36,14 @@ public class GroupController {
 
   @Autowired
   public GroupService groupService;
+
+  @Autowired
+  public UserService userService;
+
+  @PostMapping("/id/{id}/join")
+  public UserDTO joinGroup(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    return userService.joinGroup(id, user);
+  }
 
   @GetMapping
   public List<Group> getAll() {
@@ -58,6 +67,13 @@ public class GroupController {
   public ResponseEntity<UserDTO> getGroupAdmin(@PathVariable Long id) {
     UserDTO admin = groupService.getAdmin(id);
     return ResponseEntity.ok(admin);
+  }
+
+  @GetMapping("/id/{id}/users")
+  @Transactional(readOnly = true)
+  public List<UserDTO> getByGroupId(@PathVariable Long id) {
+    List<UserDTO> userDTOs = userService.getUsersByGroupId(id);
+    return userDTOs;
   }
 
   @Tag(name = "Admin Operations")

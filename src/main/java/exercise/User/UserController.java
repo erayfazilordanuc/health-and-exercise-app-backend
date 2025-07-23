@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,13 +59,6 @@ public class UserController {
         String response = userService.deleteUser(user);
 
         return response;
-    }
-
-    @GetMapping("/group/id/{id}")
-    @Transactional(readOnly = true)
-    public List<UserDTO> getByGroupId(@PathVariable Long id) {
-        List<UserDTO> userDTOs = userService.getUsersByGroupId(id);
-        return userDTOs;
     }
 
     // @Tag(name = "Admin Operations")

@@ -82,6 +82,13 @@ public class UserService implements UserDetailsService {
         return userDTO;
     }
 
+    public UserDTO joinGroup(Long groupId, User user) {
+        user.setGroupId(groupId);
+        User updatedUser = userRepo.save(user);
+        UserDTO userDTO = new UserDTO(updatedUser);
+        return userDTO;
+    }
+
     public List<AchievementDTO> getAchievements(Long userId) {
         User userEntity = userRepo.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
