@@ -153,11 +153,17 @@ public class ExerciseService {
   public ExerciseProgressDTO getExerciseProgress(User user) {
     LocalDateTime start = LocalDate.now().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
-    return new ExerciseProgressDTO(
-        exerciseProgressRepo.findByUserIdAndCreatedAtBetween(
-            user.getId(),
-            Timestamp.valueOf(start),
-            Timestamp.valueOf(end)));
+    ExerciseProgress progress = exerciseProgressRepo.findByUserIdAndCreatedAtBetween(
+        user.getId(),
+        Timestamp.valueOf(start),
+        Timestamp.valueOf(end));
+
+    if (progress == null) {
+      throw new RuntimeException("Belirtilen tarihte kayıt bulunamadı.");
+    }
+
+    return new ExerciseProgressDTO(progress);
+
   }
 
   public ExerciseProgressDTO getExerciseProgress(LocalDate date, User user) {
