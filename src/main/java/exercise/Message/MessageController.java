@@ -102,6 +102,9 @@ public class MessageController {
   public Message getLastBySenderAndReceiver(@PathVariable String sender, @PathVariable String receiver,
       @AuthenticationPrincipal User user) {
     Message lastMessage = messageService.getLastMessageBySenderAndReceiver(sender, receiver);
+    if (lastMessage == null)
+      return null;
+      
     if (!(lastMessage.getSender().equals(user.getUsername()) || lastMessage.getReceiver()
         .equals(user.getUsername()))) {
       throw new RuntimeException("You can not get someone else's messages");
