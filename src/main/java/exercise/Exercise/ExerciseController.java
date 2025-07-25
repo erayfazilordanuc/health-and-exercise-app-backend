@@ -43,6 +43,7 @@ public class ExerciseController {
     return ResponseEntity.ok(exercise);
   }
 
+  // progress dönen endpointlerde exerciseDTO daha basitleştirilebilir gecikme olmaması için
   @PutMapping("/{exerciseId}/progress/{progressRatio}")
   public ExerciseProgressDTO progressExercise(@PathVariable Long exerciseId, @PathVariable Integer progressRatio,
       @AuthenticationPrincipal User user) {
