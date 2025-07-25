@@ -1,5 +1,7 @@
 package exercise.Exercise.repositories;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +15,11 @@ public interface ExerciseProgressRepository extends JpaRepository<ExerciseProgre
 
   public List<ExerciseProgress> findByUserId(Long userId);
 
-  Optional<ExerciseProgress> findByUserIdAndExerciseId(Long userId, Long exerciseId);
+  ExerciseProgress findByUserIdAndExerciseIdAndCreatedAtBetween(
+      Long userId,
+      Long exerciseId,
+      Timestamp startOfDay,
+      Timestamp endOfDay);
 
   boolean existsByUserIdAndExerciseId(Long userId, Long exerciseId);
 }

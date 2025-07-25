@@ -1,8 +1,12 @@
 package exercise.Exercise.services;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -14,12 +18,15 @@ import org.springframework.web.server.ResponseStatusException;
 import exercise.Exercise.dtos.AchievementDTO;
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
+import exercise.Exercise.dtos.ExerciseProgressDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
 import exercise.Exercise.entities.Achievement;
 import exercise.Exercise.entities.Exercise;
+import exercise.Exercise.entities.ExerciseProgress;
 import exercise.Exercise.entities.ExerciseVideo;
 import exercise.Exercise.mappers.ExerciseMapper;
 import exercise.Exercise.repositories.AchievementRepository;
+import exercise.Exercise.repositories.ExerciseProgressRepository;
 import exercise.Exercise.repositories.ExerciseRepository;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
@@ -33,6 +40,9 @@ public class ExerciseService {
 
   @Autowired
   private UserRepository userRepo;
+
+  @Autowired
+  private ExerciseProgressRepository exerciseProgressRepo;
 
   @Autowired
   private AchievementRepository achievementRepo;
@@ -85,6 +95,61 @@ public class ExerciseService {
     ExerciseDTO savedExerciseDTO = exerciseMapper.entityToDto(savedExercise);
 
     return savedExerciseDTO;
+  }
+
+  public ExerciseProgressDTO progressExercise(Long exerciseId, Integer progressRatio, User user) {
+    ExerciseProgress newExerciseProgress = new ExerciseProgress();
+
+    LocalDateTime start = LocalDate.now().atStartOfDay();
+    LocalDateTime end = start.plusDays(1);
+    ExerciseProgress existExerciseProgress = exerciseProgressRepo.findByUserIdAndExerciseIdAndCreatedAtBetween(
+        user.getId(),
+        exerciseId,
+        Timestamp.valueOf(start),
+        Timestamp.valueOf(end));
+
+    if (existExerciseProgress != null) {
+      newExerciseProgress = existExerciseProgress;
+    } else {
+      newExerciseProgress.setUser(user);
+      Exercise exercise = exerciseRepo.findById(exerciseId)
+          .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
+      newExerciseProgress.setExercise(exercise);
+      newExerciseProgress.setProgressRatio(progressRatio);
+    }
+
+    ExerciseProgress savedExerciseProgress = exerciseProgressRepo.save(newExerciseProgress);
+    ExerciseProgressDTO newExerciseProgressDTO = new ExerciseProgressDTO(savedExerciseProgress);
+    return newExerciseProgressDTO;
+  }
+
+  public ExerciseProgressDTO getExerciseProgress(Long exerciseId, User user) {
+    LocalDateTime start = LocalDate.now().atStartOfDay();
+    LocalDateTime end = start.plusDays(1);
+    return new ExerciseProgressDTO(
+        exerciseProgressRepo.findByUserIdAndExerciseIdAndCreatedAtBetween(
+            user.getId(),
+            exerciseId,
+            Timestamp.valueOf(start),
+            Timestamp.valueOf(end)));
+  }
+
+  public ExerciseProgressDTO getExerciseProgress(Long exerciseId, LocalDate date, User user) {
+    LocalDateTime startOfDay = date.atStartOfDay(); // 00:00:00
+    LocalDateTime endOfDay = startOfDay.plusDays(1); // ertesi gün 00:00:00
+
+    ExerciseProgress progress = exerciseProgressRepo
+        .findByUserIdAndExerciseIdAndCreatedAtBetween(
+            user.getId(),
+            exerciseId,
+            Timestamp.valueOf(startOfDay),
+            Timestamp.valueOf(endOfDay));
+
+    if (progress == null) {
+      throw new RuntimeException("Belirtilen tarihte kayıt bulunamadı.");
+    }
+
+    return new ExerciseProgressDTO(progress);
   }
 
   public List<AchievementDTO> completeExercise(Long id, Long userId) {
