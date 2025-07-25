@@ -150,11 +150,50 @@ public class ExerciseService {
     return result;
   }
 
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId) {
+    List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
+    LocalDate today = LocalDate.now();
+    LocalDate monday = today.with(DayOfWeek.MONDAY);
+
+    List<ExerciseProgressDTO> result = new ArrayList<>();
+
+    for (DayOfWeek day : activeDays) {
+      LocalDate targetDate = monday.with(day);
+      LocalDateTime start = targetDate.atStartOfDay();
+      LocalDateTime end = start.plusDays(1);
+
+      ExerciseProgress progress = exerciseProgressRepo
+          .findByUserIdAndCreatedAtBetween(
+              userId,
+              Timestamp.valueOf(start),
+              Timestamp.valueOf(end));
+
+      result.add(progress != null ? new ExerciseProgressDTO(progress) : null);
+    }
+
+    return result;
+  }
+
   public ExerciseProgressDTO getExerciseProgress(User user) {
     LocalDateTime start = LocalDate.now().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
     ExerciseProgress progress = exerciseProgressRepo.findByUserIdAndCreatedAtBetween(
         user.getId(),
+        Timestamp.valueOf(start),
+        Timestamp.valueOf(end));
+
+    if (progress == null) {
+      return null;
+    }
+
+    return new ExerciseProgressDTO(progress);
+  }
+
+  public ExerciseProgressDTO getExerciseProgress(Long userId) {
+    LocalDateTime start = LocalDate.now().atStartOfDay();
+    LocalDateTime end = start.plusDays(1);
+    ExerciseProgress progress = exerciseProgressRepo.findByUserIdAndCreatedAtBetween(
+        userId,
         Timestamp.valueOf(start),
         Timestamp.valueOf(end));
 

@@ -94,6 +94,21 @@ public class ExerciseController {
   // }
 
   @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/weekly-active-days/progress/{userId}")
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgressByUserId(@PathVariable Long userId) {
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(userId);
+    return exerciseProgress;
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/daily/progress/{userId}")
+  public ExerciseProgressDTO getTodaysExerciseProgressByUserId(
+      @PathVariable Long userId) {
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(userId);
+    return exerciseProgress;
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ExerciseDTO createExercise(@RequestBody CreateExerciseDTO exerciseDTO,
       @AuthenticationPrincipal User user) throws IOException {

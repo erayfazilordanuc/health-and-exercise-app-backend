@@ -47,7 +47,7 @@ public class EmailServiceImpl implements EmailService {
 
       MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 
-      helper.setFrom(new InternetAddress(sender, "Egzersiz Takip Uygulaması"));
+      helper.setFrom(new InternetAddress(sender, "HopeMove, egzersiz takip ve sağlık uygulaması"));
 
       helper.setTo(details.getRecipient());
       helper.setSubject(details.getSubject());

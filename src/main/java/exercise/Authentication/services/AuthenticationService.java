@@ -130,7 +130,7 @@ public class AuthenticationService {
             if (Objects.isNull(requestDTO.getCode())) {
                 String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
                 cache().put(loginDTO.getUsername(), code);
-                EmailDetails email = new EmailDetails(user.getEmail(), code, "Doğrulama Kodu", null);
+                EmailDetails email = new EmailDetails(user.getEmail(), code, "Giriş Doğrulama Kodu", null);
                 emailService.sendSimpleMail(email);
                 return null;
             } else {
@@ -157,7 +157,8 @@ public class AuthenticationService {
                 if (Objects.isNull(requestDTO.getCode())) {
                     String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
                     cache().put(registerDTO.getUsername(), code);
-                    EmailDetails email = new EmailDetails(registerDTO.getEmail(), code, "Doğrulama Kodu", null);
+                    EmailDetails email = new EmailDetails(registerDTO.getEmail(), code,
+                            "Hesap Oluşturma Doğrulama Kodu", null);
                     emailService.sendSimpleMail(email);
                     return null;
                 } else {
