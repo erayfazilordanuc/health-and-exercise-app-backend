@@ -14,4 +14,7 @@ public class NewVideoDTO {
 
   @NotNull
   private String videoUrl;
+
+  @NotNull
+  private String name;
 }

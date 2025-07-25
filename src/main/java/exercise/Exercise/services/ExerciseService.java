@@ -21,6 +21,7 @@ import exercise.Exercise.dtos.AchievementDTO;
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
 import exercise.Exercise.dtos.ExerciseProgressDTO;
+import exercise.Exercise.dtos.NewVideoDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
 import exercise.Exercise.entities.Achievement;
 import exercise.Exercise.entities.Exercise;
@@ -125,7 +126,7 @@ public class ExerciseService {
     return newExerciseProgressDTO;
   }
 
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysExerciseProgress(Long exerciseId, User user) {
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long exerciseId, User user) {
     List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
     LocalDate today = LocalDate.now();
     LocalDate monday = today.with(DayOfWeek.MONDAY);
@@ -201,14 +202,15 @@ public class ExerciseService {
     return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
   }
 
-  public ExerciseDTO addVideo(Long exerciseId, String videoUrl, User user) {
+  public ExerciseDTO addVideo(Long exerciseId, NewVideoDTO videoDTO, User user) {
     Exercise existExercise = exerciseRepo.findById(exerciseId)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
     if (!existExercise.getAdmin().getId().equals(user.getId()))
       throw new RuntimeException("You can not add video to an exercise for someone else");
 
-    ExerciseVideo newVideo = new ExerciseVideo(null, videoUrl, existExercise, null);
+    String cleanedUrl = videoDTO.getVideoUrl().replaceAll("^\"|\"$", "");
+    ExerciseVideo newVideo = new ExerciseVideo(null, videoDTO.getName(), cleanedUrl, existExercise, null);
 
     List<ExerciseVideo> exerciseVideos = existExercise.getVideos();
 

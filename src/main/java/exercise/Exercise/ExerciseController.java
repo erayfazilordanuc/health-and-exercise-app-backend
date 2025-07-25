@@ -43,7 +43,8 @@ public class ExerciseController {
     return ResponseEntity.ok(exercise);
   }
 
-  // progress dönen endpointlerde exerciseDTO daha basitleştirilebilir gecikme olmaması için
+  // progress dönen endpointlerde exerciseDTO daha basitleştirilebilir gecikme
+  // olmaması için
   @PutMapping("/{exerciseId}/progress/{progressRatio}")
   public ExerciseProgressDTO progressExercise(@PathVariable Long exerciseId, @PathVariable Integer progressRatio,
       @AuthenticationPrincipal User user) {
@@ -52,21 +53,21 @@ public class ExerciseController {
   }
 
   @GetMapping("/{exerciseId}/weekly-active-days/progress")
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysExerciseProgress(@PathVariable Long exerciseId,
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(@PathVariable Long exerciseId,
       @AuthenticationPrincipal User user) {
-    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysExerciseProgress(exerciseId, user);
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(exerciseId, user);
     return exerciseProgress;
   }
 
   @GetMapping("/{exerciseId}/daily/progress")
-  public ExerciseProgressDTO getTodaysTotalExerciseProgress(@PathVariable Long exerciseId,
+  public ExerciseProgressDTO getTodaysExerciseProgress(@PathVariable Long exerciseId,
       @AuthenticationPrincipal User user) {
     ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(exerciseId, user);
     return exerciseProgress;
   }
 
   @GetMapping("/{exerciseId}/date/{date}/progress")
-  public ExerciseProgressDTO getExerciseProgressByExerciseId(@PathVariable Long exerciseId,
+  public ExerciseProgressDTO getExerciseProgressByDate(@PathVariable Long exerciseId,
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
     ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(exerciseId, date, user);
@@ -123,8 +124,7 @@ public class ExerciseController {
   public ResponseEntity<ExerciseDTO> addVideoToExercise(@PathVariable Long exerciseId,
       @RequestBody NewVideoDTO newVideoDTO,
       @AuthenticationPrincipal User user) {
-    String cleanedUrl = newVideoDTO.getVideoUrl().replaceAll("^\"|\"$", "");
-    ExerciseDTO exerciseDTO = exerciseService.addVideo(exerciseId, cleanedUrl, user);
+    ExerciseDTO exerciseDTO = exerciseService.addVideo(exerciseId, newVideoDTO, user);
     return ResponseEntity.ok(exerciseDTO);
   }
 
