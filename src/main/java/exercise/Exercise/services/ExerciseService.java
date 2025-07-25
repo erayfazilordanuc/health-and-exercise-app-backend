@@ -2,9 +2,11 @@ package exercise.Exercise.services;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -121,6 +123,31 @@ public class ExerciseService {
     ExerciseProgress savedExerciseProgress = exerciseProgressRepo.save(newExerciseProgress);
     ExerciseProgressDTO newExerciseProgressDTO = new ExerciseProgressDTO(savedExerciseProgress);
     return newExerciseProgressDTO;
+  }
+
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysExerciseProgress(Long exerciseId, User user) {
+    List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
+    LocalDate today = LocalDate.now();
+    LocalDate monday = today.with(DayOfWeek.MONDAY);
+
+    List<ExerciseProgressDTO> result = new ArrayList<>();
+
+    for (DayOfWeek day : activeDays) {
+      LocalDate targetDate = monday.with(day);
+      LocalDateTime start = targetDate.atStartOfDay();
+      LocalDateTime end = start.plusDays(1);
+
+      ExerciseProgress progress = exerciseProgressRepo
+          .findByUserIdAndExerciseIdAndCreatedAtBetween(
+              user.getId(),
+              exerciseId,
+              Timestamp.valueOf(start),
+              Timestamp.valueOf(end));
+
+      result.add(progress != null ? new ExerciseProgressDTO(progress) : null);
+    }
+
+    return result;
   }
 
   public ExerciseProgressDTO getExerciseProgress(Long exerciseId, User user) {

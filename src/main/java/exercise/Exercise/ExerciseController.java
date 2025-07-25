@@ -50,6 +50,13 @@ public class ExerciseController {
     return exerciseProgress;
   }
 
+  @GetMapping("/{exerciseId}/weekly-active-days/progress")
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysExerciseProgress(@PathVariable Long exerciseId,
+      @AuthenticationPrincipal User user) {
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysExerciseProgress(exerciseId, user);
+    return exerciseProgress;
+  }
+
   @GetMapping("/{exerciseId}/daily/progress")
   public ExerciseProgressDTO getTodaysTotalExerciseProgress(@PathVariable Long exerciseId,
       @AuthenticationPrincipal User user) {
