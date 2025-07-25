@@ -159,11 +159,10 @@ public class ExerciseService {
         Timestamp.valueOf(end));
 
     if (progress == null) {
-      throw new RuntimeException("Belirtilen tarihte kayıt bulunamadı.");
+      return null;
     }
 
     return new ExerciseProgressDTO(progress);
-
   }
 
   public ExerciseProgressDTO getExerciseProgress(LocalDate date, User user) {
@@ -177,7 +176,7 @@ public class ExerciseService {
             Timestamp.valueOf(endOfDay));
 
     if (progress == null) {
-      throw new RuntimeException("Belirtilen tarihte kayıt bulunamadı.");
+      return null;
     }
 
     return new ExerciseProgressDTO(progress);
