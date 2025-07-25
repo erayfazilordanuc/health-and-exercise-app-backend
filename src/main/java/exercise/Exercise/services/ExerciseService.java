@@ -126,7 +126,7 @@ public class ExerciseService {
     return newExerciseProgressDTO;
   }
 
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long exerciseId, User user) {
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(User user) {
     List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
     LocalDate today = LocalDate.now();
     LocalDate monday = today.with(DayOfWeek.MONDAY);
@@ -139,9 +139,8 @@ public class ExerciseService {
       LocalDateTime end = start.plusDays(1);
 
       ExerciseProgress progress = exerciseProgressRepo
-          .findByUserIdAndExerciseIdAndCreatedAtBetween(
+          .findByUserIdAndCreatedAtBetween(
               user.getId(),
-              exerciseId,
               Timestamp.valueOf(start),
               Timestamp.valueOf(end));
 
@@ -151,25 +150,23 @@ public class ExerciseService {
     return result;
   }
 
-  public ExerciseProgressDTO getExerciseProgress(Long exerciseId, User user) {
+  public ExerciseProgressDTO getExerciseProgress(User user) {
     LocalDateTime start = LocalDate.now().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
     return new ExerciseProgressDTO(
-        exerciseProgressRepo.findByUserIdAndExerciseIdAndCreatedAtBetween(
+        exerciseProgressRepo.findByUserIdAndCreatedAtBetween(
             user.getId(),
-            exerciseId,
             Timestamp.valueOf(start),
             Timestamp.valueOf(end)));
   }
 
-  public ExerciseProgressDTO getExerciseProgress(Long exerciseId, LocalDate date, User user) {
+  public ExerciseProgressDTO getExerciseProgress(LocalDate date, User user) {
     LocalDateTime startOfDay = date.atStartOfDay(); // 00:00:00
     LocalDateTime endOfDay = startOfDay.plusDays(1); // ertesi gün 00:00:00
 
     ExerciseProgress progress = exerciseProgressRepo
-        .findByUserIdAndExerciseIdAndCreatedAtBetween(
+        .findByUserIdAndCreatedAtBetween(
             user.getId(),
-            exerciseId,
             Timestamp.valueOf(startOfDay),
             Timestamp.valueOf(endOfDay));
 
@@ -180,27 +177,42 @@ public class ExerciseService {
     return new ExerciseProgressDTO(progress);
   }
 
-  public List<AchievementDTO> completeExercise(Long id, Long userId) {
-    Exercise exercise = exerciseRepo.findById(id)
-        .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + id));
-
-    achievementRepo.findByUserIdAndExerciseId(userId, id)
-        .ifPresent(a -> {
-          throw new RuntimeException("Achievement already exists for user " + userId + " and exercise " + id);
-        });
-
-    User userEntity = userRepo.findById(userId).get();
-
-    Achievement newAchievement = new Achievement(null, userEntity, exercise, null);
-
-    List<Achievement> existAchievements = userEntity.getAchievements();
-    existAchievements.add(newAchievement);
-
-    userEntity.setAchievements(existAchievements);
-    userRepo.save(userEntity);
-
-    return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
+  public void deleteExerciseProgress(Long exerciseId, LocalDate date, User user) {
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = startOfDay.plusDays(1);
+    ExerciseProgress existExerciseProgress = exerciseProgressRepo
+        .findByUserIdAndExerciseIdAndCreatedAtBetween(user.getId(), exerciseId, Timestamp.valueOf(
+            startOfDay),
+            Timestamp.valueOf(
+                endOfDay));
+    exerciseProgressRepo.delete(existExerciseProgress);
   }
+
+  // public List<AchievementDTO> completeExercise(Long id, Long userId) {
+  // Exercise exercise = exerciseRepo.findById(id)
+  // .orElseThrow(() -> new RuntimeException("Exercise not found with id: " +
+  // id));
+
+  // achievementRepo.findByUserIdAndExerciseId(userId, id)
+  // .ifPresent(a -> {
+  // throw new RuntimeException("Achievement already exists for user " + userId +
+  // " and exercise " + id);
+  // });
+
+  // User userEntity = userRepo.findById(userId).get();
+
+  // Achievement newAchievement = new Achievement(null, userEntity, exercise,
+  // null);
+
+  // List<Achievement> existAchievements = userEntity.getAchievements();
+  // existAchievements.add(newAchievement);
+
+  // userEntity.setAchievements(existAchievements);
+  // userRepo.save(userEntity);
+
+  // return
+  // userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
+  // }
 
   public ExerciseDTO addVideo(Long exerciseId, NewVideoDTO videoDTO, User user) {
     Exercise existExercise = exerciseRepo.findById(exerciseId)

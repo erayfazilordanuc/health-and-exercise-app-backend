@@ -52,26 +52,32 @@ public class ExerciseController {
     return exerciseProgress;
   }
 
-  @GetMapping("/{exerciseId}/weekly-active-days/progress")
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(@PathVariable Long exerciseId,
-      @AuthenticationPrincipal User user) {
-    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(exerciseId, user);
+  @GetMapping("/weekly-active-days/progress")
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(@AuthenticationPrincipal User user) {
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(user);
     return exerciseProgress;
   }
 
-  @GetMapping("/{exerciseId}/daily/progress")
-  public ExerciseProgressDTO getTodaysExerciseProgress(@PathVariable Long exerciseId,
+  @GetMapping("/daily/progress")
+  public ExerciseProgressDTO getTodaysExerciseProgress(
       @AuthenticationPrincipal User user) {
-    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(exerciseId, user);
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(user);
     return exerciseProgress;
   }
 
-  @GetMapping("/{exerciseId}/date/{date}/progress")
-  public ExerciseProgressDTO getExerciseProgressByDate(@PathVariable Long exerciseId,
+  @GetMapping("/date/{date}/progress")
+  public ExerciseProgressDTO getExerciseProgressByDate(
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
-    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(exerciseId, date, user);
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(date, user);
     return exerciseProgress;
+  }
+
+  @DeleteMapping("/{exerciseId}/date/{date}/progress")
+  public void getExerciseProgressByDate(@PathVariable Long exerciseId,
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+      @AuthenticationPrincipal User user) {
+    exerciseService.deleteExerciseProgress(exerciseId, date, user);
   }
 
   // @PostMapping("/{id}/achievement")

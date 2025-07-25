@@ -15,6 +15,11 @@ public interface ExerciseProgressRepository extends JpaRepository<ExerciseProgre
 
   public List<ExerciseProgress> findByUserId(Long userId);
 
+  ExerciseProgress findByUserIdAndCreatedAtBetween(
+      Long userId,
+      Timestamp startOfDay,
+      Timestamp endOfDay);
+
   ExerciseProgress findByUserIdAndExerciseIdAndCreatedAtBetween(
       Long userId,
       Long exerciseId,
