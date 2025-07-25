@@ -104,12 +104,26 @@ public class MessageController {
     Message lastMessage = messageService.getLastMessageBySenderAndReceiver(sender, receiver);
     if (lastMessage == null)
       return null;
-      
+
     if (!(lastMessage.getSender().equals(user.getUsername()) || lastMessage.getReceiver()
         .equals(user.getUsername()))) {
       throw new RuntimeException("You can not get someone else's messages");
     }
     return lastMessage;
+  }
+
+  @GetMapping("/exists/sender/{sender}/receiver/{receiver}/today/daily-status")
+  public Boolean isDailyStatusExistForToday(@PathVariable String sender, @PathVariable String receiver,
+      @AuthenticationPrincipal User user) {
+    Message dailyStatusMessage = messageService.isDailyStatusExistForToday(sender, receiver);
+    if (dailyStatusMessage == null)
+      return false;
+
+    if (!(dailyStatusMessage.getSender().equals(user.getUsername()) || dailyStatusMessage.getReceiver()
+        .equals(user.getUsername()))) {
+      throw new RuntimeException("You can not get someone else's messages");
+    }
+    return true;
   }
 
   @DeleteMapping("/id/{id}")

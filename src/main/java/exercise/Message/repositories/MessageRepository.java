@@ -1,7 +1,9 @@
 package exercise.Message.repositories;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +29,19 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
   @Query("SELECT m FROM Message m WHERE (m.sender = :sender AND m.receiver = :receiver) OR (m.sender = :receiver AND m.receiver = :sender) ORDER BY m.createdAt DESC")
   List<Message> findBySenderAndReceiverOrderByCreatedAtDesc(String sender, String receiver);
+
+  @Query("""
+      SELECT m
+      FROM   Message m
+      WHERE ((m.sender   = :sender     AND m.receiver = :receiver)
+         OR  (m.sender   = :receiver   AND m.receiver = :sender))
+        AND  m.message   LIKE %:keyword%
+        AND  m.createdAt >= :startOfDay
+        AND  m.createdAt <  :endOfDay
+      ORDER BY m.createdAt DESC
+      """)
+  Optional<Message> findFirstByMessageContainingAndCreatedAtBetweenOrderByCreatedAtDesc(
+      String keyword, String sender, String receiver,
+      LocalDateTime startOfDay,
+      LocalDateTime endOfDay);
 }

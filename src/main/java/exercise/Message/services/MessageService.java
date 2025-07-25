@@ -1,5 +1,7 @@
 package exercise.Message.services;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -90,6 +92,18 @@ public class MessageService {
     public Message getLastMessageBySenderAndReceiver(String sender, String receiver) {
         List<Message> messages = messageRepo.findBySenderAndReceiverOrderByCreatedAtDesc(sender, receiver);
         return messages.isEmpty() ? null : messages.get(0);
+    }
+
+    public Message isDailyStatusExistForToday(String sender, String receiver) {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+        Optional<Message> message = messageRepo.findFirstByMessageContainingAndCreatedAtBetweenOrderByCreatedAtDesc(
+                "dailyStatus", sender,
+                receiver, start, end);
+        if (message.isPresent())
+            return message.get();
+        else
+            return null;
     }
 
     public void delete(Long id, User user) {
