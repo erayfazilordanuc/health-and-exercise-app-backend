@@ -74,7 +74,7 @@ public class ExerciseController {
   }
 
   @DeleteMapping("/{exerciseId}/date/{date}/progress")
-  public void getExerciseProgressByDate(@PathVariable Long exerciseId,
+  public void deleteExerciseProgress(@PathVariable Long exerciseId,
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
     exerciseService.deleteExerciseProgress(exerciseId, date, user);

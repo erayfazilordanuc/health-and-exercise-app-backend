@@ -1,6 +1,8 @@
 package exercise.Exercise.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +39,8 @@ public class ExerciseProgress {
   @JsonIgnore
   private Exercise exercise;
 
+  @Min(value = 0, message = "Progress ratio must be at least 0")
+  @Max(value = 100, message = "Progress ratio cannot exceed 100")
   @Column
   private Integer progressRatio;
 
