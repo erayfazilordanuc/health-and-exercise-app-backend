@@ -21,6 +21,7 @@ public class ExerciseMapper {
         .stream()
         .map(v -> new ExerciseVideoDTO(
             v.getId(),
+            v.getName(),
             v.getVideoUrl(),
             exercise.getId(),
             v.getCreatedAt()))

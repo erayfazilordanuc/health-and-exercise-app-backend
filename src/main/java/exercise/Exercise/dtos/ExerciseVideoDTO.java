@@ -25,6 +25,8 @@ import lombok.Setter;
 public class ExerciseVideoDTO {
   private Long id;
 
+  private String name;
+
   private String videoUrl;
 
   private Long exerciseId;
