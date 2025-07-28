@@ -48,6 +48,16 @@ public class GroupService {
         return groupRequestDTO;
     }
 
+    public void deleteJoinRequest(Long groupRequestId, Long userId) {
+        GroupRequest groupRequest = groupRequestRepo.findById(groupRequestId)
+                .orElseThrow(() -> new RuntimeException("Group request not found with id: " + groupRequestId));
+        if (groupRequest.getUserId().equals(userId)) {
+            groupRequestRepo.delete(groupRequest);
+        } else {
+            throw new RuntimeException("You can not delete the group request that not yours");
+        }
+    }
+
     private GroupRequestDTO toDto(GroupRequest gr) {
         User user = userRepo.findById(gr.getUserId()).get();
         UserDTO userDTO = new UserDTO(user);
@@ -100,9 +110,6 @@ public class GroupService {
         return userDTO;
     }
 
-    // GroupRequest nesnesi içine isApproved gibi bir parametreye ihityaç var mı?
-    // null olur en başta
-    // ui da istek geçmişinde gözükebilir
     public void respondToGroupJoinRequest(Long groupRequestId, Boolean approved) {
         GroupRequest groupRequest = groupRequestRepo.findById(groupRequestId).get();
 

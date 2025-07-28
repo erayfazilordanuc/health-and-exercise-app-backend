@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,12 +45,17 @@ public class GroupController {
     return groupService.createJoinRequest(id, user.getId());
   }
 
+  @DeleteMapping("/join-request/id/{id}")
+  public void deleteJoinRequest(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    groupService.deleteJoinRequest(id, user.getId());
+  }
+
   @GetMapping("/id/{id}/join-request")
   public List<GroupRequestDTO> getGroupRequestsByGroupId(@PathVariable Long id, @AuthenticationPrincipal User user) {
     return groupService.getGroupRequestsByGroupId(id);
   }
 
-  @PostMapping("/join-request/user/id/{userId}")
+  @GetMapping("/join-request/user/id/{userId}")
   public GroupRequestDTO getGroupRequestsByUserId(@PathVariable Long userId, @AuthenticationPrincipal User user) {
     return groupService.getGroupRequestsByUserId(userId);
   }
