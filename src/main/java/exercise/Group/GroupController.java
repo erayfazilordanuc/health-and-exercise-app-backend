@@ -42,7 +42,7 @@ public class GroupController {
 
   @PostMapping("/id/{id}/join-request")
   public GroupRequestDTO createJoinRequest(@PathVariable Long id, @AuthenticationPrincipal User user) {
-    return groupService.createJoinRequest(id, user.getId());
+    return groupService.createJoinRequest(user.getId(), id);
   }
 
   @DeleteMapping("/join-request/id/{id}")
