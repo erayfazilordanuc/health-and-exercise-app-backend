@@ -62,7 +62,7 @@ public class GroupService {
         User user = userRepo.findById(gr.getUserId()).get();
         UserDTO userDTO = new UserDTO(user);
         Group group = groupRepo.findById(gr.getGroupId()).get();
-        GroupDTO groupDTO = new GroupDTO(gr.getId(), group.getName(), group.getAdminId());
+        GroupDTO groupDTO = new GroupDTO(gr.getGroupId(), group.getName(), group.getAdminId());
 
         GroupRequestDTO groupRequestDTO = new GroupRequestDTO(gr.getId(), userDTO, groupDTO);
 
