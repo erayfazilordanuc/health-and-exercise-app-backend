@@ -60,16 +60,16 @@ public class GroupService {
     }
 
     public List<GroupRequestDTO> getGroupRequestsByGroupId(Long groupId) {
-        List<GroupRequest> groupRequests = groupRequestRepo.findByUserId(groupId);
+        List<GroupRequest> groupRequests = groupRequestRepo.findByGroupId(groupId);
 
         List<GroupRequestDTO> groupRequestDTOs = groupRequests.stream().map(this::toDto).toList();
         return groupRequestDTOs;
     }
 
     public GroupRequestDTO getGroupRequestsByUserId(Long userId) {
-        GroupRequest groupRequests = groupRequestRepo.findByUserId(userId);
+        GroupRequest groupRequest = groupRequestRepo.findByUserId(userId);
 
-        GroupRequestDTO groupRequestDTO = groupRequests.stream().map(this::toDto).toList();
+        GroupRequestDTO groupRequestDTO = toDto(groupRequest);
         return groupRequestDTO;
     }
 
