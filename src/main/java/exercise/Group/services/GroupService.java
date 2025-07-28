@@ -76,8 +76,11 @@ public class GroupService {
         return groupRequestDTOs;
     }
 
-    public GroupRequestDTO getGroupRequestsByUserId(Long userId) {
+    public GroupRequestDTO getGroupRequestByUserId(Long userId) {
         GroupRequest groupRequest = groupRequestRepo.findByUserId(userId);
+
+        if (groupRequest == null)
+            return null;
 
         GroupRequestDTO groupRequestDTO = toDto(groupRequest);
         return groupRequestDTO;

@@ -56,8 +56,8 @@ public class GroupController {
   }
 
   @GetMapping("/join-request/user/id/{userId}")
-  public GroupRequestDTO getGroupRequestsByUserId(@PathVariable Long userId, @AuthenticationPrincipal User user) {
-    return groupService.getGroupRequestsByUserId(userId);
+  public GroupRequestDTO getGroupRequessByUserId(@PathVariable Long userId, @AuthenticationPrincipal User user) {
+    return groupService.getGroupRequestByUserId(userId);
   }
 
   @GetMapping
