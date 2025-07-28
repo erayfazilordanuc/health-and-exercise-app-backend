@@ -5,9 +5,6 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.util.List;
 import java.util.Objects;
-
-import javax.management.RuntimeErrorException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,10 +16,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import exercise.Group.dtos.CreateGroupDTO;
 import exercise.Group.dtos.GroupDTO;
+import exercise.Group.dtos.GroupRequestDTO;
 import exercise.Group.entities.Group;
 import exercise.Group.services.GroupService;
 import exercise.User.dtos.UserDTO;
@@ -40,9 +39,19 @@ public class GroupController {
   @Autowired
   public UserService userService;
 
-  @PostMapping("/id/{id}/join")
-  public UserDTO joinGroup(@PathVariable Long id, @AuthenticationPrincipal User user) {
-    return userService.joinGroup(id, user);
+  @PostMapping("/id/{id}/join-request")
+  public GroupRequestDTO createJoinRequest(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    return groupService.createJoinRequest(id, user.getId());
+  }
+
+  @GetMapping("/id/{id}/join-request")
+  public List<GroupRequestDTO> getGroupRequestsByGroupId(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    return groupService.getGroupRequestsByGroupId(id);
+  }
+
+  @PostMapping("/join-request/user/id/{userId}")
+  public GroupRequestDTO getGroupRequestsByUserId(@PathVariable Long userId, @AuthenticationPrincipal User user) {
+    return groupService.getGroupRequestsByUserId(userId);
   }
 
   @GetMapping
@@ -74,6 +83,14 @@ public class GroupController {
   public List<UserDTO> getByGroupId(@PathVariable Long id) {
     List<UserDTO> userDTOs = userService.getUsersByGroupId(id);
     return userDTOs;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/join-request/id/{id}/response")
+  public void respondToGroupJoinRequest(@PathVariable Long id, @RequestParam boolean approved,
+      @AuthenticationPrincipal User user) {
+    groupService.respondToGroupJoinRequest(id, approved);
   }
 
   @Tag(name = "Admin Operations")

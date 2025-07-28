@@ -73,20 +73,6 @@ public class MessageController {
     return messages;
   }
 
-  // @GetMapping("/sender/{sender}")
-  // public List<Message> getBySender(@PathVariable String sender,
-  // @AuthenticationPrincipal User user) {
-  // List<Message> messages = messageService.getMessagesBySender(sender);
-  // return messages;
-  // }
-
-  // @GetMapping("/receiver/{receiver}")
-  // public List<Message> getByReceiver(@PathVariable String receiver,
-  // @AuthenticationPrincipal User user) {
-  // List<Message> messages = messageService.getMessagesByReceiver(receiver);
-  // return messages;
-  // }
-
   @GetMapping("/sender/{sender}/receiver/{receiver}")
   public List<Message> getBySenderAndReceiver(@PathVariable String sender, @PathVariable String receiver,
       @AuthenticationPrincipal User user) {
@@ -121,15 +107,28 @@ public class MessageController {
 
     if (!(dailyStatusMessage.getSender().equals(user.getUsername()) || dailyStatusMessage.getReceiver()
         .equals(user.getUsername()))) {
-      throw new RuntimeException("You can not get someone else's messages");
+      throw new RuntimeException("You can not perform operation for someone else");
     }
     return true;
   }
 
   @DeleteMapping("/id/{id}")
-  public ResponseEntity<?> save(@PathVariable Long id, @AuthenticationPrincipal User user) {
+  public ResponseEntity<?> deleteMessageById(@PathVariable Long id, @AuthenticationPrincipal User user) {
     messageService.delete(id, user);
     return ResponseEntity.ok().build();
   }
 
+  // @GetMapping("/sender/{sender}")
+  // public List<Message> getBySender(@PathVariable String sender,
+  // @AuthenticationPrincipal User user) {
+  // List<Message> messages = messageService.getMessagesBySender(sender);
+  // return messages;
+  // }
+
+  // @GetMapping("/receiver/{receiver}")
+  // public List<Message> getByReceiver(@PathVariable String receiver,
+  // @AuthenticationPrincipal User user) {
+  // List<Message> messages = messageService.getMessagesByReceiver(receiver);
+  // return messages;
+  // }
 }

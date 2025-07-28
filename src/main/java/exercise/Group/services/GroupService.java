@@ -9,9 +9,12 @@ import org.springframework.stereotype.Service;
 
 import exercise.Group.dtos.CreateGroupDTO;
 import exercise.Group.dtos.GroupDTO;
+import exercise.Group.dtos.GroupRequestDTO;
 import exercise.Group.entities.Group;
+import exercise.Group.entities.GroupRequest;
 import exercise.Group.mappers.GroupMapper;
 import exercise.Group.repositories.GroupRepository;
+import exercise.Group.repositories.GroupRequestRepository;
 import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
@@ -21,12 +24,54 @@ public class GroupService {
 
     @Autowired
     private GroupRepository groupRepo;
+    @Autowired
+    private GroupRequestRepository groupRequestRepo;
+    @Autowired
+    private UserRepository userRepo;
 
     @Autowired
     private GroupMapper groupMapper;
 
-    @Autowired
-    private UserRepository userRepo;
+    public GroupRequestDTO createJoinRequest(Long groupId, Long userId) {
+        GroupRequest newGroupRequest = new GroupRequest(null, userId, groupId);
+        GroupRequest savedGroupRequest = groupRequestRepo.save(newGroupRequest);
+
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(userId);
+
+        Group group = groupRepo.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found with id: " + groupId));
+
+        GroupDTO groupDTO = new GroupDTO(group.getId(), group.getName(), group.getAdminId());
+
+        GroupRequestDTO groupRequestDTO = new GroupRequestDTO(savedGroupRequest.getId(), userDTO, groupDTO);
+        return groupRequestDTO;
+    }
+
+    private GroupRequestDTO toDto(GroupRequest gr) {
+        User user = userRepo.findById(gr.getUserId()).get();
+        UserDTO userDTO = new UserDTO(user);
+        Group group = groupRepo.findById(gr.getGroupId()).get();
+        GroupDTO groupDTO = new GroupDTO(gr.getId(), group.getName(), group.getAdminId());
+
+        GroupRequestDTO groupRequestDTO = new GroupRequestDTO(gr.getId(), userDTO, groupDTO);
+
+        return groupRequestDTO;
+    }
+
+    public List<GroupRequestDTO> getGroupRequestsByGroupId(Long groupId) {
+        List<GroupRequest> groupRequests = groupRequestRepo.findByUserId(groupId);
+
+        List<GroupRequestDTO> groupRequestDTOs = groupRequests.stream().map(this::toDto).toList();
+        return groupRequestDTOs;
+    }
+
+    public GroupRequestDTO getGroupRequestsByUserId(Long userId) {
+        GroupRequest groupRequests = groupRequestRepo.findByUserId(userId);
+
+        GroupRequestDTO groupRequestDTO = groupRequests.stream().map(this::toDto).toList();
+        return groupRequestDTO;
+    }
 
     public List<Group> getAll() {
         List<Group> groups = groupRepo.findAll();
@@ -53,6 +98,21 @@ public class GroupService {
         User user = userRepo.findById(group.getAdminId()).get();
         UserDTO userDTO = new UserDTO(user);
         return userDTO;
+    }
+
+    // GroupRequest nesnesi içine isApproved gibi bir parametreye ihityaç var mı?
+    // null olur en başta
+    // ui da istek geçmişinde gözükebilir
+    public void respondToGroupJoinRequest(Long groupRequestId, Boolean approved) {
+        GroupRequest groupRequest = groupRequestRepo.findById(groupRequestId).get();
+
+        if (approved) {
+            User user = userRepo.findById(groupRequest.getUserId()).get();
+            user.setGroupId(groupRequest.getGroupId());
+            userRepo.save(user);
+        }
+
+        groupRequestRepo.delete(groupRequest);
     }
 
     public Group createGroup(CreateGroupDTO createGroupDTO) {
