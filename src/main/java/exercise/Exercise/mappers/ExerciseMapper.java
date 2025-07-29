@@ -1,6 +1,7 @@
 package exercise.Exercise.mappers;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ public class ExerciseMapper {
     List<ExerciseVideoDTO> videoDTOs = Optional.ofNullable(exercise.getVideos())
         .orElse(Collections.emptyList())
         .stream()
+        .sorted((v1, v2) -> v1.getId().compareTo(v2
+            .getId()))
         .map(v -> new ExerciseVideoDTO(
             v.getId(),
             v.getName(),
