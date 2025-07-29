@@ -129,7 +129,7 @@ public class AuthenticationService {
 
         if (user.getRole().equals("ROLE_ADMIN")) {
 
-            if (user.getPassword().equals(passwordEncoder.encode(requestDTO.getLoginDTO().getPassword()))) {
+            if (passwordEncoder.matches(requestDTO.getLoginDTO().getPassword(), user.getPassword())) {
 
                 if (Objects.isNull(requestDTO.getCode())) {
                     String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
