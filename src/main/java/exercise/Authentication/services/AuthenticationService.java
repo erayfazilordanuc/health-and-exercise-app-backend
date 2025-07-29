@@ -126,18 +126,23 @@ public class AuthenticationService {
     public AuthResponseDTO loginAdmin(TwoStepLoginRequestDTO requestDTO) {
         LoginRequestDTO loginDTO = requestDTO.getLoginDTO();
         User user = userRepo.findByUsername(loginDTO.getUsername());
+
         if (user.getRole().equals("ROLE_ADMIN")) {
-            if (Objects.isNull(requestDTO.getCode())) {
-                String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
-                cache().put(loginDTO.getUsername(), code);
-                EmailDetails email = new EmailDetails(user.getEmail(), code, "Giriş Doğrulama Kodu", null);
-                emailService.sendSimpleMail(email);
-                return null;
-            } else {
-                String cachedCode = cache().get(loginDTO.getUsername(), String.class);
-                if (requestDTO.getCode().equals(cachedCode)) {
-                    AuthResponseDTO response = loginUserAndGenerateAuthResponseDTO(loginDTO);
-                    return response;
+
+            if (user.getPassword().equals(passwordEncoder.encode(requestDTO.getLoginDTO().getPassword()))) {
+
+                if (Objects.isNull(requestDTO.getCode())) {
+                    String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
+                    cache().put(loginDTO.getUsername(), code);
+                    EmailDetails email = new EmailDetails(user.getEmail(), code, "Giriş Doğrulama Kodu", null);
+                    emailService.sendSimpleMail(email);
+                    return null;
+                } else {
+                    String cachedCode = cache().get(loginDTO.getUsername(), String.class);
+                    if (requestDTO.getCode().equals(cachedCode)) {
+                        AuthResponseDTO response = loginUserAndGenerateAuthResponseDTO(loginDTO);
+                        return response;
+                    }
                 }
             }
         }

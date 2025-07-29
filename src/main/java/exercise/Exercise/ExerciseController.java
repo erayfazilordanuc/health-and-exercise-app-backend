@@ -150,11 +150,19 @@ public class ExerciseController {
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  @DeleteMapping("/{exerciseId}/videos")
-  public ResponseEntity<Void> deleteVideoFromExercise(@PathVariable Long exerciseId,
-      @RequestParam String videoUrl,
+  @PutMapping("/{exerciseId}/videos/id/{id}")
+  public ResponseEntity<ExerciseDTO> updateExerciseVideo(@PathVariable Long exerciseId, @PathVariable Long id,
+      @RequestBody NewVideoDTO newVideoDTO,
+      @AuthenticationPrincipal User user) {
+    ExerciseDTO exerciseDTO = exerciseService.updateVideo(id, exerciseId, newVideoDTO, user);
+    return ResponseEntity.ok(exerciseDTO);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @DeleteMapping("/{exerciseId}/videos/id/{id}")
+  public ResponseEntity<Void> deleteVideoFromExercise(@PathVariable Long exerciseId, @PathVariable Long id,
       @AuthenticationPrincipal User user) throws IOException {
-    exerciseService.deleteVideo(exerciseId, videoUrl, user);
+    exerciseService.deleteVideo(id, exerciseId, user);
     return ResponseEntity.noContent().build();
   }
 }
