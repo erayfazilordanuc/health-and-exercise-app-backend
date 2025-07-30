@@ -37,14 +37,14 @@ public class ReminderScheduler {
         .filter(u -> {
           ExerciseProgress p = exerciseProgressRepo
               .findByUserIdAndCreatedAtBetween(u.getId(), startTs, endTs);
-          return p.getProgressRatio() < 100;
+          return p == null || p.getProgressRatio() < 100;
         })
         .toList();
 
     usersToRemind.forEach(user -> notificationService.sendReminderNotification(user));
   }
 
-  @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
+  // @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
   public void testSchedule() {
     System.out.println("Test schedule is working");
     notificationService.sendReminderNotification(null);
