@@ -12,6 +12,7 @@ import exercise.Exercise.dtos.ExerciseDTO;
 import exercise.Exercise.dtos.ExerciseProgressDTO;
 import exercise.Exercise.dtos.NewVideoDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
+import exercise.Exercise.enums.ExercisePosition;
 import exercise.Exercise.services.ExerciseService;
 import exercise.User.entities.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,6 +36,13 @@ public class ExerciseController {
   @GetMapping
   public List<ExerciseDTO> getAllExercises() {
     return exerciseService.getAll();
+  }
+
+  @GetMapping("/today")
+  public ResponseEntity<ExerciseDTO> findTodayExercise(
+      @RequestParam ExercisePosition position,
+      @AuthenticationPrincipal User user) {
+    return ResponseEntity.ok(exerciseService.getTodayExerciseByPosition(position));
   }
 
   @GetMapping("/{id}")

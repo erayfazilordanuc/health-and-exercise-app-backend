@@ -27,6 +27,7 @@ import exercise.Exercise.entities.Achievement;
 import exercise.Exercise.entities.Exercise;
 import exercise.Exercise.entities.ExerciseProgress;
 import exercise.Exercise.entities.ExerciseVideo;
+import exercise.Exercise.enums.ExercisePosition;
 import exercise.Exercise.mappers.ExerciseMapper;
 import exercise.Exercise.repositories.AchievementRepository;
 import exercise.Exercise.repositories.ExerciseProgressRepository;
@@ -66,6 +67,17 @@ public class ExerciseService {
     return exerciseRepo.findAll().stream()
         .map(exerciseMapper::entityToDto)
         .toList();
+  }
+
+  public ExerciseDTO getTodayExerciseByPosition(ExercisePosition position) {
+    // TO DO (Imp) Burada ilerleyen zamanlarda güne özel egzersizler çekilebilir
+
+    Long seatedId = (long) 48;
+    Long standingId = (long) 47;
+    return switch (position) {
+      case SEATED -> exerciseRepo.findById(seatedId).map(exerciseMapper::entityToDto).get();
+      case STANDING -> exerciseRepo.findById(standingId).map(exerciseMapper::entityToDto).get();
+    };
   }
 
   public ExerciseDTO getById(Long id) {
