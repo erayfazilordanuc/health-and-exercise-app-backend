@@ -66,7 +66,33 @@ public class NotificationService {
     }
   }
 
-  public ResponseEntity<?> sendNotification(NotificationDTO notificationDTO, User sender) {
+  public ResponseEntity<?> sendReminderNotification(User receiver) {
+    // List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
+    List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId((long) 1);
+
+    fcmTokens.stream().forEach(token -> {
+      try {
+        Message message = Message.builder()
+            .setToken(token.getToken())
+            .setNotification(Notification.builder()
+                .setTitle("Egzersiz Hatırlatıcısı")
+                .setBody("Bugün sizi bekleyen bir egzersiziniz mevcut")
+                .build())
+            .putData("screen", "Exercise")
+            .build();
+
+        String response = FirebaseMessaging.getInstance().send(message);
+        System.out.println("✅ Successfully sent notification message to token " + token.getToken() + ": " + response);
+      } catch (Exception e) {
+        System.err.println("❌ Failed to send notification to token " + token.getToken());
+        e.printStackTrace();
+      }
+    });
+
+    return ResponseEntity.ok("Notification sent");
+  }
+
+  public ResponseEntity<?> sendChatNotification(NotificationDTO notificationDTO, User sender) {
     User receiver = userRepo.findByUsername(notificationDTO.getReceiver());
     List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
 

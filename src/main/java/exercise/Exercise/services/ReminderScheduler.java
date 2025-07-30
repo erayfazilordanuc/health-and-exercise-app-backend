@@ -1,34 +1,52 @@
 package exercise.Exercise.services;
 
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import exercise.Exercise.entities.ExerciseProgress;
+import exercise.Exercise.repositories.ExerciseProgressRepository;
 import exercise.Notification.services.NotificationService;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 
-// @Service
-// @RequiredArgsConstructor
-// public class ReminderScheduler {
-//   private final UserRepository userRepo; // dependency‑ler
-//   private final NotificationService notificationService;
+@Service
+@RequiredArgsConstructor
+public class ReminderScheduler {
+  private final UserRepository userRepo;
+  private final ExerciseProgressRepository exerciseProgressRepo;
+  private final NotificationService notificationService;
 
-//   @Scheduled(cron = "0 0 12 ? * MON,WED,FRI", zone = "Europe/Istanbul")
+  @Scheduled(cron = "0 0 12 ? * MON,WED,FRI", zone = "Europe/Istanbul")
+  public void sendMiddayExerciseReminder() {
+    List<User> allUsers = userRepo.findAll();
 
-//   public void sendMiddayExerciseReminder() {
+    List<User> targetUsers = allUsers.stream().filter(u -> u.getRole().equals("ROLE_USER")).toList();
 
-//     // List<User> targets = userRepo.findAllByRole("ROLE_USER");
+    LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
+    Timestamp startTs = Timestamp.valueOf(startOfToday);
+    Timestamp endTs = Timestamp.valueOf(startOfToday.plusDays(1));
 
-//     // burada egzersizi tamamlayanları elesin
+    List<User> usersToRemind = targetUsers.stream()
+        .filter(u -> {
+          ExerciseProgress p = exerciseProgressRepo
+              .findByUserIdAndCreatedAtBetween(u.getId(), startTs, endTs);
+          return p.getProgressRatio() < 100;
+        })
+        .toList();
 
-//     // Burada fcm tokenlerin listesi çekilsin
+    usersToRemind.forEach(user -> notificationService.sendReminderNotification(user));
+  }
 
-//     // targets.forEach(user -> notificationService.sendNotification(
-//     // user.getFcmToken(),
-//     // "Egzersiz zamanı!",
-//     // "Bugünkü antrenmanını kaçırma 💪"));
-//   }
-// }
+  @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
+  public void testSchedule() {
+    System.out.println("Test schedule is working");
+    notificationService.sendReminderNotification(null);
+  }
+}

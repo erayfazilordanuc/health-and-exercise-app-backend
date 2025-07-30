@@ -11,5 +11,4 @@ import lombok.Setter;
 public class NotificationDTO {
   private String receiver;
   private String message;
-
 }

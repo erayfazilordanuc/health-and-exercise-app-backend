@@ -40,7 +40,7 @@ public class NotificationController {
     @PostMapping("/send")
     public ResponseEntity<?> sendNotification(@RequestBody NotificationDTO notificationDTO,
             @AuthenticationPrincipal User user) {
-        ResponseEntity response = notificationService.sendNotification(notificationDTO, user);
+        ResponseEntity response = notificationService.sendChatNotification(notificationDTO, user);
         return response;
     }
 
