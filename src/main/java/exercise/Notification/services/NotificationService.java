@@ -68,7 +68,7 @@ public class NotificationService {
 
   public ResponseEntity<?> sendReminderNotification(User receiver) {
     // List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
-    List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId((long) 1);
+    List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId((long) 18);
 
     fcmTokens.stream().forEach(token -> {
       try {
