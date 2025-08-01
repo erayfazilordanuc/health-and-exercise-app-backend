@@ -153,25 +153,26 @@ public class AuthenticationService {
     public AuthResponseDTO registerAdmin(TwoStepRegisterRequestDTO requestDTO) {
         RegisterRequestDTO registerDTO = requestDTO.getRegisterDTO();
 
-        if (adminUsernames.contains(registerDTO.getUsername())) {
-            if (!registerDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-                throw new RuntimeException("Invalid email pattern");
-            }
+        // if (!adminUsernames.contains(registerDTO.getUsername()))
+        // throw new RuntimeException("This username is not valid for an admin");
 
-            if (adminEmails.contains(registerDTO.getEmail())) {
-                if (Objects.isNull(requestDTO.getCode())) {
-                    String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
-                    cache().put(registerDTO.getUsername(), code);
-                    EmailDetails email = new EmailDetails(registerDTO.getEmail(), code,
-                            "Hesap Oluşturma Doğrulama Kodu", null);
-                    emailService.sendSimpleMail(email);
-                    return null;
-                } else {
-                    String cachedCode = cache().get(registerDTO.getUsername(), String.class);
-                    if (requestDTO.getCode().equals(cachedCode)) {
-                        AuthResponseDTO response = registerUserAndGenerateAuthResponseDTO(registerDTO, "ROLE_ADMIN");
-                        return response;
-                    }
+        if (!registerDTO.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new RuntimeException("This emial is not authorized for admin account regsitration");
+        }
+
+        if (adminEmails.contains(registerDTO.getEmail())) {
+            if (Objects.isNull(requestDTO.getCode())) {
+                String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
+                cache().put(registerDTO.getUsername(), code);
+                EmailDetails email = new EmailDetails(registerDTO.getEmail(), code,
+                        "Hesap Oluşturma Doğrulama Kodu", null);
+                emailService.sendSimpleMail(email);
+                return null;
+            } else {
+                String cachedCode = cache().get(registerDTO.getUsername(), String.class);
+                if (requestDTO.getCode().equals(cachedCode)) {
+                    AuthResponseDTO response = registerUserAndGenerateAuthResponseDTO(registerDTO, "ROLE_ADMIN");
+                    return response;
                 }
             }
         }
