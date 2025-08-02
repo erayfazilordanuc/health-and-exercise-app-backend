@@ -17,4 +17,7 @@ public class NewVideoDTO {
 
   @NotNull
   private String name;
+
+  @NotNull
+  private Integer durationSeconds;
 }

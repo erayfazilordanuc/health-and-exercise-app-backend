@@ -254,17 +254,17 @@ public class ExerciseService {
     exerciseProgressRepo.delete(existExerciseProgress);
   }
 
-  public static double getDurationSec(String url) throws IOException {
-    try (ReadableByteChannel ch = Channels.newChannel(new URL(url).openStream());
-        IsoFile iso = new IsoFile(ch)) {
+  // public static double getDurationSec(String url) throws IOException {
+  // try (ReadableByteChannel ch = Channels.newChannel(new URL(url).openStream());
+  // IsoFile iso = new IsoFile(ch)) {
 
-      MovieHeaderBox mvhd = iso
-          .getBoxes(MovieHeaderBox.class, true)
-          .get(0); // moov → mvhd
+  // MovieHeaderBox mvhd = iso
+  // .getBoxes(MovieHeaderBox.class, true)
+  // .get(0); // moov → mvhd
 
-      return (double) mvhd.getDuration() / mvhd.getTimescale();
-    }
-  }
+  // return (double) mvhd.getDuration() / mvhd.getTimescale();
+  // }
+  // }
 
   public ExerciseDTO addVideo(Long exerciseId, NewVideoDTO videoDTO, User user) throws IOException {
     Exercise existExercise = exerciseRepo.findById(exerciseId)
@@ -275,10 +275,8 @@ public class ExerciseService {
 
     String cleanedUrl = videoDTO.getVideoUrl().replaceAll("^\"|\"$", "");
 
-    double seconds = getDurationSec(videoDTO.getVideoUrl());
-    int durationSeconds = (int) Math.round(seconds);
-
-    ExerciseVideo newVideo = new ExerciseVideo(null, videoDTO.getName(), cleanedUrl, durationSeconds, existExercise,
+    ExerciseVideo newVideo = new ExerciseVideo(null, videoDTO.getName(), cleanedUrl,
+        videoDTO.getDurationSeconds(), existExercise,
         null);
 
     List<ExerciseVideo> exerciseVideos = existExercise.getVideos();
@@ -301,7 +299,7 @@ public class ExerciseService {
     return savedExerciseDTO;
   }
 
-  // exercise id kaldır gereksiz ise
+  // exercise id kaldırılabilir
   public ExerciseDTO updateVideo(Long videoId, Long exerciseId, NewVideoDTO videoDTO, User user) throws IOException {
     Exercise existExercise = exerciseRepo.findById(exerciseId)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
@@ -313,11 +311,8 @@ public class ExerciseService {
         .orElseThrow(() -> new RuntimeException("Video not found with id: " + videoId));
 
     video.setName(videoDTO.getName());
-
-    double seconds = getDurationSec(videoDTO.getVideoUrl());
-    int durationSeconds = (int) Math.round(seconds);
-
-    video.setDurationSeconds(durationSeconds);
+    // video.setVideoUrl(videoDTO.getVideoUrl());
+    // video.setDurationSeconds(videoDTO.getDurationSeconds());
 
     exerciseVideoRepo.save(video);
 
