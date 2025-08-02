@@ -38,6 +38,8 @@ public class ExerciseVideo {
   @Column(nullable = false)
   private String videoUrl;
 
+  private Integer durationSeconds;
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "exercise_id")
   private Exercise exercise;

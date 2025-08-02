@@ -29,6 +29,8 @@ public class ExerciseVideoDTO {
 
   private String videoUrl;
 
+  private Integer durationSeconds;
+
   private Long exerciseId;
 
   private Timestamp createdAt;
@@ -36,6 +38,7 @@ public class ExerciseVideoDTO {
   public ExerciseVideoDTO(ExerciseVideo video) {
     this.id = video.getId();
     this.videoUrl = video.getVideoUrl();
+    this.durationSeconds = video.getDurationSeconds();
     this.exerciseId = video.getExercise().getId();
     this.createdAt = video.getCreatedAt();
   }

@@ -16,27 +16,28 @@ import exercise.Exercise.mappers.ExerciseMapper;
 @Component
 public class ExerciseMapper {
 
-  public ExerciseDTO entityToDto(Exercise exercise) {
-    List<ExerciseVideoDTO> videoDTOs = Optional.ofNullable(exercise.getVideos())
-        .orElse(Collections.emptyList())
-        .stream()
-        .sorted((v1, v2) -> v1.getId().compareTo(v2
-            .getId()))
-        .map(v -> new ExerciseVideoDTO(
-            v.getId(),
-            v.getName(),
-            v.getVideoUrl(),
-            exercise.getId(),
-            v.getCreatedAt()))
-        .toList();
-    return new ExerciseDTO(
-        exercise.getId(),
-        exercise.getName(),
-        exercise.getDescription(),
-        exercise.getPoint(),
-        videoDTOs,
-        exercise.getAdmin().getId(),
-        exercise.getCreatedAt(),
-        exercise.getUpdatedAt());
-  }
+    public ExerciseDTO entityToDto(Exercise exercise) {
+        List<ExerciseVideoDTO> videoDTOs = Optional.ofNullable(exercise.getVideos())
+                .orElse(Collections.emptyList())
+                .stream()
+                .sorted((v1, v2) -> v1.getId().compareTo(v2
+                        .getId()))
+                .map(v -> new ExerciseVideoDTO(
+                        v.getId(),
+                        v.getName(),
+                        v.getVideoUrl(),
+                        v.getDurationSeconds(),
+                        exercise.getId(),
+                        v.getCreatedAt()))
+                .toList();
+        return new ExerciseDTO(
+                exercise.getId(),
+                exercise.getName(),
+                exercise.getDescription(),
+                exercise.getPoint(),
+                videoDTOs,
+                exercise.getAdmin().getId(),
+                exercise.getCreatedAt(),
+                exercise.getUpdatedAt());
+    }
 }

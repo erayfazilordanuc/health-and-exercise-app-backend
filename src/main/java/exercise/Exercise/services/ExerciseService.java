@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -248,31 +249,17 @@ public class ExerciseService {
     exerciseProgressRepo.delete(existExerciseProgress);
   }
 
-  // public List<AchievementDTO> completeExercise(Long id, Long userId) {
-  // Exercise exercise = exerciseRepo.findById(id)
-  // .orElseThrow(() -> new RuntimeException("Exercise not found with id: " +
-  // id));
-
-  // achievementRepo.findByUserIdAndExerciseId(userId, id)
-  // .ifPresent(a -> {
-  // throw new RuntimeException("Achievement already exists for user " + userId +
-  // " and exercise " + id);
-  // });
-
-  // User userEntity = userRepo.findById(userId).get();
-
-  // Achievement newAchievement = new Achievement(null, userEntity, exercise,
-  // null);
-
-  // List<Achievement> existAchievements = userEntity.getAchievements();
-  // existAchievements.add(newAchievement);
-
-  // userEntity.setAchievements(existAchievements);
-  // userRepo.save(userEntity);
-
-  // return
-  // userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
-  // }
+  public double probeDurationSec(String url) {
+    try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(url)) {
+      grabber.start(); // meta-data okundu
+      double sec = grabber.getLengthInTime() / 1_000_000.0; // µs → s
+      grabber.stop();
+      return sec;
+    } catch (Exception e) {
+      System.out.println("Duration could not be read for {} " + url + " " + e);
+      return 0; // fallback
+    }
+  }
 
   public ExerciseDTO addVideo(Long exerciseId, NewVideoDTO videoDTO, User user) {
     Exercise existExercise = exerciseRepo.findById(exerciseId)
@@ -282,7 +269,12 @@ public class ExerciseService {
       throw new RuntimeException("You can not add video to an exercise for someone else");
 
     String cleanedUrl = videoDTO.getVideoUrl().replaceAll("^\"|\"$", "");
-    ExerciseVideo newVideo = new ExerciseVideo(null, videoDTO.getName(), cleanedUrl, existExercise, null);
+
+    double seconds = probeDurationSec(videoDTO.getVideoUrl());
+    int durationSeconds = (int) Math.round(seconds);
+
+    ExerciseVideo newVideo = new ExerciseVideo(null, videoDTO.getName(), cleanedUrl, durationSeconds, existExercise,
+        null);
 
     List<ExerciseVideo> exerciseVideos = existExercise.getVideos();
 
@@ -317,6 +309,11 @@ public class ExerciseService {
 
     video.setName(videoDTO.getName());
 
+    double seconds = probeDurationSec(videoDTO.getVideoUrl());
+    int durationSeconds = (int) Math.round(seconds);
+
+    video.setDurationSeconds(durationSeconds);
+
     exerciseVideoRepo.save(video);
 
     Exercise savedExercise = exerciseRepo.findById(exerciseId).get();
@@ -339,25 +336,6 @@ public class ExerciseService {
 
     ExerciseVideo video = exerciseVideoRepo.findById(id)
         .orElseThrow(() -> new RuntimeException("Video not found with id: " + id));
-
-    // Set<String> existingFileNames = exercise.getVideos().stream()
-    // .map(video -> {
-    // String url = video.getVideoUrl();
-    // return url.substring(url.lastIndexOf('/') + 1);
-    // })
-    // .collect(Collectors.toSet());
-
-    // if (existingFileNames.contains(videoUrl)) {
-    // s3Service.deleteObject(videoUrl);
-    // }
-
-    // List<ExerciseVideo> updatedVideos = exercise.getVideos().stream()
-    // .filter(video -> {
-    // return !video.getVideoUrl().equals(videoUrl);
-    // })
-    // .collect(Collectors.toList());
-
-    // exercise.setVideos(updatedVideos);
 
     exerciseVideoRepo.delete(video);
 
