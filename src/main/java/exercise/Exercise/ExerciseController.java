@@ -148,7 +148,7 @@ public class ExerciseController {
     return exerciseService.getPresignedUrl(exerciseId, fileName, "videos");
   }
 
-  // @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/{exerciseId}/videos")
   public ResponseEntity<ExerciseDTO> addVideoToExercise(@PathVariable Long exerciseId,
       @RequestBody NewVideoDTO newVideoDTO,
@@ -157,7 +157,7 @@ public class ExerciseController {
     return ResponseEntity.ok(exerciseDTO);
   }
 
-  // @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{exerciseId}/videos/id/{id}")
   public ResponseEntity<ExerciseDTO> updateExerciseVideo(@PathVariable Long exerciseId, @PathVariable Long id,
       @RequestBody NewVideoDTO newVideoDTO,
