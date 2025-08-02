@@ -148,20 +148,20 @@ public class ExerciseController {
     return exerciseService.getPresignedUrl(exerciseId, fileName, "videos");
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
+  // @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/{exerciseId}/videos")
   public ResponseEntity<ExerciseDTO> addVideoToExercise(@PathVariable Long exerciseId,
       @RequestBody NewVideoDTO newVideoDTO,
-      @AuthenticationPrincipal User user) {
+      @AuthenticationPrincipal User user) throws IOException {
     ExerciseDTO exerciseDTO = exerciseService.addVideo(exerciseId, newVideoDTO, user);
     return ResponseEntity.ok(exerciseDTO);
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
+  // @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{exerciseId}/videos/id/{id}")
   public ResponseEntity<ExerciseDTO> updateExerciseVideo(@PathVariable Long exerciseId, @PathVariable Long id,
       @RequestBody NewVideoDTO newVideoDTO,
-      @AuthenticationPrincipal User user) {
+      @AuthenticationPrincipal User user) throws IOException {
     ExerciseDTO exerciseDTO = exerciseService.updateVideo(id, exerciseId, newVideoDTO, user);
     return ResponseEntity.ok(exerciseDTO);
   }

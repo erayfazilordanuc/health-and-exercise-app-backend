@@ -1,6 +1,7 @@
 package exercise.Exercise.services;
 
 import java.io.IOException;
+import java.nio.channels.ReadableByteChannel;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -12,7 +13,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.bytedeco.javacv.FFmpegFrameGrabber;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,6 +37,11 @@ import exercise.Exercise.repositories.ExerciseVideoRepository;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
 import jakarta.transaction.Transactional;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import org.mp4parser.IsoFile;
+import org.mp4parser.boxes.iso14496.part12.MovieHeaderBox;
 
 @Service
 public class ExerciseService {
@@ -249,19 +254,19 @@ public class ExerciseService {
     exerciseProgressRepo.delete(existExerciseProgress);
   }
 
-  public double probeDurationSec(String url) {
-    try (FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(url)) {
-      grabber.start(); // meta-data okundu
-      double sec = grabber.getLengthInTime() / 1_000_000.0; // µs → s
-      grabber.stop();
-      return sec;
-    } catch (Exception e) {
-      System.out.println("Duration could not be read for {} " + url + " " + e);
-      return 0; // fallback
+  public static double getDurationSec(String url) throws IOException {
+    try (ReadableByteChannel ch = Channels.newChannel(new URL(url).openStream());
+        IsoFile iso = new IsoFile(ch)) {
+
+      MovieHeaderBox mvhd = iso
+          .getBoxes(MovieHeaderBox.class, true)
+          .get(0); // moov → mvhd
+
+      return (double) mvhd.getDuration() / mvhd.getTimescale();
     }
   }
 
-  public ExerciseDTO addVideo(Long exerciseId, NewVideoDTO videoDTO, User user) {
+  public ExerciseDTO addVideo(Long exerciseId, NewVideoDTO videoDTO, User user) throws IOException {
     Exercise existExercise = exerciseRepo.findById(exerciseId)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
@@ -270,7 +275,7 @@ public class ExerciseService {
 
     String cleanedUrl = videoDTO.getVideoUrl().replaceAll("^\"|\"$", "");
 
-    double seconds = probeDurationSec(videoDTO.getVideoUrl());
+    double seconds = getDurationSec(videoDTO.getVideoUrl());
     int durationSeconds = (int) Math.round(seconds);
 
     ExerciseVideo newVideo = new ExerciseVideo(null, videoDTO.getName(), cleanedUrl, durationSeconds, existExercise,
@@ -297,7 +302,7 @@ public class ExerciseService {
   }
 
   // exercise id kaldır gereksiz ise
-  public ExerciseDTO updateVideo(Long videoId, Long exerciseId, NewVideoDTO videoDTO, User user) {
+  public ExerciseDTO updateVideo(Long videoId, Long exerciseId, NewVideoDTO videoDTO, User user) throws IOException {
     Exercise existExercise = exerciseRepo.findById(exerciseId)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
 
@@ -309,7 +314,7 @@ public class ExerciseService {
 
     video.setName(videoDTO.getName());
 
-    double seconds = probeDurationSec(videoDTO.getVideoUrl());
+    double seconds = getDurationSec(videoDTO.getVideoUrl());
     int durationSeconds = (int) Math.round(seconds);
 
     video.setDurationSeconds(durationSeconds);

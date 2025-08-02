@@ -140,10 +140,15 @@
 			<version>2.31.78</version>
 		</dependency>
 		<dependency>
-			<groupId>org.bytedeco</groupId>
-			<artifactId>javacv-platform</artifactId>
-			<version>1.5.12</version>
+			<groupId>org.mp4parser</groupId>
+			<artifactId>isoparser</artifactId>
+			<version>1.9.56</version>
 		</dependency>
+		<!-- <dependency>
+			<groupId>org.bytedeco</groupId>
+			<artifactId>javacv</artifactId>
+			<version>1.5.12</version>
+		</dependency> -->
 		<!-- <dependency>
 			<groupId>com.amazonaws</groupId>
 			<artifactId>aws-java-sdk-s3</artifactId>
