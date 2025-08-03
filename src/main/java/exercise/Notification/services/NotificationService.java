@@ -66,17 +66,44 @@ public class NotificationService {
     }
   }
 
-  public ResponseEntity<?> sendReminderNotification(User receiver) {
-    // List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
-    List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId((long) 18);
+  public ResponseEntity<?> sendTestReminderNotification(User receiver) {
+    FCMToken mockToken = new FCMToken(null, null,
+        "fL69CY4pSN-kvGMY6PTVjY:APA91bGzhDSFSXr6YB1p4HCxlmIK2pPVfQYlXxy0d7tSBEiMxFf-XssesPJZphOxNk7-xMXC8VstZmhb3HtNCrO7for66gVFwBpLXFHPCSAZbdmfZKB8TCA",
+        null, null);
+    List<FCMToken> fcmTokens = List.of(mockToken);
 
     fcmTokens.stream().forEach(token -> {
       try {
         Message message = Message.builder()
             .setToken(token.getToken())
             .setNotification(Notification.builder()
-                .setTitle("Egzersiz Hatırlatıcısı")
-                .setBody("Bugün sizi bekleyen bir egzersiziniz mevcut")
+                .setTitle("💪 Egzersiz Hatırlatıcısı")
+                .setBody("🔥 Bugün seni bekleyen bir egzersiz var! 🚀 Haydi, hemen başla!")
+                .build())
+            .putData("screen", "Exercise")
+            .build();
+
+        String response = FirebaseMessaging.getInstance().send(message);
+        System.out.println("✅ Successfully sent notification message to token " + token.getToken() + ": " + response);
+      } catch (Exception e) {
+        System.err.println("❌ Failed to send notification to token " + token.getToken());
+        e.printStackTrace();
+      }
+    });
+
+    return ResponseEntity.ok("Notification sent");
+  }
+
+  public ResponseEntity<?> sendReminderNotification(User receiver) {
+    List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
+
+    fcmTokens.stream().forEach(token -> {
+      try {
+        Message message = Message.builder()
+            .setToken(token.getToken())
+            .setNotification(Notification.builder()
+                .setTitle("💪 Egzersiz Hatırlatıcısı")
+                .setBody("🔥 Bugün seni bekleyen bir egzersiz var! 🚀 Haydi, hemen başla!")
                 .build())
             .putData("screen", "Exercise")
             .build();

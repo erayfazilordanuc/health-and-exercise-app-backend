@@ -44,9 +44,15 @@ public class ReminderScheduler {
     usersToRemind.forEach(user -> notificationService.sendReminderNotification(user));
   }
 
+  // @Scheduled(cron = "0 35 12 ? * SUN", zone = "Europe/Istanbul")
+  public void testReminderSchedule() {
+    System.out.println("Test schedule is working");
+    notificationService.sendTestReminderNotification(null);
+  }
+
   // @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
   public void testSchedule() {
     System.out.println("Test schedule is working");
-    notificationService.sendReminderNotification(null);
+    notificationService.sendTestReminderNotification(null);
   }
 }
