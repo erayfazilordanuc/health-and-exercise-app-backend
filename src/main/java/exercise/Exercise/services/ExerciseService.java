@@ -140,8 +140,8 @@ public class ExerciseService {
       Exercise exercise = exerciseRepo.findById(exerciseId)
           .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
       newExerciseProgress.setExercise(exercise);
-      newExerciseProgress.setProgressRatio(progressRatio);
     }
+    newExerciseProgress.setProgressRatio(progressRatio);
 
     ExerciseProgress savedExerciseProgress = exerciseProgressRepo.save(newExerciseProgress);
     ExerciseProgressDTO newExerciseProgressDTO = new ExerciseProgressDTO(savedExerciseProgress);
