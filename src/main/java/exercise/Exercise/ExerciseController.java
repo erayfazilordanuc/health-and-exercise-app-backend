@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
 import exercise.Exercise.dtos.ExerciseProgressDTO;
+import exercise.Exercise.dtos.ExerciseVideoProgressDTO;
 import exercise.Exercise.dtos.NewVideoDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
 import exercise.Exercise.enums.ExercisePosition;
@@ -51,25 +52,25 @@ public class ExerciseController {
     return ResponseEntity.ok(exercise);
   }
 
-  // progress dönen endpointlerde exerciseDTO daha basitleştirilebilir gecikme
-  // olmaması için
-  @PutMapping("/{exerciseId}/progress/{progressRatio}")
-  public ExerciseProgressDTO progressExercise(@PathVariable Long exerciseId, @PathVariable Integer progressRatio,
+  @PutMapping("/{exerciseId}/video/{videoId}/progress/{progressDuration}")
+  public ExerciseVideoProgressDTO progressExercise(@PathVariable Long exerciseId, @PathVariable Long videoId,
+      @PathVariable Float progressDuration,
       @AuthenticationPrincipal User user) {
-    ExerciseProgressDTO exerciseProgress = exerciseService.progressExercise(exerciseId, progressRatio, user);
+    ExerciseVideoProgressDTO exerciseProgress = exerciseService.progressExercise(exerciseId, videoId, progressDuration,
+        user);
     return exerciseProgress;
   }
 
   @GetMapping("/weekly-active-days/progress")
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(@AuthenticationPrincipal User user) {
-    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(user);
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(user.getId());
     return exerciseProgress;
   }
 
   @GetMapping("/daily/progress")
   public ExerciseProgressDTO getTodaysExerciseProgress(
       @AuthenticationPrincipal User user) {
-    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(user);
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(user.getId());
     return exerciseProgress;
   }
 
@@ -77,7 +78,7 @@ public class ExerciseController {
   public ExerciseProgressDTO getExerciseProgressByDate(
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
-    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(date, user);
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(date, user.getId());
     return exerciseProgress;
   }
 
@@ -85,7 +86,7 @@ public class ExerciseController {
   public void deleteExerciseProgress(@PathVariable Long exerciseId,
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
-    exerciseService.deleteExerciseProgress(exerciseId, date, user);
+    exerciseService.deleteExerciseProgress(exerciseId, date, user.getId());
   }
 
   // @PostMapping("/{id}/achievement")

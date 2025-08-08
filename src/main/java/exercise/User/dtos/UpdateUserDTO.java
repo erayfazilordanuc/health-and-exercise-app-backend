@@ -1,7 +1,6 @@
 package exercise.User.dtos;
 
 import java.util.List;
-import exercise.Exercise.dtos.AchievementDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -22,6 +21,4 @@ public class UpdateUserDTO {
     // private String password;
 
     private Long groupId;
-
-    private List<AchievementDTO> achievementDTOs;
 }

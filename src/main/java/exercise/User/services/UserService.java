@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import exercise.User.dtos.UserDTO;
-import exercise.Exercise.dtos.AchievementDTO;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.mappers.UserMapper;
@@ -82,12 +81,6 @@ public class UserService implements UserDetailsService {
         User updatedUser = userRepo.save(user);
         UserDTO userDTO = new UserDTO(updatedUser);
         return userDTO;
-    }
-
-    public List<AchievementDTO> getAchievements(Long userId) {
-        User userEntity = userRepo.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        return userEntity.getAchievements().stream().map(AchievementDTO::new).toList();
     }
 
     public User updateUser(UpdateUserDTO newUserDTO, User user) {

@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import exercise.Exercise.entities.Achievement;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -67,9 +66,10 @@ public class User implements UserDetails {
     @Column
     private Long groupId;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonIgnore
-    private List<Achievement> achievements;
+    // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch =
+    // FetchType.LAZY, orphanRemoval = true)
+    // @JsonIgnore
+    // private List<Achievement> achievements;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -101,13 +101,12 @@ public class User implements UserDetails {
             String email,
             String fullName,
             String password,
-            Long groupId, List<Achievement> achievements) {
+            Long groupId) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.fullName = fullName;
         this.password = password;
         this.groupId = groupId;
-        this.achievements = achievements;
     }
 }

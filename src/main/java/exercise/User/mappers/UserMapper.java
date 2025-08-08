@@ -8,9 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import exercise.Exercise.dtos.AchievementDTO;
-import exercise.Exercise.entities.Achievement;
-import exercise.Exercise.repositories.AchievementRepository;
 import exercise.Exercise.repositories.ExerciseRepository;
 import exercise.Symptoms.dtos.SymptomsDTO;
 import exercise.Symptoms.entities.Symptoms;
@@ -26,28 +23,14 @@ public class UserMapper {
         SymptomsRepository symptomsRepo;
 
         @Autowired
-        AchievementRepository achievementRepo;
-
-        @Autowired
         private ExerciseRepository exerciseRepo;
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
         public User DTOToEntity(UserDTO userDTO, User user) {
-                List<Achievement> achievements = userDTO.getAchievements().stream()
-                                .map(dto -> {
-                                        Achievement a = new Achievement();
-                                        a.setId(dto.getId());
-                                        a.setUser(user);
-                                        a.setExercise(exerciseRepo.findById(dto.getExerciseDTO().getId()).get());
-                                        return a;
-                                })
-                                .collect(Collectors.toList());
-
                 User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(),
                                 userDTO.getFullName(),
-                                passwordEncoder.encode(user.getPassword()), userDTO.getGroupId(),
-                                achievements);
+                                passwordEncoder.encode(user.getPassword()), userDTO.getGroupId());
 
                 return userEntity;
         }
@@ -56,8 +39,7 @@ public class UserMapper {
                 User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(),
                                 userDTO.getFullName(),
                                 /* passwordEncoder.encode(userDTO.getPassword()) */user.getPassword(),
-                                userDTO.getGroupId(),
-                                user.getAchievements());
+                                userDTO.getGroupId());
 
                 // List<Achievement> achievements = userDTO.getAchievementDTOs().stream()
                 // .map(aDto -> {
@@ -83,12 +65,6 @@ public class UserMapper {
                                 .toList();
 
                 userDTO.setSymptomList(symptomDTOs);
-
-                List<Achievement> achievements = achievementRepo.findByUserId(user.getId());
-
-                userDTO.setAchievements(achievements.stream()
-                                .map(AchievementDTO::new)
-                                .collect(Collectors.toList()));
 
                 return userDTO;
         }

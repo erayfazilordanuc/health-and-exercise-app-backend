@@ -1,7 +1,6 @@
 package exercise.Exercise.services;
 
 import java.io.IOException;
-import java.nio.channels.ReadableByteChannel;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -9,8 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,30 +15,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import exercise.Exercise.dtos.AchievementDTO;
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
 import exercise.Exercise.dtos.ExerciseProgressDTO;
+import exercise.Exercise.dtos.ExerciseVideoProgressDTO;
 import exercise.Exercise.dtos.NewVideoDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
-import exercise.Exercise.entities.Achievement;
 import exercise.Exercise.entities.Exercise;
-import exercise.Exercise.entities.ExerciseProgress;
 import exercise.Exercise.entities.ExerciseVideo;
+import exercise.Exercise.entities.ExerciseVideoProgress;
 import exercise.Exercise.enums.ExercisePosition;
 import exercise.Exercise.mappers.ExerciseMapper;
-import exercise.Exercise.repositories.AchievementRepository;
-import exercise.Exercise.repositories.ExerciseProgressRepository;
 import exercise.Exercise.repositories.ExerciseRepository;
+import exercise.Exercise.repositories.ExerciseVideoProgressRepository;
 import exercise.Exercise.repositories.ExerciseVideoRepository;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
 import jakarta.transaction.Transactional;
-import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import org.mp4parser.IsoFile;
-import org.mp4parser.boxes.iso14496.part12.MovieHeaderBox;
 
 @Service
 public class ExerciseService {
@@ -56,10 +46,10 @@ public class ExerciseService {
   private UserRepository userRepo;
 
   @Autowired
-  private ExerciseProgressRepository exerciseProgressRepo;
+  private ExerciseVideoProgressRepository exerciseVideoProgressRepo;
 
-  @Autowired
-  private AchievementRepository achievementRepo;
+  // @Autowired
+  // private AchievementRepository achievementRepo;
 
   @Autowired
   private S3Service s3Service;
@@ -93,9 +83,8 @@ public class ExerciseService {
 
   @Transactional
   public ExerciseDTO create(CreateExerciseDTO exerciseDTO, User admin) throws IOException {
-    User adminWithAchievements = userRepo.findById(admin.getId()).get();
     Exercise newExercise = new Exercise(null, exerciseDTO.getName(), exerciseDTO.getDescription(),
-        exerciseDTO.getPoint(), null, adminWithAchievements, null, null);
+        exerciseDTO.getPoint(), null, admin, null, null);
 
     Exercise savedExercise = exerciseRepo.save(newExercise);
 
@@ -122,54 +111,24 @@ public class ExerciseService {
     return savedExerciseDTO;
   }
 
-  public ExerciseProgressDTO progressExercise(Long exerciseId, Integer progressRatio, User user) {
-    ExerciseProgress newExerciseProgress = new ExerciseProgress();
-
+  public ExerciseVideoProgressDTO progressExercise(Long exerciseId, Long videoId, Float progressDuration, User user) {
     LocalDateTime start = LocalDate.now().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
-    ExerciseProgress existExerciseProgress = exerciseProgressRepo.findByUserIdAndExerciseIdAndCreatedAtBetween(
-        user.getId(),
-        exerciseId,
-        Timestamp.valueOf(start),
-        Timestamp.valueOf(end));
+    ExerciseVideoProgress videoProgress = exerciseVideoProgressRepo
+        .findByUserIdAndVideoIdAndCreatedAtBetween(
+            user.getId(),
+            videoId,
+            Timestamp.valueOf(start),
+            Timestamp.valueOf(end))
+        .orElse(new ExerciseVideoProgress(user, exerciseRepo.findById(exerciseId)
+            .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId)),
+            exerciseVideoRepo.findById(videoId)
+                .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + videoId))));
 
-    if (existExerciseProgress != null) {
-      newExerciseProgress = existExerciseProgress;
-    } else {
-      newExerciseProgress.setUser(user);
-      Exercise exercise = exerciseRepo.findById(exerciseId)
-          .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId));
-      newExerciseProgress.setExercise(exercise);
-    }
-    newExerciseProgress.setProgressRatio(progressRatio);
+    videoProgress.setProgressDuration(progressDuration);
 
-    ExerciseProgress savedExerciseProgress = exerciseProgressRepo.save(newExerciseProgress);
-    ExerciseProgressDTO newExerciseProgressDTO = new ExerciseProgressDTO(savedExerciseProgress);
-    return newExerciseProgressDTO;
-  }
-
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(User user) {
-    List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
-    LocalDate today = LocalDate.now();
-    LocalDate monday = today.with(DayOfWeek.MONDAY);
-
-    List<ExerciseProgressDTO> result = new ArrayList<>();
-
-    for (DayOfWeek day : activeDays) {
-      LocalDate targetDate = monday.with(day);
-      LocalDateTime start = targetDate.atStartOfDay();
-      LocalDateTime end = start.plusDays(1);
-
-      ExerciseProgress progress = exerciseProgressRepo
-          .findByUserIdAndCreatedAtBetween(
-              user.getId(),
-              Timestamp.valueOf(start),
-              Timestamp.valueOf(end));
-
-      result.add(progress != null ? new ExerciseProgressDTO(progress) : null);
-    }
-
-    return result;
+    ExerciseVideoProgress savedVideoProgress = exerciseVideoProgressRepo.save(videoProgress);
+    return new ExerciseVideoProgressDTO(savedVideoProgress);
   }
 
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId) {
@@ -184,74 +143,91 @@ public class ExerciseService {
       LocalDateTime start = targetDate.atStartOfDay();
       LocalDateTime end = start.plusDays(1);
 
-      ExerciseProgress progress = exerciseProgressRepo
+      List<ExerciseVideoProgress> videoProgress = exerciseVideoProgressRepo
           .findByUserIdAndCreatedAtBetween(
               userId,
               Timestamp.valueOf(start),
               Timestamp.valueOf(end));
 
-      result.add(progress != null ? new ExerciseProgressDTO(progress) : null);
+      if (videoProgress.isEmpty())
+        result.add(null);
+      else {
+        List<ExerciseVideoProgressDTO> videoProgressDTO = videoProgress.stream()
+            .map(vp -> new ExerciseVideoProgressDTO(vp))
+            .collect(Collectors.toList());
+        Float totalProgress = (float) videoProgress.stream()
+            .filter(p -> p.getProgressDuration() != null)
+            .mapToDouble(p -> p.getProgressDuration())
+            .sum();
+        result.add(new ExerciseProgressDTO(userId,
+            new ExerciseDTO(videoProgress.get(0).getExercise()), videoProgressDTO, totalProgress));
+      }
     }
 
     return result;
   }
 
-  public ExerciseProgressDTO getExerciseProgress(User user) {
-    LocalDateTime start = LocalDate.now().atStartOfDay();
-    LocalDateTime end = start.plusDays(1);
-    ExerciseProgress progress = exerciseProgressRepo.findByUserIdAndCreatedAtBetween(
-        user.getId(),
-        Timestamp.valueOf(start),
-        Timestamp.valueOf(end));
-
-    if (progress == null) {
-      return null;
-    }
-
-    return new ExerciseProgressDTO(progress);
-  }
-
   public ExerciseProgressDTO getExerciseProgress(Long userId) {
     LocalDateTime start = LocalDate.now().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
-    ExerciseProgress progress = exerciseProgressRepo.findByUserIdAndCreatedAtBetween(
-        userId,
-        Timestamp.valueOf(start),
-        Timestamp.valueOf(end));
 
-    if (progress == null) {
+    List<ExerciseVideoProgress> videoProgress = exerciseVideoProgressRepo
+        .findByUserIdAndCreatedAtBetween(
+            userId,
+            Timestamp.valueOf(start),
+            Timestamp.valueOf(end));
+
+    if (videoProgress.isEmpty())
       return null;
+    else {
+      List<ExerciseVideoProgressDTO> videoProgressDTO = videoProgress.stream()
+          .map(vp -> new ExerciseVideoProgressDTO(vp))
+          .collect(Collectors.toList());
+      Float totalProgress = (float) videoProgress.stream()
+          .filter(p -> p.getProgressDuration() != null)
+          .mapToDouble(p -> p.getProgressDuration())
+          .sum();
+      return new ExerciseProgressDTO(userId,
+          new ExerciseDTO(videoProgress.get(0).getExercise()), videoProgressDTO, totalProgress);
     }
-
-    return new ExerciseProgressDTO(progress);
   }
 
-  public ExerciseProgressDTO getExerciseProgress(LocalDate date, User user) {
+  public ExerciseProgressDTO getExerciseProgress(LocalDate date, Long userId) {
     LocalDateTime startOfDay = date.atStartOfDay(); // 00:00:00
     LocalDateTime endOfDay = startOfDay.plusDays(1); // ertesi gün 00:00:00
 
-    ExerciseProgress progress = exerciseProgressRepo
+    List<ExerciseVideoProgress> videoProgress = exerciseVideoProgressRepo
         .findByUserIdAndCreatedAtBetween(
-            user.getId(),
-            Timestamp.valueOf(startOfDay),
+            userId,
+            Timestamp.valueOf(
+                startOfDay),
             Timestamp.valueOf(endOfDay));
 
-    if (progress == null) {
+    if (videoProgress.isEmpty())
       return null;
+    else {
+      List<ExerciseVideoProgressDTO> videoProgressDTO = videoProgress.stream()
+          .map(vp -> new ExerciseVideoProgressDTO(vp))
+          .collect(Collectors.toList());
+      Float totalProgress = (float) videoProgress.stream()
+          .filter(p -> p.getProgressDuration() != null)
+          .mapToDouble(p -> p.getProgressDuration())
+          .sum();
+      return new ExerciseProgressDTO(userId,
+          new ExerciseDTO(videoProgress.get(0).getExercise()), videoProgressDTO, totalProgress);
     }
-
-    return new ExerciseProgressDTO(progress);
   }
 
-  public void deleteExerciseProgress(Long exerciseId, LocalDate date, User user) {
+  public void deleteExerciseProgress(Long exerciseId, LocalDate date, Long userId) {
     LocalDateTime startOfDay = date.atStartOfDay();
     LocalDateTime endOfDay = startOfDay.plusDays(1);
-    ExerciseProgress existExerciseProgress = exerciseProgressRepo
-        .findByUserIdAndExerciseIdAndCreatedAtBetween(user.getId(), exerciseId, Timestamp.valueOf(
-            startOfDay),
+    List<ExerciseVideoProgress> videoProgress = exerciseVideoProgressRepo
+        .findByUserIdAndCreatedAtBetween(
+            userId,
             Timestamp.valueOf(
-                endOfDay));
-    exerciseProgressRepo.delete(existExerciseProgress);
+                startOfDay),
+            Timestamp.valueOf(endOfDay));
+    exerciseVideoProgressRepo.deleteAll(videoProgress);
   }
 
   // public static double getDurationSec(String url) throws IOException {

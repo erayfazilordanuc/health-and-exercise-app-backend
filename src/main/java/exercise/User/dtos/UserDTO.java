@@ -3,7 +3,6 @@ package exercise.User.dtos;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import exercise.Exercise.dtos.AchievementDTO;
 import exercise.Symptoms.dtos.SymptomsDTO;
 import exercise.User.entities.User;
 import lombok.AllArgsConstructor;
@@ -34,8 +33,6 @@ public class UserDTO {
     private List<SymptomsDTO> symptomList = new ArrayList<>();
 
     private Long groupId;
-
-    private List<AchievementDTO> achievements = new ArrayList<>();
 
     public UserDTO(User user) {
         this.id = user.getId();

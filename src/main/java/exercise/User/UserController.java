@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import exercise.User.dtos.UserDTO;
-import exercise.Exercise.dtos.AchievementDTO;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.services.UserService;
@@ -38,10 +37,11 @@ public class UserController {
         return userDTO;
     }
 
-    @GetMapping("/me/achievements")
-    public List<AchievementDTO> getAchievement(@AuthenticationPrincipal User user) {
-        return userService.getAchievements(user.getId());
-    }
+    // @GetMapping("/me/achievements")
+    // public List<AchievementDTO> getAchievement(@AuthenticationPrincipal User
+    // user) {
+    // return userService.getAchievements(user.getId());
+    // }
 
     @PutMapping("/me")
     public UserDTO updateMe(@RequestBody UpdateUserDTO newUser,
@@ -85,7 +85,7 @@ public class UserController {
         }
         return userDTO;
     }
-    
+
     // @PreAuthorize("hasRole('ADMIN')")
     // @PutMapping("/id/{id}")
     // public String updateById(@PathVariable Long id, @RequestBody UpdateUserDTO

@@ -20,29 +20,35 @@ import exercise.User.entities.User;
 @Getter
 @Setter
 @Entity
-@Table(name = "exercise_progress")
+@Table(name = "exercise_video_progress")
 @AllArgsConstructor
 @NoArgsConstructor
-public class ExerciseProgress {
+public class ExerciseVideoProgress {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column
+  private Float progressDuration;
+
+  @Column
+  private Boolean isCompeleted = false;
+
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "video_id")
   @JsonIgnore
-  private User user;
+  private ExerciseVideo video;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "exercise_id")
   @JsonIgnore
   private Exercise exercise;
 
-  @Min(value = 0, message = "Progress ratio must be at least 0")
-  @Max(value = 100, message = "Progress ratio cannot exceed 100")
-  @Column
-  private Integer progressRatio;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  @JsonIgnore
+  private User user;
 
   @CreationTimestamp
   @Column(updatable = false)
@@ -51,4 +57,10 @@ public class ExerciseProgress {
   @UpdateTimestamp
   @Column
   private Timestamp updatedAt;
+
+  public ExerciseVideoProgress(User user, Exercise exercise, ExerciseVideo video) {
+    this.user = user;
+    this.exercise = exercise;
+    this.video = video;
+  }
 }

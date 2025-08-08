@@ -9,8 +9,8 @@ import java.util.Objects;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import exercise.Exercise.entities.ExerciseProgress;
-import exercise.Exercise.repositories.ExerciseProgressRepository;
+import exercise.Exercise.entities.ExerciseVideoProgress;
+import exercise.Exercise.repositories.ExerciseVideoProgressRepository;
 import exercise.Notification.services.NotificationService;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReminderScheduler {
   private final UserRepository userRepo;
-  private final ExerciseProgressRepository exerciseProgressRepo;
+  private final ExerciseVideoProgressRepository exerciseVideoProgressRepo;
   private final NotificationService notificationService;
 
   @Scheduled(cron = "0 0 12 ? * MON,WED,FRI", zone = "Europe/Istanbul")
@@ -35,9 +35,9 @@ public class ReminderScheduler {
 
     List<User> usersToRemind = targetUsers.stream()
         .filter(u -> {
-          ExerciseProgress p = exerciseProgressRepo
+          List<ExerciseVideoProgress> vp = exerciseVideoProgressRepo
               .findByUserIdAndCreatedAtBetween(u.getId(), startTs, endTs);
-          return p == null || p.getProgressRatio() < 100;
+          return vp.isEmpty() || !vp.stream().allMatch(ExerciseVideoProgress::getIsCompeleted);
         })
         .toList();
 

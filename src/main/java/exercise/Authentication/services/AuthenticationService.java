@@ -102,7 +102,7 @@ public class AuthenticationService {
             String role) {
         User user = new User(null, registerDTO.getUsername(), registerDTO.getEmail(),
                 registerDTO.getFullName(), registerDTO.getBirthDate(),
-                passwordEncoder.encode(registerDTO.getPassword()), registerDTO.getGender(), role, null, null);
+                passwordEncoder.encode(registerDTO.getPassword()), registerDTO.getGender(), role, null);
         userRepo.save(user);
 
         String accessToken = "Bearer " +
