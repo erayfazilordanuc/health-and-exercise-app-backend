@@ -123,9 +123,13 @@ public class ExerciseService {
         .orElse(new ExerciseVideoProgress(user, exerciseRepo.findById(exerciseId)
             .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + exerciseId)),
             exerciseVideoRepo.findById(videoId)
-                .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + videoId))));
+                .orElseThrow(() -> new RuntimeException("Exercise not found with video id: " + videoId))));
 
     videoProgress.setProgressDuration(progressDuration);
+    ExerciseVideo video = exerciseVideoRepo.findById(videoId)
+        .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + videoId));
+    if (Math.round(progressDuration) - video.getDurationSeconds() < 1)
+      videoProgress.setIsCompeleted(true);
 
     ExerciseVideoProgress savedVideoProgress = exerciseVideoProgressRepo.save(videoProgress);
     return new ExerciseVideoProgressDTO(savedVideoProgress);

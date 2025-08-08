@@ -18,5 +18,5 @@ public class ExerciseProgressDTO {
 
   private List<ExerciseVideoProgressDTO> videoProgress;
 
-  private Float totalrogressDuration;
+  private Float totalProgressDuration;
 }
