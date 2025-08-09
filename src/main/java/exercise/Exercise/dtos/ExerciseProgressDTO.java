@@ -1,5 +1,6 @@
 package exercise.Exercise.dtos;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -18,5 +19,5 @@ public class ExerciseProgressDTO {
 
   private List<ExerciseVideoProgressDTO> videoProgress;
 
-  private Float totalProgressDuration;
+  private BigDecimal totalProgressDuration;
 }

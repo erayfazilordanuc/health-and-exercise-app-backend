@@ -12,6 +12,7 @@ import exercise.Exercise.dtos.ExerciseDTO;
 import exercise.Exercise.dtos.ExerciseProgressDTO;
 import exercise.Exercise.dtos.ExerciseVideoProgressDTO;
 import exercise.Exercise.dtos.NewVideoDTO;
+import exercise.Exercise.dtos.ProgressRequestDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
 import exercise.Exercise.enums.ExercisePosition;
 import exercise.Exercise.services.ExerciseService;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -52,11 +54,12 @@ public class ExerciseController {
     return ResponseEntity.ok(exercise);
   }
 
-  @PutMapping("/{exerciseId}/video/{videoId}/progress/{progressDuration}")
+  @PutMapping("/{exerciseId}/video/{videoId}/progress")
   public ExerciseVideoProgressDTO progressExercise(@PathVariable Long exerciseId, @PathVariable Long videoId,
-      @PathVariable Float progressDuration,
+      @RequestBody ProgressRequestDTO progressDTO,
       @AuthenticationPrincipal User user) {
-    ExerciseVideoProgressDTO exerciseProgress = exerciseService.progressExercise(exerciseId, videoId, progressDuration,
+    ExerciseVideoProgressDTO exerciseProgress = exerciseService.progressExercise(exerciseId, videoId,
+        progressDTO.getSeconds(),
         user);
     return exerciseProgress;
   }

@@ -1,6 +1,7 @@
 package exercise.Exercise.services;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -111,7 +112,8 @@ public class ExerciseService {
     return savedExerciseDTO;
   }
 
-  public ExerciseVideoProgressDTO progressExercise(Long exerciseId, Long videoId, Float progressDuration, User user) {
+  public ExerciseVideoProgressDTO progressExercise(Long exerciseId, Long videoId, BigDecimal progressDuration,
+      User user) {
     LocalDateTime start = LocalDate.now().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
     ExerciseVideoProgress videoProgress = exerciseVideoProgressRepo
@@ -128,8 +130,13 @@ public class ExerciseService {
     videoProgress.setProgressDuration(progressDuration);
     ExerciseVideo video = exerciseVideoRepo.findById(videoId)
         .orElseThrow(() -> new RuntimeException("Exercise not found with id: " + videoId));
-    if (Math.round(progressDuration) - video.getDurationSeconds() < 1)
+    BigDecimal EPS = BigDecimal.ONE;
+    BigDecimal duration = BigDecimal.valueOf(video.getDurationSeconds());
+    BigDecimal remaining = duration.subtract(progressDuration);
+
+    if (remaining.compareTo(EPS) <= 0 && remaining.signum() >= 0) {
       videoProgress.setIsCompeleted(true);
+    }
 
     ExerciseVideoProgress savedVideoProgress = exerciseVideoProgressRepo.save(videoProgress);
     return new ExerciseVideoProgressDTO(savedVideoProgress);
@@ -159,10 +166,9 @@ public class ExerciseService {
         List<ExerciseVideoProgressDTO> videoProgressDTO = videoProgress.stream()
             .map(vp -> new ExerciseVideoProgressDTO(vp))
             .collect(Collectors.toList());
-        Float totalProgress = (float) videoProgress.stream()
-            .filter(p -> p.getProgressDuration() != null)
-            .mapToDouble(p -> p.getProgressDuration())
-            .sum();
+        BigDecimal totalProgress = videoProgress.stream()
+            .map(p -> p != null && p.getProgressDuration() != null ? p.getProgressDuration() : BigDecimal.ZERO)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
         result.add(new ExerciseProgressDTO(userId,
             new ExerciseDTO(videoProgress.get(0).getExercise()), videoProgressDTO, totalProgress));
       }
@@ -187,10 +193,9 @@ public class ExerciseService {
       List<ExerciseVideoProgressDTO> videoProgressDTO = videoProgress.stream()
           .map(vp -> new ExerciseVideoProgressDTO(vp))
           .collect(Collectors.toList());
-      Float totalProgress = (float) videoProgress.stream()
-          .filter(p -> p.getProgressDuration() != null)
-          .mapToDouble(p -> p.getProgressDuration())
-          .sum();
+      BigDecimal totalProgress = videoProgress.stream()
+          .map(p -> p != null && p.getProgressDuration() != null ? p.getProgressDuration() : BigDecimal.ZERO)
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
       return new ExerciseProgressDTO(userId,
           new ExerciseDTO(videoProgress.get(0).getExercise()), videoProgressDTO, totalProgress);
     }
@@ -213,10 +218,9 @@ public class ExerciseService {
       List<ExerciseVideoProgressDTO> videoProgressDTO = videoProgress.stream()
           .map(vp -> new ExerciseVideoProgressDTO(vp))
           .collect(Collectors.toList());
-      Float totalProgress = (float) videoProgress.stream()
-          .filter(p -> p.getProgressDuration() != null)
-          .mapToDouble(p -> p.getProgressDuration())
-          .sum();
+      BigDecimal totalProgress = videoProgress.stream()
+          .map(p -> p != null && p.getProgressDuration() != null ? p.getProgressDuration() : BigDecimal.ZERO)
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
       return new ExerciseProgressDTO(userId,
           new ExerciseDTO(videoProgress.get(0).getExercise()), videoProgressDTO, totalProgress);
     }

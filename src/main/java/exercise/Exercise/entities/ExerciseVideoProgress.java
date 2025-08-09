@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -30,7 +31,7 @@ public class ExerciseVideoProgress {
   private Long id;
 
   @Column
-  private Float progressDuration;
+  private BigDecimal progressDuration;
 
   @Column
   private Boolean isCompeleted = false;

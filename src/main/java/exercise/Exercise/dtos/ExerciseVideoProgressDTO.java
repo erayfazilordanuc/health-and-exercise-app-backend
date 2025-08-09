@@ -1,5 +1,6 @@
 package exercise.Exercise.dtos;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 import exercise.Exercise.entities.ExerciseVideoProgress;
@@ -16,7 +17,7 @@ public class ExerciseVideoProgressDTO {
 
   private Long id;
 
-  private Float progressDuration;
+  private BigDecimal progressDuration;
   private Boolean isCompeleted;
 
   private Long videoId;
