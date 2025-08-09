@@ -37,6 +37,7 @@ public class ExerciseVideoDTO {
 
   public ExerciseVideoDTO(ExerciseVideo video) {
     this.id = video.getId();
+    this.name = video.getName();
     this.videoUrl = video.getVideoUrl();
     this.durationSeconds = video.getDurationSeconds();
     this.exerciseId = video.getExercise().getId();
