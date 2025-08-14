@@ -99,6 +99,7 @@ public class SymptomsService {
 
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
+        symptoms.setTotalCaloriesBurned(symptomsDTO.getTotalCaloriesBurned());
         symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
         symptoms.setSleepMinutes(symptomsDTO.getSleepMinutes());
 
@@ -126,6 +127,7 @@ public class SymptomsService {
 
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
+        symptoms.setTotalCaloriesBurned(symptomsDTO.getTotalCaloriesBurned());
         symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
         symptoms.setSleepMinutes(symptomsDTO.getSleepMinutes());
 
