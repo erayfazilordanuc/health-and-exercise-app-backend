@@ -11,9 +11,10 @@ public class SymptomsMapper {
 
     public SymptomsDTO entityToDTO(Symptoms symptoms) {
         SymptomsDTO symptomsDTO = new SymptomsDTO(symptoms.getId(), symptoms.getPulse(),
-                symptoms.getSteps(), symptoms.getActiveCaloriesBurned(),
-                symptoms.getSleepHours(),
-                symptoms.getSleepSessions(),
+                symptoms.getSteps(), symptoms
+                        .getTotalCaloriesBurned(),
+                symptoms.getActiveCaloriesBurned(),
+                symptoms.getSleepMinutes(),
                 symptoms.getUser().getId(), symptoms.getCreatedAt(), symptoms.getUpdatedAt());
 
         return symptomsDTO;

@@ -15,15 +15,15 @@ public class UpsertSymptomsDTO {
 
   private Integer pulse; // bpm
   private Integer steps; // steps count
+  private Integer totalCaloriesBurned;
   private Integer activeCaloriesBurned;
 
-  private Integer sleepHours; // sleepHours duration in minutes
+  private Integer sleepMinutes; // sleepMinutes duration in minutes
   private List<String> sleepSessions; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
   public UpsertSymptomsDTO(Symptoms symptom) {
     this.pulse = symptom.getPulse();
     this.steps = symptom.getSteps();
-    this.sleepHours = symptom.getSleepHours();
-    this.sleepSessions = symptom.getSleepSessions();
+    this.sleepMinutes = symptom.getSleepMinutes();
   }
 }

@@ -33,8 +33,8 @@ public class SymptomsService {
 
     public Symptoms createSymptoms(UpsertSymptomsDTO symptomsDTO, User user) {
         Symptoms newSymptoms = new Symptoms(null, symptomsDTO.getPulse(),
-                symptomsDTO.getSteps(), symptomsDTO.getActiveCaloriesBurned(),
-                symptomsDTO.getSleepHours(), symptomsDTO.getSleepSessions(), user, null, null);
+                symptomsDTO.getSteps(), symptomsDTO.getTotalCaloriesBurned(), symptomsDTO.getActiveCaloriesBurned(),
+                symptomsDTO.getSleepMinutes(), user, null, null);
         Symptoms savedSymptoms = symptomsRepo.save(newSymptoms);
 
         return savedSymptoms;
@@ -100,8 +100,7 @@ public class SymptomsService {
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
         symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
-        symptoms.setSleepHours(symptomsDTO.getSleepHours());
-        symptoms.setSleepSessions(symptomsDTO.getSleepSessions());
+        symptoms.setSleepMinutes(symptomsDTO.getSleepMinutes());
 
         Symptoms savedSymptoms = symptomsRepo.save(symptoms);
 
@@ -128,8 +127,7 @@ public class SymptomsService {
         symptoms.setPulse(symptomsDTO.getPulse());
         symptoms.setSteps(symptomsDTO.getSteps());
         symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
-        symptoms.setSleepHours(symptomsDTO.getSleepHours());
-        symptoms.setSleepSessions(symptomsDTO.getSleepSessions());
+        symptoms.setSleepMinutes(symptomsDTO.getSleepMinutes());
 
         Symptoms savedSymptoms = symptomsRepo.save(symptoms);
 
