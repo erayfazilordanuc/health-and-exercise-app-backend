@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import exercise.User.dtos.UserDTO;
+import exercise.Consent.entities.Consent;
+import exercise.Consent.repositories.ConsentRepository;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.mappers.UserMapper;
@@ -24,7 +26,17 @@ public class UserService implements UserDetailsService {
     private UserRepository userRepo;
 
     @Autowired
+    private ConsentRepository consentRepo;
+
+    @Autowired
     private UserMapper userMapper;
+
+    public Boolean checkUserConsentState(Long userId) {
+        List<Consent> consents = consentRepo.findByUser_Id(userId);
+        if (consents.size() < 2)
+            return false;
+        return true;
+    }
 
     @Transactional(readOnly = true)
     public UserDTO getUserDTO(User user) {

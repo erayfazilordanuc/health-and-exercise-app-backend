@@ -21,12 +21,16 @@ import exercise.Symptoms.mappers.SymptomsMapper;
 import exercise.Symptoms.repositories.SymptomsRepository;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
+import exercise.User.services.UserService;
 
 @Service
 public class SymptomsService {
 
     @Autowired
     private SymptomsRepository symptomsRepo;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private SymptomsMapper symptomsMapper;
@@ -53,6 +57,10 @@ public class SymptomsService {
     }
 
     public List<Symptoms> getAllSymptomsByUserId(Long userId) {
+        if (!userService.checkUserConsentState(userId))
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "KVKK consent required");
+
         List<Symptoms> symptoms = symptomsRepo.findByUserId(userId);
 
         return symptoms;
@@ -74,6 +82,10 @@ public class SymptomsService {
     }
 
     public Symptoms getSymptomsByUserIdAndDate(Long userId, LocalDate date) {
+        if (!userService.checkUserConsentState(userId))
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "KVKK consent required");
+
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
         Symptoms symptoms = symptomsRepo.findByUserIdAndDate(userId, startOfDay);
 

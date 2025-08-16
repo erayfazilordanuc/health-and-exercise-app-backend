@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -58,8 +59,6 @@ public class UserController {
         return response;
     }
 
-    // @Tag(name = "Admin Operations")
-    // @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/id/{id}")
     @Transactional(readOnly = true)
     public UserDTO getById(@PathVariable Long id, @AuthenticationPrincipal User user) {

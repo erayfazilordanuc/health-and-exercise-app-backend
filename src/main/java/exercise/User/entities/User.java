@@ -66,6 +66,12 @@ public class User implements UserDetails {
     @Column
     private Long groupId;
 
+    // @Column
+    // private Boolean kvkkApproved;
+
+    // @Column
+    // private Boolean healthDataApproved;
+
     // @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch =
     // FetchType.LAZY, orphanRemoval = true)
     // @JsonIgnore

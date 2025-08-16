@@ -32,6 +32,7 @@ import exercise.Exercise.repositories.ExerciseVideoProgressRepository;
 import exercise.Exercise.repositories.ExerciseVideoRepository;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
+import exercise.User.services.UserService;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -45,6 +46,9 @@ public class ExerciseService {
 
   @Autowired
   private UserRepository userRepo;
+
+  @Autowired
+  private UserService userService;
 
   @Autowired
   private ExerciseVideoProgressRepository exerciseVideoProgressRepo;
@@ -143,6 +147,11 @@ public class ExerciseService {
   }
 
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId) {
+    if (!userService.checkUserConsentState(userId))
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "KVKK consent required");
+    ;
+
     List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
     LocalDate today = LocalDate.now();
     LocalDate monday = today.with(DayOfWeek.MONDAY);
@@ -178,6 +187,11 @@ public class ExerciseService {
   }
 
   public ExerciseProgressDTO getExerciseProgress(Long userId) {
+    if (!userService.checkUserConsentState(userId))
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "KVKK consent required");
+    ;
+
     LocalDateTime start = LocalDate.now().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
 
