@@ -3,23 +3,33 @@ package exercise.Consent.dtos;
 import java.sql.Timestamp;
 
 import exercise.Consent.entities.ConsentPolicy;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-public record ConsentPolicyDTO(
-    Long id,
-    String purpose,
-    String version,
-    String locale,
-    String contentHash,
-    String contentUrl,
-    String content, // includeContent=true ise dolar
-    Timestamp createdAt,
-    Timestamp effectiveAt) {
+@Getter
+@Setter
+@AllArgsConstructor
+public class ConsentPolicyDTO {
+  private Long id;
+  private String purpose;
+  private String version;
+  private String locale;
+  private String contentHash;
+  private String contentUrl;
+  private String content; // includeContent=true ise dolar
+  private Timestamp createdAt;
+  private Timestamp effectiveAt;
 
-  public static ConsentPolicyDTO of(ConsentPolicy p, boolean includeContent) {
-    return new ConsentPolicyDTO(
-        p.getId(),
-        p.getPurpose().name(), p.getVersion(), p.getLocale(),
-        p.getContentHash(), p.getContentUrl(),
-        includeContent ? p.getContentMd() : null, p.getCreatedAt(), p.getEffectiveAt());
+  public ConsentPolicyDTO(ConsentPolicy p, boolean includeContent) {
+    this.id = p.getId();
+    this.purpose = p.getPurpose().name();
+    this.version = p.getVersion();
+    this.locale = p.getLocale();
+    this.contentHash = p.getContentHash();
+    this.contentUrl = p.getContentUrl();
+    this.content = includeContent ? p.getContentMd() : null;
+    this.createdAt = p.getCreatedAt();
+    this.effectiveAt = p.getEffectiveAt();
   }
 }

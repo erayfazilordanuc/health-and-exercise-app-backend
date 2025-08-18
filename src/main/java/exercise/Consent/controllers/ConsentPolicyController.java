@@ -42,7 +42,7 @@ public class ConsentPolicyController {
     return ResponseEntity.ok()
         .eTag(etag)
         // .cacheControl(CacheControl.maxAge(Duration.ofHours(12)).cachePublic())
-        .body(ConsentPolicyDTO.of(p, includeContent));
+        .body(new ConsentPolicyDTO(p, includeContent));
   }
 
   @GetMapping("/{version}")
@@ -51,6 +51,6 @@ public class ConsentPolicyController {
       @RequestParam ConsentPolicyPurpose purpose,
       @RequestParam(defaultValue = "tr-TR") String locale,
       @RequestParam(defaultValue = "true") boolean includeContent) {
-    return ConsentPolicyDTO.of(service.byVersion(purpose, version, locale), includeContent);
+    return new ConsentPolicyDTO(service.byVersion(purpose, version, locale), includeContent);
   }
 }

@@ -1,5 +1,6 @@
 package exercise.Consent.services;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -8,8 +9,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import exercise.Consent.dtos.ConsentDTO;
 import exercise.Consent.entities.Consent;
+import exercise.Consent.entities.ConsentPolicy;
 import exercise.Consent.enums.ConsentPurpose;
 import exercise.Consent.enums.ConsentStatus;
+import exercise.Consent.repositories.ConsentPolicyRepository;
 import exercise.Consent.repositories.ConsentRepository;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
@@ -21,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class ConsentServiceImpl implements ConsentService {
 
   private final ConsentRepository repo;
-  private final UserRepository userRepo; // sadece id'li proxy yaratmak istemezsen
+  private final ConsentPolicyRepository policyRepo;
 
   @Transactional
   @Override
@@ -29,7 +32,6 @@ public class ConsentServiceImpl implements ConsentService {
     Consent c = repo.findByUser_IdAndPurpose(userId, dto.purpose())
         .orElseGet(() -> {
           Consent n = new Consent();
-          // sadece id veren proxy yeterliyse:
           User u = new User();
           u.setId(userId);
           n.setUser(u);
@@ -37,9 +39,17 @@ public class ConsentServiceImpl implements ConsentService {
           return n;
         });
 
-    c.setStatus(dto.status());
-    c.setPolicyVersion(dto.policyVersion());
-    c.setEvidenceHash(dto.evidenceHash());
+    ConsentPolicy consentPolicy = policyRepo.findById(dto.consentPolicyId()).get();
+    if (dto.purpose() == ConsentPurpose.KVKK_NOTICE_ACK) {
+      c.setStatus(ConsentStatus.ACKNOWLEDGED); // gelen status'ü YOK SAY
+      if (c.getGrantedAt() == null) {
+        c.setGrantedAt(new Timestamp(System.currentTimeMillis()));
+      }
+      c.setWithdrawnAt(null);
+    } else {
+      c.setStatus(dto.status());
+    }
+    c.setConsentPolicy(consentPolicy);
     c.setIpAddress(ip);
     c.setUserAgent(ua);
     c.setLocale(dto.locale());

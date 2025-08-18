@@ -43,6 +43,10 @@ public class Consent {
   @JsonIgnore
   private User user;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "consent_policy_id")
+  private ConsentPolicy consentPolicy;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private ConsentPurpose purpose;
@@ -51,13 +55,9 @@ public class Consent {
   @Column(nullable = false)
   private ConsentStatus status; // ACCEPTED / REJECTED / WITHDRAWN
 
-  @Column(nullable = false, length = 32)
-  private String policyVersion;
-
   @Column
   private String ipAddress;
 
-  private String evidenceHash;
   private String source = "MOBILE";
   private String userAgent;
   private String locale;
@@ -76,15 +76,17 @@ public class Consent {
   @PrePersist
   @PreUpdate
   private void syncTimestampsByStatus() {
-    if (status == ConsentStatus.ACCEPTED && grantedAt == null) {
+    // Hem ACCEPTED hem de ACKNOWLEDGED için grantedAt zorunlu
+    if ((status == ConsentStatus.ACCEPTED || status == ConsentStatus.ACKNOWLEDGED) && grantedAt == null) {
       grantedAt = new Timestamp(System.currentTimeMillis());
     }
+
     if (status == ConsentStatus.WITHDRAWN) {
       if (withdrawnAt == null) {
         withdrawnAt = new Timestamp(System.currentTimeMillis());
       }
     } else {
-      withdrawnAt = null; // ACCEPTED/REJECTED iken withdrawnAt boş kalır
+      withdrawnAt = null; // ACCEPTED/REJECTED/ACKNOWLEDGED iken withdrawnAt boş kalır
     }
   }
 
