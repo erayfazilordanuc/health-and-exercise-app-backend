@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import exercise.Consent.dtos.PolicyResponse;
+import exercise.Consent.dtos.ConsentPolicyDTO;
 import exercise.Consent.enums.ConsentPolicyPurpose;
 import exercise.Consent.services.ConsentPolicyService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +28,7 @@ public class ConsentPolicyController {
   private final ConsentPolicyService service;
 
   @GetMapping("/latest")
-  public ResponseEntity<PolicyResponse> latest(
+  public ResponseEntity<ConsentPolicyDTO> latest(
       @RequestParam ConsentPolicyPurpose purpose,
       @RequestParam(defaultValue = "tr-TR") String locale,
       @RequestParam(defaultValue = "false") boolean includeContent,
@@ -41,16 +41,16 @@ public class ConsentPolicyController {
     }
     return ResponseEntity.ok()
         .eTag(etag)
-        .cacheControl(CacheControl.maxAge(Duration.ofHours(12)).cachePublic())
-        .body(PolicyResponse.of(p, includeContent));
+        // .cacheControl(CacheControl.maxAge(Duration.ofHours(12)).cachePublic())
+        .body(ConsentPolicyDTO.of(p, includeContent));
   }
 
   @GetMapping("/{version}")
-  public PolicyResponse byVersion(
+  public ConsentPolicyDTO byVersion(
       @PathVariable String version,
       @RequestParam ConsentPolicyPurpose purpose,
       @RequestParam(defaultValue = "tr-TR") String locale,
       @RequestParam(defaultValue = "true") boolean includeContent) {
-    return PolicyResponse.of(service.byVersion(purpose, version, locale), includeContent);
+    return ConsentPolicyDTO.of(service.byVersion(purpose, version, locale), includeContent);
   }
 }

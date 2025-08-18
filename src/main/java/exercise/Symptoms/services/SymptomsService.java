@@ -56,8 +56,8 @@ public class SymptomsService {
         return ResponseEntity.ok(dto);
     }
 
-    public List<Symptoms> getAllSymptomsByUserId(Long userId) {
-        if (!userService.checkUserConsentState(userId))
+    public List<Symptoms> getAllSymptomsByUserId(Long userId, User actor) {
+        if (Objects.isNull(actor) || userId != actor.getId() && !userService.checkUserConsentState(userId))
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "KVKK consent required");
 
@@ -81,8 +81,8 @@ public class SymptomsService {
         return symptoms;
     }
 
-    public Symptoms getSymptomsByUserIdAndDate(Long userId, LocalDate date) {
-        if (!userService.checkUserConsentState(userId))
+    public Symptoms getSymptomsByUserIdAndDate(Long userId, LocalDate date, User actor) {
+        if (Objects.isNull(actor) || userId != actor.getId() && !userService.checkUserConsentState(userId))
             throw new ResponseStatusException(
                     HttpStatus.FORBIDDEN, "KVKK consent required");
 

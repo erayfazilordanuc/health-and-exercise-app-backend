@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,11 +147,10 @@ public class ExerciseService {
     return new ExerciseVideoProgressDTO(savedVideoProgress);
   }
 
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId) {
-    if (!userService.checkUserConsentState(userId))
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId, User actor) {
+    if (Objects.isNull(actor) || userId != actor.getId() && !userService.checkUserConsentState(userId))
       throw new ResponseStatusException(
           HttpStatus.FORBIDDEN, "KVKK consent required");
-    ;
 
     List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
     LocalDate today = LocalDate.now();
@@ -186,8 +186,8 @@ public class ExerciseService {
     return result;
   }
 
-  public ExerciseProgressDTO getExerciseProgress(Long userId) {
-    if (!userService.checkUserConsentState(userId))
+  public ExerciseProgressDTO getExerciseProgress(Long userId, User actor) {
+    if (Objects.isNull(actor) || userId != actor.getId() && !userService.checkUserConsentState(userId))
       throw new ResponseStatusException(
           HttpStatus.FORBIDDEN, "KVKK consent required");
     ;
