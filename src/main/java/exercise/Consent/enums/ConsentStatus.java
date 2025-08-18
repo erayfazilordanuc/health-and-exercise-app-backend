@@ -1,5 +1,5 @@
 package exercise.Consent.enums;
 
 public enum ConsentStatus {
-  ACCEPTED, REJECTED, WITHDRAWN
+  ACCEPTED, REJECTED, WITHDRAWN, ACKNOWLEDGED
 }

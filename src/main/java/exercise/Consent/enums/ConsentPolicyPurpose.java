@@ -1,5 +1,5 @@
 package exercise.Consent.enums;
 
 public enum ConsentPolicyPurpose {
-  KVKK_SUMMARY, HEALTH_DATA_PROCESSING
+  KVKK_NOTICE, HEALTH_DATA_PROCESSING
 }
