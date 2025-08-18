@@ -29,32 +29,32 @@ public class ConsentServiceImpl implements ConsentService {
   @Transactional
   @Override
   public Consent upsertConsent(Long userId, ConsentDTO dto, String ip, String ua) {
-    Consent c = repo.findByUser_IdAndPurpose(userId, dto.purpose())
+    Consent c = repo.findByUser_IdAndPurpose(userId, dto.getPurpose())
         .orElseGet(() -> {
           Consent n = new Consent();
           User u = new User();
           u.setId(userId);
           n.setUser(u);
-          n.setPurpose(dto.purpose());
+          n.setPurpose(dto.getPurpose());
           return n;
         });
 
-    ConsentPolicy consentPolicy = policyRepo.findById(dto.consentPolicyId()).get();
-    if (dto.purpose() == ConsentPurpose.KVKK_NOTICE_ACK) {
+    ConsentPolicy consentPolicy = policyRepo.findById(dto.getConsentPolicyId()).get();
+    if (dto.getPurpose() == ConsentPurpose.KVKK_NOTICE_ACK) {
       c.setStatus(ConsentStatus.ACKNOWLEDGED); // gelen status'ü YOK SAY
       if (c.getGrantedAt() == null) {
         c.setGrantedAt(new Timestamp(System.currentTimeMillis()));
       }
       c.setWithdrawnAt(null);
     } else {
-      c.setStatus(dto.status());
+      c.setStatus(dto.getStatus());
     }
     c.setConsentPolicy(consentPolicy);
     c.setIpAddress(ip);
     c.setUserAgent(ua);
-    c.setLocale(dto.locale());
-    if (dto.source() != null && !dto.source().isBlank()) {
-      c.setSource(dto.source());
+    c.setLocale(dto.getLocale());
+    if (dto.getSource() != null && !dto.getSource().isBlank()) {
+      c.setSource(dto.getSource());
     }
     // grantedAt/withdrawnAt gibi alanlar eklediysen @PrePersist/@PreUpdate ile
     // otomatik işler

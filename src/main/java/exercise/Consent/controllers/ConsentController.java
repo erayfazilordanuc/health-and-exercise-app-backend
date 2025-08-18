@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
@@ -56,16 +57,13 @@ public class ConsentController {
   }
 
   @GetMapping("/mine/latest")
-  public Map<ConsentPurpose, Consent> myLatest(@RequestParam(required = false) List<ConsentPurpose> purposes,
+  public ConsentDTO myLatest(@RequestParam ConsentPurpose purpose,
       @AuthenticationPrincipal User user) {
-    Long userId = user.getId();
-    List<ConsentPurpose> list = (purposes == null || purposes.isEmpty())
-        ? Arrays.asList(ConsentPurpose.values())
-        : purposes;
-    return list.stream()
-        .map(p -> Map.entry(p, service.latest(userId, p).orElse(null)))
-        .filter(e -> e.getValue() != null)
-        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    Optional<Consent> latest = service.latest(user.getId(), purpose);
+    if (latest.isPresent())
+      return new ConsentDTO(latest.get());
+    else
+      return null;
   }
 
   // küçük yardımcı (proxy arkasında doğru IP için)
