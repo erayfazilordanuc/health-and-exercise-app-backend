@@ -54,7 +54,7 @@ public class SymptomsController {
   @GetMapping
   public List<Symptoms> getSymptomsByUser(
       @AuthenticationPrincipal User user) {
-    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user.getId());
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user.getId(), user);
     return symptoms;
   }
 
@@ -104,7 +104,7 @@ public class SymptomsController {
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/user/id/{id}")
   public List<Symptoms> getByUserId(@PathVariable Long id) {
-    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(id);
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(id, null);
     return symptoms;
   }
 
@@ -114,7 +114,7 @@ public class SymptomsController {
   public Symptoms getSymptomsByUserIdAndDate(
       @PathVariable Long id,
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(id, date);
+    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(id, date, null);
     return symptoms;
   }
 }
