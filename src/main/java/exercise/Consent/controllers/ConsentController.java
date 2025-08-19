@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import exercise.Consent.dtos.ConsentDTO;
+import exercise.Consent.dtos.UpsertConsentDTO;
 import exercise.Consent.entities.Consent;
 import exercise.Consent.enums.ConsentPurpose;
 import exercise.Consent.services.ConsentService;
@@ -39,13 +40,14 @@ public class ConsentController {
   private final ConsentService service;
 
   @PostMapping
-  public ResponseEntity<Consent> give(@Valid @RequestBody ConsentDTO dto,
+  public ResponseEntity<Consent> give(@Valid @RequestBody UpsertConsentDTO dto,
       HttpServletRequest req,
       @AuthenticationPrincipal User user) {
     Long userId = user.getId();
     String ip = clientIp(req);
     String ua = req.getHeader("User-Agent");
     Consent saved = service.upsertConsent(userId, dto, ip, ua);
+
     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }
 
@@ -59,11 +61,7 @@ public class ConsentController {
   @GetMapping("/mine/latest")
   public ConsentDTO myLatest(@RequestParam ConsentPurpose purpose,
       @AuthenticationPrincipal User user) {
-    Optional<Consent> latest = service.latest(user.getId(), purpose);
-    if (latest.isPresent())
-      return new ConsentDTO(latest.get());
-    else
-      return null;
+    return service.latest(user.getId(), purpose);
   }
 
   // küçük yardımcı (proxy arkasında doğru IP için)

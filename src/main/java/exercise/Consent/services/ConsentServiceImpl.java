@@ -3,15 +3,19 @@ package exercise.Consent.services;
 import java.sql.Timestamp;
 import java.util.Optional;
 
+import org.checkerframework.checker.units.qual.m;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import exercise.Consent.dtos.ConsentDTO;
+import exercise.Consent.dtos.ConsentPolicyDTO;
+import exercise.Consent.dtos.UpsertConsentDTO;
 import exercise.Consent.entities.Consent;
 import exercise.Consent.entities.ConsentPolicy;
 import exercise.Consent.enums.ConsentPurpose;
 import exercise.Consent.enums.ConsentStatus;
+import exercise.Consent.mappers.ConsentMapper;
 import exercise.Consent.repositories.ConsentPolicyRepository;
 import exercise.Consent.repositories.ConsentRepository;
 import exercise.User.entities.User;
@@ -25,10 +29,11 @@ public class ConsentServiceImpl implements ConsentService {
 
   private final ConsentRepository repo;
   private final ConsentPolicyRepository policyRepo;
+  private final ConsentMapper mapper;
 
   @Transactional
   @Override
-  public Consent upsertConsent(Long userId, ConsentDTO dto, String ip, String ua) {
+  public Consent upsertConsent(Long userId, UpsertConsentDTO dto, String ip, String ua) {
     Consent c = repo.findByUser_IdAndPurpose(userId, dto.getPurpose())
         .orElseGet(() -> {
           Consent n = new Consent();
@@ -39,7 +44,7 @@ public class ConsentServiceImpl implements ConsentService {
           return n;
         });
 
-    ConsentPolicy consentPolicy = policyRepo.findById(dto.getConsentPolicyId()).get();
+    ConsentPolicy consentPolicy = policyRepo.findById(dto.getPolicyId()).get();
     if (dto.getPurpose() == ConsentPurpose.KVKK_NOTICE_ACK) {
       c.setStatus(ConsentStatus.ACKNOWLEDGED); // gelen status'ü YOK SAY
       if (c.getGrantedAt() == null) {
@@ -82,9 +87,16 @@ public class ConsentServiceImpl implements ConsentService {
     return c;
   }
 
+  @Transactional
   @Override
-  public Optional<Consent> latest(Long userId, ConsentPurpose purpose) {
-    return repo.findByUser_IdAndPurpose(userId, purpose);
+  public ConsentDTO latest(Long userId, ConsentPurpose purpose) {
+    Optional<Consent> consent = repo.findByUser_IdAndPurpose(userId, purpose);
+    if (consent.isPresent()) {
+      ConsentPolicy policy = policyRepo.findById(consent.get().getConsentPolicy().getId()).get();
+      ConsentDTO dto = mapper.entityToDTO(consent.get());
+      return dto;
+    } else
+      return null;
   }
 
   @Override

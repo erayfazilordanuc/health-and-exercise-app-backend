@@ -1,9 +1,12 @@
 package exercise.Consent.dtos;
 
+import java.util.Objects;
+
 import exercise.Consent.entities.Consent;
 import exercise.Consent.entities.ConsentPolicy;
 import exercise.Consent.enums.ConsentPurpose;
 import exercise.Consent.enums.ConsentStatus;
+import exercise.User.entities.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -14,23 +17,17 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ConsentDTO {
-        @NotNull
+
+        private Long id;
+
         private ConsentPurpose purpose;
 
-        @NotNull
-        private ConsentStatus status; // ACCEPTED / REJECTED / WITHDRAWN
+        private ConsentStatus status;
 
-        @NotNull
-        private Long consentPolicyId;
+        private ConsentPolicyDTO policyDTO;
+
+        private Long userId;
 
         private String locale;
-        private String source; //
-
-        public ConsentDTO(Consent c) {
-                this.purpose = c.getPurpose();
-                this.status = c.getStatus();
-                this.consentPolicyId = c.getConsentPolicy().getId();
-                this.locale = c.getLocale();
-                this.source = c.getSource();
-        }
+        private String source;
 }
