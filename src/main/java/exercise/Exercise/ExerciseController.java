@@ -107,16 +107,17 @@ public class ExerciseController {
 
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/weekly-active-days/progress/{userId}")
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgressByUserId(@PathVariable Long userId) {
-    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(userId, null);
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgressByUserId(@PathVariable Long userId,
+      @AuthenticationPrincipal User user) {
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(userId, user);
     return exerciseProgress;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/daily/progress/{userId}")
   public ExerciseProgressDTO getTodaysExerciseProgressByUserId(
-      @PathVariable Long userId) {
-    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(userId, null);
+      @PathVariable Long userId, @AuthenticationPrincipal User user) {
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(userId, user);
     return exerciseProgress;
   }
 
