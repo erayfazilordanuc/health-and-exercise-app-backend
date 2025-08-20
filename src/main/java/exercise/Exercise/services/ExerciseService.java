@@ -13,6 +13,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -170,7 +171,7 @@ public class ExerciseService {
           .findByUserIdAndCreatedAtBetween(
               userId,
               Timestamp.valueOf(start),
-              Timestamp.valueOf(end));
+              Timestamp.valueOf(end), Sort.by(Sort.Direction.ASC, "createdAt"));
 
       if (videoProgress.isEmpty())
         result.add(null);
@@ -205,7 +206,7 @@ public class ExerciseService {
         .findByUserIdAndCreatedAtBetween(
             userId,
             Timestamp.valueOf(start),
-            Timestamp.valueOf(end));
+            Timestamp.valueOf(end), Sort.by(Sort.Direction.ASC, "createdAt"));
 
     if (videoProgress.isEmpty())
       return null;
@@ -230,7 +231,7 @@ public class ExerciseService {
             userId,
             Timestamp.valueOf(
                 startOfDay),
-            Timestamp.valueOf(endOfDay));
+            Timestamp.valueOf(endOfDay), Sort.by(Sort.Direction.ASC, "createdAt"));
 
     if (videoProgress.isEmpty())
       return null;
@@ -254,7 +255,7 @@ public class ExerciseService {
             userId,
             Timestamp.valueOf(
                 startOfDay),
-            Timestamp.valueOf(endOfDay));
+            Timestamp.valueOf(endOfDay), Sort.by(Sort.Direction.ASC, "createdAt"));
     exerciseVideoProgressRepo.deleteAll(videoProgress);
   }
 

@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -36,7 +37,7 @@ public class ReminderScheduler {
     List<User> usersToRemind = targetUsers.stream()
         .filter(u -> {
           List<ExerciseVideoProgress> vp = exerciseVideoProgressRepo
-              .findByUserIdAndCreatedAtBetween(u.getId(), startTs, endTs);
+              .findByUserIdAndCreatedAtBetween(u.getId(), startTs, endTs, Sort.by(Sort.Direction.ASC, "createdAt"));
           return vp.isEmpty() || !vp.stream().allMatch(ExerciseVideoProgress::getIsCompeleted);
         })
         .toList();
