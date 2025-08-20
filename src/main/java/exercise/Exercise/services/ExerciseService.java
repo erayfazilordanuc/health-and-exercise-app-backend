@@ -148,7 +148,8 @@ public class ExerciseService {
   }
 
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId, User actor) {
-    if (Objects.isNull(actor) || userId != actor.getId() && !userService.checkUserConsentState(userId))
+    if (Objects.isNull(actor) || actor.getRole().equals("ROLE_USER")
+        && userId != actor.getId() && !userService.checkUserConsentState(userId))
       throw new ResponseStatusException(
           HttpStatus.FORBIDDEN, "KVKK consent required");
 
@@ -187,7 +188,8 @@ public class ExerciseService {
   }
 
   public ExerciseProgressDTO getExerciseProgress(Long userId, User actor) {
-    if (Objects.isNull(actor) || userId != actor.getId() && !userService.checkUserConsentState(userId))
+    if (Objects.isNull(actor) || actor.getRole().equals("ROLE_USER")
+        && userId != actor.getId() && !userService.checkUserConsentState(userId))
       throw new ResponseStatusException(
           HttpStatus.FORBIDDEN, "KVKK consent required");
     ;

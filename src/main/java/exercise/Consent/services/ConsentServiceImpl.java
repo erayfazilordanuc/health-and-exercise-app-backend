@@ -92,7 +92,6 @@ public class ConsentServiceImpl implements ConsentService {
   public ConsentDTO latest(Long userId, ConsentPurpose purpose) {
     Optional<Consent> consent = repo.findByUser_IdAndPurpose(userId, purpose);
     if (consent.isPresent()) {
-      ConsentPolicy policy = policyRepo.findById(consent.get().getConsentPolicy().getId()).get();
       ConsentDTO dto = mapper.entityToDTO(consent.get());
       return dto;
     } else

@@ -113,8 +113,8 @@ public class SymptomsController {
   @GetMapping("/user/id/{id}/date/{date}")
   public Symptoms getSymptomsByUserIdAndDate(
       @PathVariable Long id,
-      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(id, date, null);
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @AuthenticationPrincipal User user) {
+    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(id, date, user);
     return symptoms;
   }
 }

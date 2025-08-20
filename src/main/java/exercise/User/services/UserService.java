@@ -1,6 +1,9 @@
 package exercise.User.services;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import exercise.User.dtos.UserDTO;
 import exercise.Consent.entities.Consent;
+import exercise.Consent.enums.ConsentPurpose;
+import exercise.Consent.enums.ConsentStatus;
 import exercise.Consent.repositories.ConsentRepository;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
@@ -31,11 +36,40 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserMapper userMapper;
 
-    public Boolean checkUserConsentState(Long userId) {
+    public boolean checkUserConsentState(Long userId) {
         List<Consent> consents = consentRepo.findByUser_Id(userId);
-        if (consents.size() < 2)
+        if (consents == null || consents.isEmpty())
             return false;
-        return true;
+
+        // withdrawn/iptal edilenleri ele
+        List<Consent> active = consents.stream()
+                .filter(c -> c.getWithdrawnAt() == null)
+                .toList();
+
+        // her purpose için EN GÜNCEL kaydı al (grantedAt varsa onu, yoksa createdAt)
+        Map<ConsentPurpose, Consent> latestByPurpose = active.stream()
+                .collect(Collectors.toMap(
+                        Consent::getPurpose,
+                        c -> c,
+                        (a, b) -> {
+                            var atA = a.getGrantedAt() != null ? a.getGrantedAt() : a.getCreatedAt();
+                            var atB = b.getGrantedAt() != null ? b.getGrantedAt() : b.getCreatedAt();
+                            return atA.after(atB) ? a : b;
+                        }));
+
+        // KVKK bilgilendirmesi "okudum"
+        boolean kvkkOk = Optional.ofNullable(latestByPurpose.get(ConsentPurpose.KVKK_NOTICE_ACK))
+                .map(Consent::getStatus)
+                .map(s -> s == ConsentStatus.ACKNOWLEDGED) // senin enum’una göre
+                .orElse(false);
+
+        // Sağlık verileri için açık rıza
+        boolean healthOk = Optional.ofNullable(latestByPurpose.get(ConsentPurpose.HEALTH_DATA_PROCESSING))
+                .map(Consent::getStatus)
+                .map(s -> s == ConsentStatus.ACCEPTED) // hangisini kullanıyorsan
+                .orElse(false);
+
+        return kvkkOk && healthOk;
     }
 
     @Transactional(readOnly = true)

@@ -13,7 +13,7 @@ public class ConsentMapper {
         ConsentDTO ConsentDTO = new ConsentDTO(consent.getId(), consent.getPurpose(),
                 consent.getStatus(),
                 new ConsentPolicyDTO(consent
-                        .getConsentPolicy(), false),
+                        .getConsentPolicy(), true),
                 consent.getUser().getId(),
                 consent.getLocale(),
                 consent.getSource());
