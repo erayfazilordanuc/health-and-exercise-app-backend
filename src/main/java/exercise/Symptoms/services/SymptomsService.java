@@ -57,10 +57,11 @@ public class SymptomsService {
     }
 
     public List<Symptoms> getAllSymptomsByUserId(Long userId, User actor) {
-        if (userId != actor.getId()
-                && !userService.checkUserConsentState(userId) || !userService.checkUserConsentState(actor.getId()))
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "KVKK consent required");
+        if (!Objects.isNull(actor)) { // if true, the actor is admin
+            if (!userService.checkUserConsentState(actor.getId()) || !userService.checkUserConsentState(userId))
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "KVKK consent required");
+        }
 
         List<Symptoms> symptoms = symptomsRepo.findByUserId(userId);
 
@@ -83,10 +84,11 @@ public class SymptomsService {
     }
 
     public Symptoms getSymptomsByUserIdAndDate(Long userId, LocalDate date, User actor) {
-        if (userId != actor.getId()
-                && !userService.checkUserConsentState(userId) || !userService.checkUserConsentState(actor.getId()))
-            throw new ResponseStatusException(
-                    HttpStatus.FORBIDDEN, "KVKK consent required");
+        if (!Objects.isNull(actor)) { // if true, the actor is admin
+            if (!userService.checkUserConsentState(actor.getId()) || !userService.checkUserConsentState(userId))
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "KVKK consent required");
+        }
 
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
         Symptoms symptoms = symptomsRepo.findByUserIdAndDate(userId, startOfDay);

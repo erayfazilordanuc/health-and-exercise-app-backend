@@ -149,10 +149,11 @@ public class ExerciseService {
   }
 
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId, User actor) {
-    if (userId != actor.getId()
-        && !userService.checkUserConsentState(userId) || !userService.checkUserConsentState(actor.getId()))
-      throw new ResponseStatusException(
-          HttpStatus.FORBIDDEN, "KVKK consent required");
+    if (!Objects.isNull(actor)) { // if true, the actor is admin
+      if (!userService.checkUserConsentState(actor.getId()) || !userService.checkUserConsentState(userId))
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN, "KVKK consent required");
+    }
 
     List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
     LocalDate today = LocalDate.now();
@@ -189,11 +190,11 @@ public class ExerciseService {
   }
 
   public ExerciseProgressDTO getExerciseProgress(Long userId, User actor) {
-    if (userId != actor.getId() && !userService.checkUserConsentState(userId)
-        || !userService.checkUserConsentState(actor.getId()))
-      throw new ResponseStatusException(
-          HttpStatus.FORBIDDEN, "KVKK consent required");
-    ;
+    if (!Objects.isNull(actor)) { // if true, the actor is admin
+      if (!userService.checkUserConsentState(actor.getId()) || !userService.checkUserConsentState(userId))
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN, "KVKK consent required");
+    }
 
     LocalDateTime start = LocalDate.now().atStartOfDay();
     LocalDateTime end = start.plusDays(1);
