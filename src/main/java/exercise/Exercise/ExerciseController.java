@@ -73,7 +73,7 @@ public class ExerciseController {
   @GetMapping("/daily/progress")
   public ExerciseProgressDTO getTodaysExerciseProgress(
       @AuthenticationPrincipal User user) {
-    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(user.getId(), user);
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(user.getId(), null);
     return exerciseProgress;
   }
 

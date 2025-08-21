@@ -103,8 +103,8 @@ public class SymptomsController {
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/user/id/{id}")
-  public List<Symptoms> getByUserId(@PathVariable Long id) {
-    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(id, null);
+  public List<Symptoms> getByUserId(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(id, user);
     return symptoms;
   }
 
