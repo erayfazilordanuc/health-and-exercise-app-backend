@@ -64,12 +64,14 @@ public class UserService implements UserDetailsService {
                 .orElse(false);
 
         // Sağlık verileri için açık rıza
-        boolean healthOk = Optional.ofNullable(latestByPurpose.get(ConsentPurpose.HEALTH_DATA_PROCESSING))
-                .map(Consent::getStatus)
-                .map(s -> s == ConsentStatus.ACCEPTED) // hangisini kullanıyorsan
-                .orElse(false);
+        // boolean healthOk =
+        // Optional.ofNullable(latestByPurpose.get(ConsentPurpose.HEALTH_DATA_PROCESSING))
+        // .map(Consent::getStatus)
+        // .map(s -> s == ConsentStatus.ACCEPTED) // hangisini kullanıyorsan
+        // .orElse(false);
 
-        return kvkkOk && healthOk;
+        return kvkkOk;
+        // return kvkkOk && healthOk;
     }
 
     @Transactional(readOnly = true)
