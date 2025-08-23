@@ -1,8 +1,6 @@
 spring:
   config:
-    import: >
-      optional:file:./stage.yml,
-      optional:file:/home/ec2-user/test/exercise-backend/stage.yml
+    import: "file:./stage.yml"
 
   application:
     name: Exercise
