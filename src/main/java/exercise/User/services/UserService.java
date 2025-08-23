@@ -37,6 +37,13 @@ public class UserService implements UserDetailsService {
     private UserMapper userMapper;
 
     public boolean checkUserConsentState(Long userId) {
+        // isAdmin eklenip ona göre kontrol eklenebilir yoksa her seferinde userRepodan
+        // çekmek sunucuyu çok yorar
+        // // Şuanlık admin için bir sözleşme kısıtlaması yok
+        // if (user.getRole().equals("ROLE_ADMIN"))
+        // admine özel kontrol
+        // return true;
+
         List<Consent> consents = consentRepo.findByUser_Id(userId);
         if (consents == null || consents.isEmpty())
             return false;
@@ -64,14 +71,23 @@ public class UserService implements UserDetailsService {
                 .orElse(false);
 
         // Sağlık verileri için açık rıza
-        // boolean healthOk =
-        // Optional.ofNullable(latestByPurpose.get(ConsentPurpose.HEALTH_DATA_PROCESSING))
-        // .map(Consent::getStatus)
-        // .map(s -> s == ConsentStatus.ACCEPTED) // hangisini kullanıyorsan
-        // .orElse(false);
+        boolean healthOk = Optional.ofNullable(latestByPurpose.get(ConsentPurpose.HEALTH_DATA_PROCESSING_ACK))
+                .map(Consent::getStatus)
+                .map(s -> s == ConsentStatus.ACCEPTED) // hangisini kullanıyorsan
+                .orElse(false);
 
-        return kvkkOk;
-        // return kvkkOk && healthOk;
+        // Egzersiz verileri için açık rıza
+        boolean exerciseOk = Optional.ofNullable(latestByPurpose.get(ConsentPurpose.EXERCISE_DATA_PROCESSING_ACK))
+                .map(Consent::getStatus)
+                .map(s -> s == ConsentStatus.ACCEPTED) // hangisini kullanıyorsan
+                .orElse(false);
+
+        boolean studyOk = Optional.ofNullable(latestByPurpose.get(ConsentPurpose.STUDY_CONSENT_ACK))
+                .map(Consent::getStatus)
+                .map(s -> s == ConsentStatus.ACCEPTED) // hangisini kullanıyorsan
+                .orElse(false);
+
+        return kvkkOk && healthOk && exerciseOk && studyOk;
     }
 
     @Transactional(readOnly = true)
