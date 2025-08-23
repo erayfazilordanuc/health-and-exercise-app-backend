@@ -30,6 +30,7 @@ public class ConsentServiceImpl implements ConsentService {
   private final ConsentRepository repo;
   private final ConsentPolicyRepository policyRepo;
   private final ConsentMapper mapper;
+  private final UserRepository userRepo;
 
   @Transactional
   @Override
@@ -37,8 +38,7 @@ public class ConsentServiceImpl implements ConsentService {
     Consent c = repo.findByUser_IdAndPurpose(userId, dto.getPurpose())
         .orElseGet(() -> {
           Consent n = new Consent();
-          User u = new User();
-          u.setId(userId);
+          User u = userRepo.findById(userId).get();
           n.setUser(u);
           n.setPurpose(dto.getPurpose());
           return n;
