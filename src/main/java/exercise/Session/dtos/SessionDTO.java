@@ -17,7 +17,6 @@ public class SessionDTO {
         private Long id;
         private Long userId;
 
-        private String locale;
         private String source;
 
         private Timestamp startedAt;

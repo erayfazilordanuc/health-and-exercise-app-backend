@@ -11,7 +11,6 @@ public class SessionMapper {
     // public SessionDTO entityToDTO(Session consent) {
     //     SessionDTO SessionDTO = new SessionDTO(consent.getId(),
     //             consent.getUser().getId(),
-    //             consent.getLocale(),
     //             consent.getSource());
 
     //     return SessionDTO;

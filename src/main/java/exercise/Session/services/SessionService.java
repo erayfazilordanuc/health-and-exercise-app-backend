@@ -132,7 +132,6 @@ public class SessionService {
     return SessionDTO.builder()
         .id(s.getId())
         .userId(s.getUser() != null ? s.getUser().getId() : null)
-        .locale(s.getLocale())
         .source(s.getSource())
         .startedAt(s.getStartedAt())
         .endedAt(s.getEndedAt())

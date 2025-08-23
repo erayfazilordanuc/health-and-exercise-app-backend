@@ -65,16 +65,7 @@ public class Session {
   private String reason; // "logout" | "close"
 
   @Column
-  private String ipAddress;
-
-  @Column
   private String source = "MOBILE";
-
-  @Column
-  private String userAgent;
-
-  @Column
-  private String locale;
 
   @CreationTimestamp
   @Column(updatable = false)
