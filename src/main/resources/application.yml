@@ -1,6 +1,8 @@
 spring:
   config:
-    import: "file:./stage.yml"
+    import: >
+      optional:file:./stage.yml,
+      optional:file:/etc/hopemove/stage.yml
 
   application:
     name: Exercise
