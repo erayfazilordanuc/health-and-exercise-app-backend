@@ -1,8 +1,6 @@
 spring:
   config:
-    import: >
-      optional:file:./stage.yml,
-      optional:file:/home/ec2-user/test/exercise-backend/stage.yml
+    import: ${SPRING_CONFIG_IMPORT:optional:file:./stage.yml}
 
   application:
     name: Exercise
@@ -14,8 +12,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 10MB
+      max-request-size: 10MB
 
   jackson:
     time-zone: Europe/Istanbul
@@ -55,6 +53,10 @@ logging:
 jwt:
   secret:
     key: ${jwt.secret.key}
+
+firebase:
+  credentials:
+    path: ${firebase.credentials.path}
 
 auth:
   admin:
