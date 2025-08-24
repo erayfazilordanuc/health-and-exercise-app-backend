@@ -20,6 +20,7 @@ public class CorsConfig implements CorsConfigurationSource {
                         "GET",
                         "POST",
                         "PUT",
+                        "PATCH",
                         "DELETE",
                         "OPTIONS");
 
