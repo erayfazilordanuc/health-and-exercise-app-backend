@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.UniqueConstraint;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -75,18 +76,18 @@ public class Consent {
 
   @PrePersist
   @PreUpdate
-  private void syncTimestampsByStatus() {
-    // Hem ACCEPTED hem de ACKNOWLEDGED için grantedAt zorunlu
-    if ((status == ConsentStatus.ACCEPTED || status == ConsentStatus.ACKNOWLEDGED) && grantedAt == null) {
-      grantedAt = new Timestamp(System.currentTimeMillis());
-    }
-
-    if (status == ConsentStatus.WITHDRAWN) {
-      if (withdrawnAt == null) {
-        withdrawnAt = new Timestamp(System.currentTimeMillis());
-      }
-    } else {
-      withdrawnAt = null; // ACCEPTED/REJECTED/ACKNOWLEDGED iken withdrawnAt boş kalır
+  private void syncByStatus() {
+    if (status == ConsentStatus.ACCEPTED || status == ConsentStatus.ACKNOWLEDGED) {
+      if (grantedAt == null)
+        grantedAt = Timestamp.from(Instant.now());
+      withdrawnAt = null;
+    } else if (status == ConsentStatus.WITHDRAWN) {
+      if (withdrawnAt == null)
+        withdrawnAt = Timestamp.from(Instant.now());
+      grantedAt = null;
+    } else if (status == ConsentStatus.REJECTED) {
+      grantedAt = null;
+      withdrawnAt = null;
     }
   }
 

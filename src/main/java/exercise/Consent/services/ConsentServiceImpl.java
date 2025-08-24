@@ -47,13 +47,11 @@ public class ConsentServiceImpl implements ConsentService {
     ConsentPolicy consentPolicy = policyRepo.findById(dto.getPolicyId()).get();
     if (dto.getPurpose() == ConsentPurpose.KVKK_NOTICE_ACK) {
       c.setStatus(ConsentStatus.ACKNOWLEDGED); // gelen status'ü YOK SAY
-      if (c.getGrantedAt() == null) {
-        c.setGrantedAt(new Timestamp(System.currentTimeMillis()));
-      }
-      c.setWithdrawnAt(null);
     } else {
       c.setStatus(dto.getStatus());
     }
+    syncTimestampsForStatus(c); // <-- EKLE
+
     c.setConsentPolicy(consentPolicy);
     c.setIpAddress(ip);
     c.setUserAgent(ua);
@@ -61,8 +59,6 @@ public class ConsentServiceImpl implements ConsentService {
     if (dto.getSource() != null && !dto.getSource().isBlank()) {
       c.setSource(dto.getSource());
     }
-    // grantedAt/withdrawnAt gibi alanlar eklediysen @PrePersist/@PreUpdate ile
-    // otomatik işler
     return repo.save(c);
   }
 
@@ -79,16 +75,12 @@ public class ConsentServiceImpl implements ConsentService {
     }
 
     if (c.getPurpose().equals(ConsentPurpose.KVKK_NOTICE_ACK)) {
-      if (!c.getStatus().equals(ConsentStatus.ACKNOWLEDGED)) {
-        c.setStatus(ConsentStatus.ACKNOWLEDGED);
-        c = repo.save(c);
-      }
+      c.setStatus(ConsentStatus.ACKNOWLEDGED);
     } else {
-      if (!c.getStatus().equals(ConsentStatus.ACCEPTED)) {
-        c.setStatus(ConsentStatus.ACCEPTED);
-        c = repo.save(c);
-      }
+      c.setStatus(ConsentStatus.ACCEPTED);
     }
+    syncTimestampsForStatus(c);
+    c = repo.save(c);
 
     return mapper.entityToDTO(c);
   }
@@ -108,7 +100,7 @@ public class ConsentServiceImpl implements ConsentService {
     // zaten withdrawn ise dokunma
     if (c.getStatus() != ConsentStatus.WITHDRAWN) {
       c.setStatus(ConsentStatus.WITHDRAWN);
-      // varsa lifecycle hook'ların withdrawnAt'i setler
+      syncTimestampsForStatus(c); // <-- EKLE
       c = repo.save(c);
     }
     return mapper.entityToDTO(c);
@@ -130,5 +122,28 @@ public class ConsentServiceImpl implements ConsentService {
     return repo.findByUser_IdAndPurpose(userId, purpose)
         .map(c -> c.getStatus() == ConsentStatus.ACCEPTED)
         .orElse(false);
+  }
+
+  private static Timestamp nowTs() {
+    return new Timestamp(System.currentTimeMillis());
+  }
+
+  private void syncTimestampsForStatus(Consent c) {
+    switch (c.getStatus()) {
+      case ACCEPTED:
+      case ACKNOWLEDGED:
+        if (c.getGrantedAt() == null)
+          c.setGrantedAt(nowTs());
+        c.setWithdrawnAt(null);
+        break;
+      case WITHDRAWN:
+        c.setWithdrawnAt(nowTs());
+        c.setGrantedAt(null); // <-- kritik: constraint için
+        break;
+      case REJECTED:
+        c.setGrantedAt(null);
+        c.setWithdrawnAt(null);
+        break;
+    }
   }
 }
