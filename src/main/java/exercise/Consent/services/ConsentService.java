@@ -11,7 +11,9 @@ import exercise.User.entities.User;
 public interface ConsentService {
   Consent upsertConsent(Long userId, UpsertConsentDTO dto, String ip, String ua);
 
-  Consent withdraw(Long consentId, User actor); // actor: sahip mi? admin mi? kontrolü için
+  ConsentDTO approve(Long consentId, User actor);
+
+  ConsentDTO withdraw(Long consentId, User actor); // actor: sahip mi? admin mi? kontrolü için
 
   ConsentDTO latest(Long userId, ConsentPurpose purpose);
 

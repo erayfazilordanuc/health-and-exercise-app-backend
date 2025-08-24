@@ -74,7 +74,7 @@ public class SessionController {
   }
 
   @PreAuthorize("hasRole('ADMIN')")
-  @GetMapping("/weekly")
+  @GetMapping("/users/{userId}/weekly")
   public ResponseEntity<List<DailySessionSummaryDTO>> getWeeklySummary(
       @PathVariable Long userId,
       @AuthenticationPrincipal User user,

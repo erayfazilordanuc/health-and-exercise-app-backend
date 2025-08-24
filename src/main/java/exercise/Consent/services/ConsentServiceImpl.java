@@ -68,12 +68,39 @@ public class ConsentServiceImpl implements ConsentService {
 
   @Transactional
   @Override
-  public Consent withdraw(Long consentId, User actor) {
+  public ConsentDTO approve(Long consentId, User actor) {
     Consent c = repo.findById(consentId)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CONSENT_NOT_FOUND"));
 
     boolean isOwner = c.getUser().getId().equals(actor.getId());
-    boolean isAdmin = actor.getRole() != null && actor.getRole().equals("ROLE_ADMIN");
+    boolean isAdmin = actor.getRole().equals("ROLE_ADMIN");
+    if (!isOwner && !isAdmin) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "NOT_ALLOWED");
+    }
+
+    if (c.getPurpose().equals(ConsentPurpose.KVKK_NOTICE_ACK)) {
+      if (!c.getStatus().equals(ConsentStatus.ACKNOWLEDGED)) {
+        c.setStatus(ConsentStatus.ACKNOWLEDGED);
+        c = repo.save(c);
+      }
+    } else {
+      if (!c.getStatus().equals(ConsentStatus.ACCEPTED)) {
+        c.setStatus(ConsentStatus.ACCEPTED);
+        c = repo.save(c);
+      }
+    }
+
+    return mapper.entityToDTO(c);
+  }
+
+  @Transactional
+  @Override
+  public ConsentDTO withdraw(Long consentId, User actor) {
+    Consent c = repo.findById(consentId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "CONSENT_NOT_FOUND"));
+
+    boolean isOwner = c.getUser().getId().equals(actor.getId());
+    boolean isAdmin = actor.getRole().equals("ROLE_ADMIN");
     if (!isOwner && !isAdmin) {
       throw new ResponseStatusException(HttpStatus.FORBIDDEN, "NOT_ALLOWED");
     }
@@ -84,7 +111,7 @@ public class ConsentServiceImpl implements ConsentService {
       // varsa lifecycle hook'ların withdrawnAt'i setler
       c = repo.save(c);
     }
-    return c;
+    return mapper.entityToDTO(c);
   }
 
   @Transactional

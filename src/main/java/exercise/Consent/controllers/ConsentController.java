@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -51,8 +52,15 @@ public class ConsentController {
     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }
 
+  @PutMapping("/{id}/approve")
+  public ConsentDTO approve(@PathVariable Long id,
+      @AuthenticationPrincipal User user) {
+    // Not: owner veya admin kontrolünü service içinde yapıyoruz
+    return service.approve(id, user);
+  }
+
   @PatchMapping("/{id}/withdraw")
-  public Consent withdraw(@PathVariable Long id,
+  public ConsentDTO withdraw(@PathVariable Long id,
       @AuthenticationPrincipal User user) {
     // Not: owner veya admin kontrolünü service içinde yapıyoruz
     return service.withdraw(id, user);
