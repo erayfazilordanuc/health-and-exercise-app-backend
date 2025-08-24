@@ -129,14 +129,22 @@ public class SessionService {
   }
 
   private SessionDTO toDTO(Session s) {
+    if (s == null)
+      return null;
+
     return SessionDTO.builder()
         .id(s.getId())
         .userId(s.getUser() != null ? s.getUser().getId() : null)
-        .source(s.getSource())
+        .sessionId(s.getSessionId())
         .startedAt(s.getStartedAt())
         .endedAt(s.getEndedAt())
         .activeMs(s.getActiveMs())
+        .lastHeartbeatAt(s.getLastHeartbeatAt())
         .heartbeatCount(s.getHeartbeatCount())
+        .reason(s.getReason())
+        .source(s.getSource())
+        .createdAt(s.getCreatedAt())
+        .updatedAt(s.getUpdatedAt())
         .build();
   }
 }
