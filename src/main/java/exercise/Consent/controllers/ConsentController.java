@@ -41,13 +41,13 @@ public class ConsentController {
   private final ConsentService service;
 
   @PostMapping
-  public ResponseEntity<Consent> give(@Valid @RequestBody UpsertConsentDTO dto,
+  public ResponseEntity<ConsentDTO> give(@Valid @RequestBody UpsertConsentDTO dto,
       HttpServletRequest req,
       @AuthenticationPrincipal User user) {
     Long userId = user.getId();
     String ip = clientIp(req);
     String ua = req.getHeader("User-Agent");
-    Consent saved = service.upsertConsent(userId, dto, ip, ua);
+    ConsentDTO saved = service.upsertConsent(userId, dto, ip, ua);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(saved);
   }

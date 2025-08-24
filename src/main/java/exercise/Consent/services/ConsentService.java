@@ -9,7 +9,7 @@ import exercise.Consent.enums.ConsentPurpose;
 import exercise.User.entities.User;
 
 public interface ConsentService {
-  Consent upsertConsent(Long userId, UpsertConsentDTO dto, String ip, String ua);
+  ConsentDTO upsertConsent(Long userId, UpsertConsentDTO dto, String ip, String ua);
 
   ConsentDTO approve(Long consentId, User actor);
 

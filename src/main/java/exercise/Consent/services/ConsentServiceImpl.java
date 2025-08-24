@@ -3,13 +3,11 @@ package exercise.Consent.services;
 import java.sql.Timestamp;
 import java.util.Optional;
 
-import org.checkerframework.checker.units.qual.m;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import exercise.Consent.dtos.ConsentDTO;
-import exercise.Consent.dtos.ConsentPolicyDTO;
 import exercise.Consent.dtos.UpsertConsentDTO;
 import exercise.Consent.entities.Consent;
 import exercise.Consent.entities.ConsentPolicy;
@@ -34,7 +32,7 @@ public class ConsentServiceImpl implements ConsentService {
 
   @Transactional
   @Override
-  public Consent upsertConsent(Long userId, UpsertConsentDTO dto, String ip, String ua) {
+  public ConsentDTO upsertConsent(Long userId, UpsertConsentDTO dto, String ip, String ua) {
     Consent c = repo.findByUser_IdAndPurpose(userId, dto.getPurpose())
         .orElseGet(() -> {
           Consent n = new Consent();
@@ -45,13 +43,8 @@ public class ConsentServiceImpl implements ConsentService {
         });
 
     ConsentPolicy consentPolicy = policyRepo.findById(dto.getPolicyId()).get();
-    if (dto.getPurpose() == ConsentPurpose.KVKK_NOTICE_ACK) {
-      c.setStatus(ConsentStatus.ACKNOWLEDGED); // gelen status'ü YOK SAY
-    } else {
-      c.setStatus(dto.getStatus());
-    }
-    syncTimestampsForStatus(c); // <-- EKLE
-
+    c.setStatus(dto.getStatus());
+    c.setGrantedAt(new Timestamp(System.currentTimeMillis()));
     c.setConsentPolicy(consentPolicy);
     c.setIpAddress(ip);
     c.setUserAgent(ua);
@@ -59,7 +52,7 @@ public class ConsentServiceImpl implements ConsentService {
     if (dto.getSource() != null && !dto.getSource().isBlank()) {
       c.setSource(dto.getSource());
     }
-    return repo.save(c);
+    return mapper.entityToDTO(repo.save(c));
   }
 
   @Transactional
@@ -79,7 +72,6 @@ public class ConsentServiceImpl implements ConsentService {
     } else {
       c.setStatus(ConsentStatus.ACCEPTED);
     }
-    syncTimestampsForStatus(c);
     c = repo.save(c);
 
     return mapper.entityToDTO(c);
@@ -100,7 +92,7 @@ public class ConsentServiceImpl implements ConsentService {
     // zaten withdrawn ise dokunma
     if (c.getStatus() != ConsentStatus.WITHDRAWN) {
       c.setStatus(ConsentStatus.WITHDRAWN);
-      syncTimestampsForStatus(c); // <-- EKLE
+      c.setWithdrawnAt(new Timestamp(System.currentTimeMillis()));
       c = repo.save(c);
     }
     return mapper.entityToDTO(c);
@@ -122,28 +114,5 @@ public class ConsentServiceImpl implements ConsentService {
     return repo.findByUser_IdAndPurpose(userId, purpose)
         .map(c -> c.getStatus() == ConsentStatus.ACCEPTED)
         .orElse(false);
-  }
-
-  private static Timestamp nowTs() {
-    return new Timestamp(System.currentTimeMillis());
-  }
-
-  private void syncTimestampsForStatus(Consent c) {
-    switch (c.getStatus()) {
-      case ACCEPTED:
-      case ACKNOWLEDGED:
-        if (c.getGrantedAt() == null)
-          c.setGrantedAt(nowTs());
-        c.setWithdrawnAt(null);
-        break;
-      case WITHDRAWN:
-        c.setWithdrawnAt(nowTs());
-        c.setGrantedAt(null); // <-- kritik: constraint için
-        break;
-      case REJECTED:
-        c.setGrantedAt(null);
-        c.setWithdrawnAt(null);
-        break;
-    }
   }
 }

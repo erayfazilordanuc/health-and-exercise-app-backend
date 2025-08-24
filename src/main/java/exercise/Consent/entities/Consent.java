@@ -57,11 +57,13 @@ public class Consent {
   private ConsentStatus status; // ACCEPTED / REJECTED / WITHDRAWN
 
   @Column
-  private String ipAddress;
-
-  private String source = "MOBILE";
-  private String userAgent;
   private String locale;
+  @Column
+  private String ipAddress;
+  @Column
+  private String userAgent;
+  @Column
+  private String source = "MOBILE";
 
   @CreationTimestamp
   @Column(updatable = false)
@@ -70,26 +72,10 @@ public class Consent {
   @UpdateTimestamp
   private Timestamp updatedAt;
 
-  // --- minimal ekler ---
+  @Column
   private Timestamp grantedAt; // ilk ACCEPTED anı
+  @Column
   private Timestamp withdrawnAt; // WITHDRAWN anı
-
-  @PrePersist
-  @PreUpdate
-  private void syncByStatus() {
-    if (status == ConsentStatus.ACCEPTED || status == ConsentStatus.ACKNOWLEDGED) {
-      if (grantedAt == null)
-        grantedAt = Timestamp.from(Instant.now());
-      withdrawnAt = null;
-    } else if (status == ConsentStatus.WITHDRAWN) {
-      if (withdrawnAt == null)
-        withdrawnAt = Timestamp.from(Instant.now());
-      grantedAt = null;
-    } else if (status == ConsentStatus.REJECTED) {
-      grantedAt = null;
-      withdrawnAt = null;
-    }
-  }
 
   @JsonProperty("user_id")
   public Long getUserId() {
