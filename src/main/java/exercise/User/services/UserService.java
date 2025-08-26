@@ -131,9 +131,11 @@ public class UserService implements UserDetailsService {
 
     public List<UserDTO> getUsersByGroupId(Long id) {
         List<User> users = userRepo.findByGroupId(id);
-        List<UserDTO> userDTOs = users.stream().map(u -> userMapper.entityToDTO(u)).toList();
+        List<UserDTO> userDTOs = users.stream()
+                .map(userMapper::entityToDTO)
+                .collect(Collectors.toList());
         boolean hasAdmin = userDTOs.stream()
-                .anyMatch(u -> "ROLE_ADMIN".equals(u.getRole()));
+                .anyMatch(u -> u.getRole().equals("ROLE_ADMIN"));
         if (!hasAdmin) {
             User user = userRepo.findById(id).get();
             userDTOs.add(new UserDTO(user));
