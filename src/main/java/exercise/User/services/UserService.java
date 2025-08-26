@@ -7,19 +7,19 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import exercise.User.dtos.UserDTO;
 import exercise.Consent.entities.Consent;
 import exercise.Consent.enums.ConsentPurpose;
 import exercise.Consent.enums.ConsentStatus;
 import exercise.Consent.repositories.ConsentRepository;
+import exercise.Group.entities.Group;
+import exercise.Group.repositories.GroupRepository;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.mappers.UserMapper;
@@ -30,6 +30,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private GroupRepository groupRepo;
 
     @Autowired
     private ConsentRepository consentRepo;
@@ -137,7 +140,8 @@ public class UserService implements UserDetailsService {
         boolean hasAdmin = userDTOs.stream()
                 .anyMatch(u -> u.getRole().equals("ROLE_ADMIN"));
         if (!hasAdmin) {
-            User user = userRepo.findById(id).get();
+            Group group = groupRepo.findById(id).get();
+            User user = userRepo.findById(group.getAdminId()).get();
             userDTOs.add(new UserDTO(user));
         }
         userDTOs.sort(Comparator.comparing((UserDTO u) -> !"ROLE_ADMIN".equals(u.getRole())));
