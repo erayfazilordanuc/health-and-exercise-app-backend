@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import exercise.Exercise.dtos.CreateExerciseDTO;
 import exercise.Exercise.dtos.ExerciseDTO;
 import exercise.Exercise.dtos.ExerciseProgressDTO;
+import exercise.Exercise.dtos.ExerciseScheduleRequest;
 import exercise.Exercise.dtos.ExerciseVideoProgressDTO;
 import exercise.Exercise.dtos.NewVideoDTO;
 import exercise.Exercise.dtos.ProgressRequestDTO;
@@ -52,6 +53,19 @@ public class ExerciseController {
   public ResponseEntity<ExerciseDTO> getExerciseById(@PathVariable Long id) {
     ExerciseDTO exercise = exerciseService.getById(id);
     return ResponseEntity.ok(exercise);
+  }
+
+  @GetMapping("/schedule")
+  public ResponseEntity<List<Long>> getExerciseSchedule(@AuthenticationPrincipal User user) {
+    List<Long> activeDays = exerciseService.getSchedule(user);
+    return ResponseEntity.ok(activeDays);
+  }
+
+  @PutMapping("/schedule")
+  public ResponseEntity<List<Long>> upsertExerciseSchedule(@RequestBody ExerciseScheduleRequest request,
+      @AuthenticationPrincipal User user) {
+    List<Long> activeDays = exerciseService.upsertSchedule(request.activeDays(), user);
+    return ResponseEntity.ok(activeDays);
   }
 
   @PutMapping("/{exerciseId}/video/{videoId}/progress")

@@ -64,7 +64,7 @@ public class UserMapper {
                                 .map(s -> new SymptomsDTO(s))
                                 .toList();
 
-                userDTO.setSymptomList(symptomDTOs);
+                // userDTO.setSymptomList(symptomDTOs);
 
                 return userDTO;
         }

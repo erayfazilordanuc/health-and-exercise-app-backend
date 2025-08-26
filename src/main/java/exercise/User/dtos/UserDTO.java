@@ -30,7 +30,7 @@ public class UserDTO {
 
     private String role;
 
-    private List<SymptomsDTO> symptomList = new ArrayList<>();
+    // private List<SymptomsDTO> symptomList = new ArrayList<>();
 
     private Long groupId;
 

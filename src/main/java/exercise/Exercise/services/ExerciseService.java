@@ -9,7 +9,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +27,13 @@ import exercise.Exercise.dtos.ExerciseVideoProgressDTO;
 import exercise.Exercise.dtos.NewVideoDTO;
 import exercise.Exercise.dtos.UpdateExerciseDTO;
 import exercise.Exercise.entities.Exercise;
+import exercise.Exercise.entities.ExerciseSchedule;
 import exercise.Exercise.entities.ExerciseVideo;
 import exercise.Exercise.entities.ExerciseVideoProgress;
 import exercise.Exercise.enums.ExercisePosition;
 import exercise.Exercise.mappers.ExerciseMapper;
 import exercise.Exercise.repositories.ExerciseRepository;
+import exercise.Exercise.repositories.ExerciseScheduleRepository;
 import exercise.Exercise.repositories.ExerciseVideoProgressRepository;
 import exercise.Exercise.repositories.ExerciseVideoRepository;
 import exercise.User.entities.User;
@@ -45,6 +49,9 @@ public class ExerciseService {
 
   @Autowired
   private ExerciseVideoRepository exerciseVideoRepo;
+
+  @Autowired
+  private ExerciseScheduleRepository exerciseScheduleRepo;
 
   @Autowired
   private UserRepository userRepo;
@@ -64,8 +71,6 @@ public class ExerciseService {
   @Autowired
   private ExerciseMapper exerciseMapper;
 
-  // TO DO burada exerciseDTO içindeki exerciseVideos artık exerciseVideoDTO
-  // olarak dönsün
   public List<ExerciseDTO> getAll() {
     return exerciseRepo.findAll().stream()
         .map(exerciseMapper::entityToDto)
@@ -74,7 +79,6 @@ public class ExerciseService {
 
   public ExerciseDTO getTodayExerciseByPosition(ExercisePosition position) {
     // TO DO (Imp) Burada ilerleyen zamanlarda güne özel egzersizler çekilebilir
-
     Long seatedId = (long) 48;
     Long standingId = (long) 47;
     return switch (position) {
@@ -86,6 +90,24 @@ public class ExerciseService {
   public ExerciseDTO getById(Long id) {
     return exerciseRepo.findById(id).map(exerciseMapper::entityToDto)
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exercise not found"));
+  }
+
+  public List<Long> getSchedule(User user) {
+    return exerciseScheduleRepo.findByUserId(user.getId())
+        .map(ExerciseSchedule::getActiveDays)
+        .orElseThrow(() -> new NoSuchElementException("Schedule not found for user: " + user.getId()));
+  }
+
+  public List<Long> upsertSchedule(List<Long> newActiveDays, User user) {
+    Optional<ExerciseSchedule> existSchedule = exerciseScheduleRepo.findByUserId(user.getId());
+    if (existSchedule.isPresent()) {
+      ExerciseSchedule updatedSchedule = existSchedule.get();
+      updatedSchedule.setActiveDays(newActiveDays);
+      return exerciseScheduleRepo.save(updatedSchedule).getActiveDays();
+    }
+
+    ExerciseSchedule newSchedule = new ExerciseSchedule(null, newActiveDays, user);
+    return exerciseScheduleRepo.save(newSchedule).getActiveDays();
   }
 
   @Transactional
