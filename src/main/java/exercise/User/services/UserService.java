@@ -1,5 +1,6 @@
 package exercise.User.services;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -131,6 +132,13 @@ public class UserService implements UserDetailsService {
     public List<UserDTO> getUsersByGroupId(Long id) {
         List<User> users = userRepo.findByGroupId(id);
         List<UserDTO> userDTOs = users.stream().map(u -> userMapper.entityToDTO(u)).toList();
+        boolean hasAdmin = userDTOs.stream()
+                .anyMatch(u -> "ROLE_ADMIN".equals(u.getRole()));
+        if (!hasAdmin) {
+            User user = userRepo.findById(id).get();
+            userDTOs.add(new UserDTO(user));
+        }
+        userDTOs.sort(Comparator.comparing((UserDTO u) -> !"ROLE_ADMIN".equals(u.getRole())));
         return userDTOs;
     }
 
