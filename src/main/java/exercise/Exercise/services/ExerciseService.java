@@ -98,6 +98,16 @@ public class ExerciseService {
         .orElseThrow(() -> new NoSuchElementException("Schedule not found for user: " + user.getId()));
   }
 
+  public List<Long> getScheduleByUserId(Long userId) {
+    if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
+      throw new ResponseStatusException(
+          HttpStatus.FORBIDDEN, "KVKK consent required");
+
+    return exerciseScheduleRepo.findByUserId(userId)
+        .map(ExerciseSchedule::getActiveDays)
+        .orElseThrow(() -> new NoSuchElementException("Schedule not found for user: " + userId));
+  }
+
   public List<Long> upsertSchedule(List<Long> newActiveDays, User user) {
     Optional<ExerciseSchedule> existSchedule = exerciseScheduleRepo.findByUserId(user.getId());
     if (existSchedule.isPresent()) {

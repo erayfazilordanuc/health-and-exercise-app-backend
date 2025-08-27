@@ -120,6 +120,14 @@ public class ExerciseController {
   // }
 
   @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/schedule/{userId}")
+  public ResponseEntity<List<Long>> getExerciseScheduleByUserId(@PathVariable Long userId,
+      @AuthenticationPrincipal User user) {
+    List<Long> activeDays = exerciseService.getScheduleByUserId(userId);
+    return ResponseEntity.ok(activeDays);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/weekly-active-days/progress/{userId}")
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgressByUserId(@PathVariable Long userId,
       @AuthenticationPrincipal User user) {
