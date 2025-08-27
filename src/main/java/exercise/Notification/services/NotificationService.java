@@ -1,6 +1,7 @@
 package exercise.Notification.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.management.RuntimeErrorException;
@@ -41,6 +42,10 @@ public class NotificationService {
     if (!isValid) {
       return ResponseEntity.badRequest().body("Invalid FCM token");
     }
+
+    Optional<FCMToken> exist = fcmTokenRepo.findByToken(tokenDTO.getToken());
+    if (exist.isPresent())
+      fcmTokenRepo.delete(exist.get());
 
     FCMToken token = new FCMToken(tokenDTO);
 
