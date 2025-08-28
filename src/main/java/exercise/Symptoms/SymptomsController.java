@@ -25,7 +25,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import exercise.Symptoms.dtos.SymptomsDTO;
 import exercise.Symptoms.dtos.UpsertSymptomsDTO;
+import exercise.Symptoms.entities.StepGoal;
 import exercise.Symptoms.entities.Symptoms;
+import exercise.Symptoms.services.StepGoalService;
 import exercise.Symptoms.services.SymptomsService;
 import exercise.User.entities.User;
 
@@ -37,7 +39,9 @@ public class SymptomsController {
   @Autowired
   public SymptomsService symptomsService;
 
-  @Tag(name = "Admin Operations")
+  @Autowired
+  public StepGoalService stepGoalService;
+
   // @Tag(name = "Symptoms - GET Operations")
   @GetMapping("/id/{id}")
   public ResponseEntity<SymptomsDTO> getSymptomsById(
@@ -97,6 +101,32 @@ public class SymptomsController {
   @DeleteMapping("/id/{id}")
   public String deleteSymptomsById(@PathVariable Long id, @AuthenticationPrincipal User user) {
     String response = symptomsService.deleteSymptoms(id, user);
+    return response;
+  }
+
+  @PutMapping("/step-goal")
+  public StepGoal createStepGoal(@RequestParam Integer goal, @AuthenticationPrincipal User user) {
+    StepGoal response = stepGoalService.create(goal, user);
+    return response;
+  }
+
+  @PutMapping("/step-goal/done")
+  public StepGoal completeGoal(@AuthenticationPrincipal User user) {
+    StepGoal response = stepGoalService.complete(user.getId());
+    return response;
+  }
+
+  @GetMapping("/step-goal")
+  public StepGoal getStepGoal(@AuthenticationPrincipal User user) {
+    StepGoal response = stepGoalService.getByUserId(user.getId());
+    return response;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/user/id/{id}/step-goal")
+  public StepGoal getStepGoalByUserId(@PathVariable Long id) {
+    StepGoal response = stepGoalService.getByUserId(id);
     return response;
   }
 
