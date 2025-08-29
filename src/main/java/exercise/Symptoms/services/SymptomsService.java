@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +99,24 @@ public class SymptomsService {
                 .orElse(0);
 
         return (int) Math.round(avg);
+    }
+
+    public int getThisWeekTotalSteps(Long userId) {
+        ZoneId TR = ZoneId.of("Europe/Istanbul");
+
+        LocalDate monday = LocalDate.now(TR)
+                .with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        // Hafta başlangıcı (Pazartesi 00:00)
+        ZonedDateTime zStart = monday.atStartOfDay(TR);
+        // Şu an (gelecek günleri dahil etmemek için)
+        ZonedDateTime zEnd = ZonedDateTime.now(TR);
+
+        Timestamp start = Timestamp.from(zStart.toInstant());
+        Timestamp end = Timestamp.from(zEnd.toInstant());
+
+        Long sum = symptomsRepo.sumStepsBetween(userId, start, end);
+        return sum == null ? 0 : sum.intValue();
     }
 
     public ResponseEntity<SymptomsDTO> getSymptomsById(Long id, User user) {

@@ -45,7 +45,15 @@ public class StepGoalService {
     if (goalValue < weeklyStepAverage - 5000)
       throw new ResponseStatusException(
           HttpStatus.BAD_REQUEST,
-          "Önceki haftadaki ilerlemenize göre bu kadar düşük bir hedef giremezsiniz");
+          "Hedef, önceki ilerlemenize göre çok düşük.");
+
+    if (weeklyStepAverage == 0) {
+      int thisWeek = symptomsService.getThisWeekTotalSteps(user.getId());
+      if (goalValue < thisWeek)
+        throw new ResponseStatusException(
+            HttpStatus.BAD_REQUEST,
+            "Hedef, önceki ilerlemenize göre çok düşük.");
+    }
 
     StepGoal newGoal = new StepGoal(null, user, goalValue, false, null, null);
     return new StepGoalDTO(repo.save(newGoal));

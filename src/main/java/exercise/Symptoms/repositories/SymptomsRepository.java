@@ -28,4 +28,15 @@ public interface SymptomsRepository extends JpaRepository<Symptoms, Long> {
             @Param("startDate") Timestamp startDate);
 
     List<Symptoms> findAllByUserIdAndCreatedAtBefore(Long userId, LocalDateTime before);
+
+    @Query("""
+                SELECT COALESCE(SUM(COALESCE(s.steps, 0)), 0)
+                FROM Symptoms s
+                WHERE s.user.id = :userId
+                  AND s.createdAt >= :start
+                  AND s.createdAt < :end
+            """)
+    Long sumStepsBetween(@Param("userId") Long userId,
+            @Param("start") Timestamp start,
+            @Param("end") Timestamp end);
 }
