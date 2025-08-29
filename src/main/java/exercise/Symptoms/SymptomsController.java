@@ -133,6 +133,14 @@ public class SymptomsController {
 
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/user/id/{id}/steps/weekly")
+  public Integer getWeeklyStepGoalProgressByUserId(@PathVariable Long id) {
+    Integer response = symptomsService.getWeeklySteps(id);
+    return response;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/user/id/{id}/step-goal/weekly")
   public StepGoalDTO getWeeklyStepGoalByUserId(@PathVariable Long id) {
     StepGoalDTO response = stepGoalService.getWeeklyByUserId(id);
@@ -142,7 +150,7 @@ public class SymptomsController {
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/user/id/{id}/step-goal/done")
-  public List<StepGoalDTO> getStepGoalsByUserId(@PathVariable Long id) {
+  public List<StepGoalDTO> getDoneStepGoalsByUserId(@PathVariable Long id) {
     List<StepGoalDTO> response = stepGoalService.getDonesByUserId(id);
     return response;
   }
