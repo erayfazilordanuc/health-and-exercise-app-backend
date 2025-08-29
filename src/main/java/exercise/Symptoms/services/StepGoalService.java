@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import exercise.Symptoms.dtos.StepGoalDTO;
 import exercise.Symptoms.entities.StepGoal;
+import exercise.Symptoms.entities.Symptoms;
 import exercise.Symptoms.repositories.StepGoalRepository;
 import exercise.User.entities.User;
 
@@ -22,6 +23,9 @@ public class StepGoalService {
 
   @Autowired
   private StepGoalRepository repo;
+
+  @Autowired
+  SymptomsService symptomsService;
 
   public StepGoalDTO create(Integer goalValue, User user) {
     ZoneId zone = ZoneId.of("Europe/Istanbul");
@@ -35,6 +39,13 @@ public class StepGoalService {
     Optional<StepGoal> goal = repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(user.getId(), start, end);
     if (goal.isPresent())
       throw new RuntimeException("Goal already exist for this week");
+
+    Integer weeklyStepAverage = symptomsService.getAverageWeeklyStepsExcludingCurrent(user.getId());
+
+    if (goalValue < weeklyStepAverage - 5000)
+      throw new ResponseStatusException(
+          HttpStatus.BAD_REQUEST,
+          "Önceki haftadaki ilerlemenize göre bu kadar düşük bir hedef giremezsiniz");
 
     StepGoal newGoal = new StepGoal(null, user, goalValue, false, null, null);
     return new StepGoalDTO(repo.save(newGoal));

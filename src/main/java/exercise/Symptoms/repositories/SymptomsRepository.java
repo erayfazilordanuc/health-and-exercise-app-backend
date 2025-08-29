@@ -1,6 +1,7 @@
 package exercise.Symptoms.repositories;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,6 @@ public interface SymptomsRepository extends JpaRepository<Symptoms, Long> {
     @Query("SELECT s FROM Symptoms s WHERE s.user.id = :userId AND s.updatedAt >= :startDate ORDER BY s.updatedAt DESC")
     List<Symptoms> findLastWeekByUserId(@Param("userId") Long userId,
             @Param("startDate") Timestamp startDate);
+
+    List<Symptoms> findAllByUserIdAndCreatedAtBefore(Long userId, LocalDateTime before);
 }

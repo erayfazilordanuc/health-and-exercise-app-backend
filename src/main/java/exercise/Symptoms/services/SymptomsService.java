@@ -1,9 +1,13 @@
 package exercise.Symptoms.services;
 
 import java.sql.Timestamp;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -56,6 +60,44 @@ public class SymptomsService {
                 .sum();
 
         return totalSteps;
+    }
+
+    public int getAverageWeeklyStepsExcludingCurrent(Long userId) {
+        ZoneId TR = ZoneId.of("Europe/Istanbul");
+
+        LocalDate todayTr = LocalDate.now(TR);
+        LocalDate currentMonday = todayTr.with(DayOfWeek.MONDAY);
+        LocalDateTime currentWeekStart = currentMonday.atStartOfDay();
+
+        List<Symptoms> allBeforeThisWeek = symptomsRepo.findAllByUserIdAndCreatedAtBefore(userId, currentWeekStart);
+        if (allBeforeThisWeek.isEmpty())
+            return 0;
+
+        Map<LocalDate, Long> weeklyTotals = new HashMap<>();
+
+        for (Symptoms s : allBeforeThisWeek) {
+            Integer steps = s.getSteps();
+            if (steps == null || steps <= 0)
+                continue;
+
+            LocalDate createdDateTr = s.getCreatedAt()
+                    .toInstant()
+                    .atZone(TR)
+                    .toLocalDate();
+
+            LocalDate weekMonday = createdDateTr.with(DayOfWeek.MONDAY);
+            weeklyTotals.merge(weekMonday, steps.longValue(), Long::sum);
+        }
+
+        if (weeklyTotals.isEmpty())
+            return 0;
+
+        double avg = weeklyTotals.values().stream()
+                .mapToLong(Long::longValue)
+                .average()
+                .orElse(0);
+
+        return (int) Math.round(avg);
     }
 
     public ResponseEntity<SymptomsDTO> getSymptomsById(Long id, User user) {

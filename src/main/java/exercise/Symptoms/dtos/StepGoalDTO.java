@@ -1,10 +1,8 @@
 package exercise.Symptoms.dtos;
 
 import java.sql.Timestamp;
-import java.util.List;
 
 import exercise.Symptoms.entities.StepGoal;
-import exercise.Symptoms.entities.Symptoms;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
