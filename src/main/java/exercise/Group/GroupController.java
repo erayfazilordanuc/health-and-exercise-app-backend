@@ -117,8 +117,8 @@ public class GroupController {
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping
-  public Group update(@RequestBody UpdateGroupDTO groupDTO) {
-    Group group = groupService.updateGroup(groupDTO);
+  public Group update(@RequestBody UpdateGroupDTO updateGroupDTO) {
+    Group group = groupService.updateGroup(updateGroupDTO);
     return group;
   }
 }
