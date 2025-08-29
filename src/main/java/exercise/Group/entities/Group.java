@@ -28,4 +28,7 @@ public class Group {
 
     @Column(nullable = false)
     private Long adminId;
+
+    @Column
+    private Boolean exerciseEnabled;
 }

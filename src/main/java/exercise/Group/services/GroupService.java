@@ -42,7 +42,7 @@ public class GroupService {
         Group group = groupRepo.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found with id: " + groupId));
 
-        GroupDTO groupDTO = new GroupDTO(groupId, group.getName(), group.getAdminId());
+        GroupDTO groupDTO = new GroupDTO(groupId, group.getName(), group.getAdminId(), group.getExerciseEnabled());
 
         GroupRequestDTO groupRequestDTO = new GroupRequestDTO(savedGroupRequest.getId(), userDTO, groupDTO);
         return groupRequestDTO;
@@ -62,7 +62,8 @@ public class GroupService {
         User user = userRepo.findById(gr.getUserId()).get();
         UserDTO userDTO = new UserDTO(user);
         Group group = groupRepo.findById(gr.getGroupId()).get();
-        GroupDTO groupDTO = new GroupDTO(gr.getGroupId(), group.getName(), group.getAdminId());
+        GroupDTO groupDTO = new GroupDTO(gr.getGroupId(), group.getName(), group.getAdminId(),
+                group.getExerciseEnabled());
 
         GroupRequestDTO groupRequestDTO = new GroupRequestDTO(gr.getId(), userDTO, groupDTO);
 

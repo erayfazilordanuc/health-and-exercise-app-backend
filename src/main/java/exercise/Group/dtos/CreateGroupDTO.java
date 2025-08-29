@@ -16,4 +16,6 @@ public class CreateGroupDTO {
   private String name;
 
   private Long adminId;
+
+  private Boolean exerciseEnabled;
 }

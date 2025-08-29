@@ -20,4 +20,7 @@ public class GroupDTO {
 
   @NotNull
   private Long adminId;
+
+  @NotNull
+  private Boolean exerciseEnabled;
 }

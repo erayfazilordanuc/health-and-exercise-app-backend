@@ -18,14 +18,14 @@ public class GroupMapper {
 
   public Group DTOToEntity(CreateGroupDTO groupDTO) {
     Group group = new Group(null, groupDTO.getName(),
-        groupDTO.getAdminId());
+        groupDTO.getAdminId(), groupDTO.getExerciseEnabled());
 
     return group;
   }
 
   public Group DTOToEntity(GroupDTO groupDTO) {
     Group group = new Group(null, groupDTO.getName(),
-        groupDTO.getAdminId());
+        groupDTO.getAdminId(), groupDTO.getExerciseEnabled());
 
     return group;
   }
