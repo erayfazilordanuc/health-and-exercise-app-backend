@@ -21,4 +21,8 @@ public interface SymptomsRepository extends JpaRepository<Symptoms, Long> {
 
     @Query("SELECT s FROM Symptoms s WHERE s.user.id = :userId AND DATE(s.updatedAt) = DATE(:date)")
     Symptoms findByUserIdAndDate(Long userId, Timestamp date);
+
+    @Query("SELECT s FROM Symptoms s WHERE s.user.id = :userId AND s.updatedAt >= :startDate ORDER BY s.updatedAt DESC")
+    List<Symptoms> findLastWeekByUserId(@Param("userId") Long userId,
+            @Param("startDate") Timestamp startDate);
 }

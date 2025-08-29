@@ -113,6 +113,12 @@ public class SymptomsController {
     return response;
   }
 
+  @GetMapping("/steps/weekly")
+  public Integer getWeeklyStepGoalProgress(@AuthenticationPrincipal User user) {
+    Integer response = symptomsService.getWeeklySteps(user.getId());
+    return response;
+  }
+
   @GetMapping("/step-goal/weekly")
   public StepGoalDTO getWeeklyStepGoal(@AuthenticationPrincipal User user) {
     StepGoalDTO response = stepGoalService.getWeeklyByUserId(user.getId());

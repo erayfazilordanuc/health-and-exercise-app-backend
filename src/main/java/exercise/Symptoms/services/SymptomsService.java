@@ -44,6 +44,20 @@ public class SymptomsService {
         return savedSymptoms;
     }
 
+    public Integer getWeeklySteps(Long userId) {
+        Timestamp lastWeek = new Timestamp(System.currentTimeMillis() - 7L * 24 * 60 * 60 * 1000);
+
+        List<Symptoms> lastWeekSymptoms = symptomsRepo.findLastWeekByUserId(userId, lastWeek);
+
+        Integer totalSteps = lastWeekSymptoms.stream()
+                .map(Symptoms::getSteps)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        return totalSteps;
+    }
+
     public ResponseEntity<SymptomsDTO> getSymptomsById(Long id, User user) {
         Symptoms symptoms = symptomsRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Symptoms not found"));
