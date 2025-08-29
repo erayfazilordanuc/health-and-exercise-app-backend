@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import exercise.Group.dtos.CreateGroupDTO;
 import exercise.Group.dtos.GroupDTO;
 import exercise.Group.dtos.GroupRequestDTO;
+import exercise.Group.dtos.UpdateGroupDTO;
 import exercise.Group.entities.Group;
 import exercise.Group.entities.GroupRequest;
 import exercise.Group.mappers.GroupMapper;
@@ -138,12 +139,15 @@ public class GroupService {
         return savedGroup;
     }
 
-    public Group updateGroup(GroupDTO groupDTO) {
+    public Group updateGroup(UpdateGroupDTO groupDTO) {
         Optional<Group> optionalGroup = groupRepo.findById(groupDTO.getId());
         if (!optionalGroup.isPresent())
             throw new RuntimeException("Group not found");
         Group group = optionalGroup.get();
-        group.setName(groupDTO.getName());
+        if (!Objects.isNull(groupDTO.getName()))
+            group.setName(groupDTO.getName());
+        if (!Objects.isNull(groupDTO.getExerciseEnabled()))
+            group.setExerciseEnabled(groupDTO.getExerciseEnabled());
         Group savedGroup = groupRepo.save(group);
         return savedGroup;
     }

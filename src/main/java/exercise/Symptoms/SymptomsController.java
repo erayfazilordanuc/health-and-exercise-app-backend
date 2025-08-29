@@ -2,11 +2,9 @@ package exercise.Symptoms;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,13 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
+import exercise.Symptoms.dtos.StepGoalDTO;
 import exercise.Symptoms.dtos.SymptomsDTO;
 import exercise.Symptoms.dtos.UpsertSymptomsDTO;
-import exercise.Symptoms.entities.StepGoal;
 import exercise.Symptoms.entities.Symptoms;
 import exercise.Symptoms.services.StepGoalService;
 import exercise.Symptoms.services.SymptomsService;
@@ -105,28 +102,42 @@ public class SymptomsController {
   }
 
   @PutMapping("/step-goal")
-  public StepGoal createStepGoal(@RequestParam Integer goal, @AuthenticationPrincipal User user) {
-    StepGoal response = stepGoalService.create(goal, user);
+  public StepGoalDTO createStepGoal(@RequestParam Integer goal, @AuthenticationPrincipal User user) {
+    StepGoalDTO response = stepGoalService.create(goal, user);
     return response;
   }
 
-  @PutMapping("/step-goal/done")
-  public StepGoal completeGoal(@AuthenticationPrincipal User user) {
-    StepGoal response = stepGoalService.complete(user.getId());
+  @PutMapping("/step-goal/id/{id}/done")
+  public StepGoalDTO completeGoal(@PathVariable Long id, @AuthenticationPrincipal User user) {
+    StepGoalDTO response = stepGoalService.complete(id, user.getId());
     return response;
   }
 
-  @GetMapping("/step-goal")
-  public StepGoal getStepGoal(@AuthenticationPrincipal User user) {
-    StepGoal response = stepGoalService.getByUserId(user.getId());
+  @GetMapping("/step-goal/weekly")
+  public StepGoalDTO getWeeklyStepGoal(@AuthenticationPrincipal User user) {
+    StepGoalDTO response = stepGoalService.getWeeklyByUserId(user.getId());
+    return response;
+  }
+
+  @GetMapping("/step-goal/done")
+  public List<StepGoalDTO> getDoneStepGoals(@AuthenticationPrincipal User user) {
+    List<StepGoalDTO> response = stepGoalService.getDonesByUserId(user.getId());
     return response;
   }
 
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
-  @GetMapping("/user/id/{id}/step-goal")
-  public StepGoal getStepGoalByUserId(@PathVariable Long id) {
-    StepGoal response = stepGoalService.getByUserId(id);
+  @GetMapping("/user/id/{id}/step-goal/weekly")
+  public StepGoalDTO getWeeklyStepGoalByUserId(@PathVariable Long id) {
+    StepGoalDTO response = stepGoalService.getWeeklyByUserId(id);
+    return response;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/user/id/{id}/step-goal/done")
+  public List<StepGoalDTO> getStepGoalsByUserId(@PathVariable Long id) {
+    List<StepGoalDTO> response = stepGoalService.getDonesByUserId(id);
     return response;
   }
 

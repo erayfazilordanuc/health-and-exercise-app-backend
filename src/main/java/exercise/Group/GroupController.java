@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import exercise.Group.dtos.CreateGroupDTO;
 import exercise.Group.dtos.GroupDTO;
 import exercise.Group.dtos.GroupRequestDTO;
+import exercise.Group.dtos.UpdateGroupDTO;
 import exercise.Group.entities.Group;
 import exercise.Group.services.GroupService;
 import exercise.User.dtos.UserDTO;
@@ -116,7 +117,7 @@ public class GroupController {
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping
-  public Group update(@RequestBody GroupDTO groupDTO) {
+  public Group update(@RequestBody UpdateGroupDTO groupDTO) {
     Group group = groupService.updateGroup(groupDTO);
     return group;
   }
