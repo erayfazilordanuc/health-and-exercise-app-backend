@@ -3,6 +3,7 @@ package exercise.User.services;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -161,12 +162,30 @@ public class UserService implements UserDetailsService {
         return userDTO;
     }
 
-    public User updateUser(UpdateUserDTO newUserDTO, User user) {
-        User updatedUser = userMapper.updateDTOToEntity(newUserDTO, user);
+    public User updateUser(UpdateUserDTO dto, User user) {
 
-        userRepo.save(updatedUser);
+        if (dto == null)
+            return user;
 
-        return updatedUser;
+        if (dto.getId() != null && !dto.getId().equals(user.getId()))
+            throw new IllegalArgumentException("ID mismatch");
+
+        if (dto.getUsername() != null)
+            user.setUsername(dto.getUsername());
+
+        if (dto.getEmail() != null)
+            user.setEmail(dto.getEmail());
+
+        if (dto.getFullName() != null)
+            user.setFullName(dto.getFullName());
+
+        if (dto.getGroupId() != null)
+            user.setGroupId(dto.getGroupId());
+
+        if (dto.getTheme() != null)
+            user.setTheme(dto.getTheme());
+
+        return userRepo.save(user);
     }
 
     public User updateUser(UpdateUserDTO newUserDTO, Long id) {
