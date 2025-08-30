@@ -21,4 +21,6 @@ public class UpdateUserDTO {
     // private String password;
 
     private Long groupId;
+
+    private String theme;
 }

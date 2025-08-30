@@ -29,4 +29,6 @@ public class RegisterRequestDTO {
 
     @NotNull
     private String gender;
+
+    private String theme = "blueSystem";
 }

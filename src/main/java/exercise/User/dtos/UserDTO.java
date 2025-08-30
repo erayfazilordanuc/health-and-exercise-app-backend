@@ -34,6 +34,8 @@ public class UserDTO {
 
     private Long groupId;
 
+    private String theme;
+
     public UserDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
@@ -43,5 +45,6 @@ public class UserDTO {
         this.gender = user.getGender();
         this.role = user.getRole();
         this.groupId = user.getGroupId();
+        this.theme = user.getTheme();
     }
 }

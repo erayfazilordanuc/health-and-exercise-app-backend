@@ -66,6 +66,9 @@ public class User implements UserDetails {
     @Column
     private Long groupId;
 
+    @Column
+    private String theme;
+
     // @Column
     // private Boolean kvkkApproved;
 
@@ -107,12 +110,13 @@ public class User implements UserDetails {
             String email,
             String fullName,
             String password,
-            Long groupId) {
+            Long groupId, String theme) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.fullName = fullName;
         this.password = password;
         this.groupId = groupId;
+        this.theme = theme;
     }
 }

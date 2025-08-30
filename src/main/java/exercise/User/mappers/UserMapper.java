@@ -1,6 +1,7 @@
 package exercise.User.mappers;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,16 +31,20 @@ public class UserMapper {
         public User DTOToEntity(UserDTO userDTO, User user) {
                 User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(),
                                 userDTO.getFullName(),
-                                passwordEncoder.encode(user.getPassword()), userDTO.getGroupId());
+                                passwordEncoder.encode(user.getPassword()), userDTO.getGroupId(), userDTO.getTheme());
 
                 return userEntity;
         }
 
         public User updateDTOToEntity(UpdateUserDTO userDTO, User user) {
-                User userEntity = new User(user.getId(), userDTO.getUsername(), userDTO.getEmail(),
-                                userDTO.getFullName(),
-                                /* passwordEncoder.encode(userDTO.getPassword()) */user.getPassword(),
-                                userDTO.getGroupId());
+                return new User(
+                                user.getId(),
+                                Objects.requireNonNullElse(userDTO.getUsername(), user.getUsername()),
+                                Objects.requireNonNullElse(userDTO.getEmail(), user.getEmail()),
+                                Objects.requireNonNullElse(userDTO.getFullName(), user.getFullName()),
+                                user.getPassword(),
+                                Objects.requireNonNullElse(userDTO.getGroupId(), user.getGroupId()),
+                                Objects.requireNonNullElse(userDTO.getTheme(), user.getTheme()));
 
                 // List<Achievement> achievements = userDTO.getAchievementDTOs().stream()
                 // .map(aDto -> {
@@ -53,7 +58,13 @@ public class UserMapper {
                 // .collect(Collectors.toList());
                 // userEntity.setAchievements(achievements);
 
-                return userEntity;
+                // User userEntity = new User(user.getId(), userDTO.getUsername(),
+                // userDTO.getEmail(),
+                // userDTO.getFullName(),
+                // /* passwordEncoder.encode(userDTO.getPassword()) */user.getPassword(),
+                // userDTO.getGroupId());
+
+                // return userEntity;
         }
 
         public UserDTO entityToDTO(User user) {
