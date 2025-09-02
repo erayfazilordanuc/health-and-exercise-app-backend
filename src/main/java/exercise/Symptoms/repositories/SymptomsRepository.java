@@ -35,9 +35,47 @@ public interface SymptomsRepository extends JpaRepository<Symptoms, Long> {
         Symptoms findFirstByUserIdAndUpdatedAtBetweenOrderByUpdatedAtDesc(
                         Long userId, Timestamp start, Timestamp end);
 
-        @Query("SELECT s FROM Symptoms s WHERE s.user.id = :userId AND s.updatedAt >= :startDate ORDER BY s.updatedAt DESC")
-        List<Symptoms> findLastWeekByUserId(@Param("userId") Long userId,
-                        @Param("startDate") Timestamp startDate);
+        @Query(value = """
+                        WITH ranked AS (
+                          SELECT s.*,
+                                 ROW_NUMBER() OVER (
+                                   PARTITION BY (s.updated_at AT TIME ZONE 'Europe/Istanbul')::date
+                                   ORDER BY s.updated_at DESC
+                                 ) AS rn
+                          FROM symptoms s
+                          WHERE s.user_id = :userId
+                            AND s.updated_at >= :startTs
+                            AND s.updated_at <  :endTs
+                        )
+                        SELECT * FROM ranked
+                        WHERE rn = 1
+                        ORDER BY updated_at DESC
+                        """, nativeQuery = true)
+        List<Symptoms> findLatestPerDayInRangePg(
+                        @Param("userId") Long userId,
+                        @Param("startTs") Timestamp startTs,
+                        @Param("endTs") Timestamp endTs);
+
+        @Query(value = """
+                        WITH ranked AS (
+                          SELECT s.steps,
+                                 ROW_NUMBER() OVER (
+                                   PARTITION BY (s.updated_at AT TIME ZONE 'Europe/Istanbul')::date
+                                   ORDER BY s.updated_at DESC
+                                 ) AS rn
+                          FROM symptoms s
+                          WHERE s.user_id = :userId
+                            AND s.updated_at >= :startTs
+                            AND s.updated_at <  :endTs
+                        )
+                        SELECT COALESCE(SUM(steps), 0)
+                        FROM ranked
+                        WHERE rn = 1
+                        """, nativeQuery = true)
+        Integer sumStepsOfLatestPerDayInRangePg(
+                        @Param("userId") Long userId,
+                        @Param("startTs") Timestamp startTs,
+                        @Param("endTs") Timestamp endTs);
 
         List<Symptoms> findAllByUserIdAndCreatedAtBefore(Long userId, LocalDateTime before);
 

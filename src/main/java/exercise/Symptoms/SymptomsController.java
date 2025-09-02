@@ -58,7 +58,8 @@ public class SymptomsController {
     return response;
   }
 
-  @GetMapping("/{date}") // sonuna /all eklenebilir
+  // sonuna /all eklenebilir
+  @GetMapping("/{date}")
   public List<Symptoms> getAllSymptomsByDate(
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
@@ -66,8 +67,8 @@ public class SymptomsController {
     return symptoms;
   }
 
-  // Old
-  @GetMapping("/date/{date}") // sonuna /latest eklenmeli
+  // sonuna /latest eklenmeli
+  @GetMapping("/date/{date}")
   public Symptoms getLatestSymptomsByDate(
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {

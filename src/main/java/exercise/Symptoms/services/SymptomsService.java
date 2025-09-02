@@ -106,17 +106,25 @@ public class SymptomsService {
     }
 
     public Integer getWeeklySteps(Long userId) {
-        Timestamp lastWeek = new Timestamp(System.currentTimeMillis() - 7L * 24 * 60 * 60 * 1000);
+        ZoneId TR = ZoneId.of("Europe/Istanbul");
+        LocalDate todayTr = LocalDate.now(TR);
+        LocalDate monday = todayTr.with(DayOfWeek.MONDAY);
 
-        List<Symptoms> lastWeekSymptoms = symptomsRepo.findLastWeekByUserId(userId, lastWeek);
+        Timestamp startTs = Timestamp.valueOf(monday.atStartOfDay()); // bu haftanın başlangıcı
+        Timestamp endTs = Timestamp.valueOf(monday.plusWeeks(1).atStartOfDay());
 
-        Integer totalSteps = lastWeekSymptoms.stream()
-                .map(Symptoms::getSteps)
-                .filter(Objects::nonNull)
-                .mapToInt(Integer::intValue)
-                .sum();
+        Integer sum = symptomsRepo.sumStepsOfLatestPerDayInRangePg(userId, startTs, endTs);
 
-        return totalSteps;
+        // List<Symptoms> lastWeekSymptoms =
+        // symptomsRepo.findLatestPerDayInRangePg(userId, startTs, endTs);
+
+        // Integer totalSteps = lastWeekSymptoms.stream()
+        // .map(Symptoms::getSteps)
+        // .filter(Objects::nonNull)
+        // .mapToInt(Integer::intValue)
+        // .sum();
+
+        return sum;
     }
 
     public int getAverageWeeklyStepsExcludingCurrent(Long userId) {
