@@ -75,9 +75,6 @@ public class ExerciseService {
   @Autowired
   private ExerciseMapper exerciseMapper;
 
-  @Autowired
-  private ExerciseService exerciseService;
-
   public List<ExerciseDTO> getAll() {
     return exerciseRepo.findAll().stream()
         .map(exerciseMapper::entityToDto)
@@ -194,7 +191,7 @@ public class ExerciseService {
             HttpStatus.FORBIDDEN, "KVKK consent required");
     }
 
-    List<Long> rawDays = exerciseService.getScheduleByUserId(userId);
+    List<Long> rawDays = getScheduleByUserId(userId);
 
     List<DayOfWeek> activeDays = rawDays.stream()
         .map(Long::intValue)
