@@ -260,23 +260,21 @@ public class SymptomsService {
     }
 
     public Symptoms getLatestSymptomsByUserIdAndDateForAdmin(Long userId, LocalDate date, User actor) {
-        if (!Objects.isNull(actor)) { // if true, the actor is admin
-            if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
+        if (!Objects.isNull(actor)) { // actor varsa admin
+            if (!userService.checkUserConsentState(userId))
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "KVKK consent required");
         }
 
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
+        Timestamp endOfDay = Timestamp.valueOf(date.plusDays(1).atStartOfDay());
+
         Symptoms symptoms = symptomsRepo.findLatestByUserIdAndDate(userId, startOfDay);
 
-        List<Symptoms> daySymptoms = symptomsRepo.findByUserIdAndDate(userId, startOfDay);
-        List<Integer> pulses = daySymptoms.stream().map(Symptoms::getSteps)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        Double avgPulse = symptomsRepo.findAvgPulseByUserIdAndDate(userId, startOfDay, endOfDay);
 
-        if (!pulses.isEmpty()) {
-            double avg = pulses.stream().mapToInt(Integer::intValue).average().orElse(0);
-            symptoms.setPulse((int) Math.round(avg));
+        if (avgPulse != null) {
+            symptoms.setPulse((int) Math.round(avgPulse));
         } else {
             symptoms.setPulse(null);
         }

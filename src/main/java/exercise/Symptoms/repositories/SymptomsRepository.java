@@ -32,8 +32,36 @@ public interface SymptomsRepository extends JpaRepository<Symptoms, Long> {
                         """, nativeQuery = true)
         Symptoms findLatestByUserIdAndDate(Long userId, Timestamp targetDate);
 
+        Symptoms findByUserIdAndUpdatedAtBetweenOrderByUpdatedAtDesc(
+                        Long userId, Timestamp start, Timestamp end);
+
         Symptoms findFirstByUserIdAndUpdatedAtBetweenOrderByUpdatedAtDesc(
                         Long userId, Timestamp start, Timestamp end);
+
+        @Query("""
+                          SELECT AVG(s.pulse)
+                          FROM Symptoms s
+                          WHERE s.user.id = :userId
+                            AND s.updatedAt >= :start
+                            AND s.updatedAt <  :end
+                        """)
+        Double findAvgPulseInRange(
+                        @Param("userId") Long userId,
+                        @Param("start") Timestamp start,
+                        @Param("end") Timestamp end);
+
+        @Query("""
+                            SELECT AVG(s.pulse)
+                            FROM Symptoms s
+                            WHERE s.user.id = :userId
+                              AND s.updatedAt >= :start
+                              AND s.updatedAt <  :end
+                              AND s.pulse IS NOT NULL
+                        """)
+        Double findAvgPulseByUserIdAndDate(
+                        @Param("userId") Long userId,
+                        @Param("start") Timestamp start,
+                        @Param("end") Timestamp end);
 
         @Query(value = """
                         WITH ranked AS (

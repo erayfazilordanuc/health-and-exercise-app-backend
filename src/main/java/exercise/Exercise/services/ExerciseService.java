@@ -36,6 +36,7 @@ import exercise.Exercise.repositories.ExerciseRepository;
 import exercise.Exercise.repositories.ExerciseScheduleRepository;
 import exercise.Exercise.repositories.ExerciseVideoProgressRepository;
 import exercise.Exercise.repositories.ExerciseVideoRepository;
+import exercise.Symptoms.repositories.SymptomsRepository;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
 import exercise.User.services.UserService;
@@ -58,6 +59,9 @@ public class ExerciseService {
 
   @Autowired
   private UserService userService;
+
+  @Autowired
+  private SymptomsRepository symptomsRepo;
 
   @Autowired
   private ExerciseVideoProgressRepository exerciseVideoProgressRepo;
@@ -274,6 +278,69 @@ public class ExerciseService {
       return new ExerciseProgressDTO(userId,
           new ExerciseDTO(videoProgress.get(0).getExercise()), videoProgressDTO, totalProgress);
     }
+  }
+
+  public Integer getAverageExercisePulseByDate(LocalDate date, Long userId) {
+    // TR gün sınırını doğru almak istiyorsan ZoneId kullan (opsiyonel)
+    LocalDateTime startOfDay = date.atStartOfDay(); // 00:00
+    LocalDateTime endOfDay = startOfDay.plusDays(1); // ertesi gün 00:00
+
+    // Gün içindeki tüm video progress kayıtlarını topla
+    List<ExerciseVideoProgress> videoProgress = exerciseVideoProgressRepo
+        .findByUserIdAndCreatedAtBetween(
+            userId,
+            Timestamp.valueOf(startOfDay),
+            Timestamp.valueOf(endOfDay),
+            Sort.by(Sort.Direction.ASC, "createdAt"));
+
+    if (videoProgress.isEmpty()) {
+      return null; // o gün hiç progress yoksa
+    }
+
+    // Her progress için (createdAt, updatedAt) aralığındaki pulse ortalamasını çek
+    List<Double> perProgressAverages = new ArrayList<>();
+
+    for (ExerciseVideoProgress vp : videoProgress) {
+      Timestamp startTs = vp.getCreatedAt() != null
+          ? new Timestamp(vp.getCreatedAt().getTime())
+          : null;
+      Timestamp endTs = vp.getUpdatedAt() != null
+          ? new Timestamp(vp.getUpdatedAt().getTime())
+          : null;
+
+      // Güvenlik: null durumları veya ters aralıkları normalize et
+      if (startTs == null && endTs == null) {
+        continue;
+      } else if (startTs == null) {
+        // sadece updatedAt varsa küçük bir pencere oluştur (ya da continue)
+        startTs = endTs;
+      } else if (endTs == null) {
+        endTs = startTs;
+      }
+
+      // Eğer eşitlerse (çok kısa aralık) < end sınırı yüzünden veri kaçmasın diye
+      // +1ms ekleyebilirsin
+      if (!endTs.after(startTs)) {
+        endTs = new Timestamp(startTs.getTime() + 1);
+      }
+
+      Double avg = symptomsRepo.findAvgPulseInRange(userId, startTs, endTs);
+      if (avg != null) {
+        perProgressAverages.add(avg);
+      }
+    }
+
+    if (perProgressAverages.isEmpty()) {
+      return null; // progress var ama aralıklarda semptom yoksa
+    }
+
+    // Tüm per-progress ortalamalarının ortalaması
+    double overall = perProgressAverages.stream()
+        .mapToDouble(Double::doubleValue)
+        .average()
+        .orElse(Double.NaN);
+
+    return Double.isNaN(overall) ? null : (int) Math.round(overall);
   }
 
   public void deleteExerciseProgress(Long exerciseId, LocalDate date, Long userId) {

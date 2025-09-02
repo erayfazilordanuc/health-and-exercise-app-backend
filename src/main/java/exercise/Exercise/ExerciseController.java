@@ -99,6 +99,14 @@ public class ExerciseController {
     return exerciseProgress;
   }
 
+  @GetMapping("/date/{date}/pulse")
+  public Integer getAverageExercisePulseByDate(
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+      @AuthenticationPrincipal User user) {
+    Integer pulseAvg = exerciseService.getAverageExercisePulseByDate(date, user.getId());
+    return pulseAvg;
+  }
+
   @DeleteMapping("/{exerciseId}/date/{date}/progress")
   public void deleteExerciseProgress(@PathVariable Long exerciseId,
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
