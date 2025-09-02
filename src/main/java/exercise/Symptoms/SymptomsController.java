@@ -174,8 +174,8 @@ public class SymptomsController {
 
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
-  @GetMapping("/user/id/{id}/date/{date}")
-  public Symptoms getSymptomsByUserIdAndDate(
+  @GetMapping("/user/id/{id}/date/{date}") // latest eklenebilir ama frontendde değişiklik gerekir
+  public Symptoms getLatestSymptomsByUserIdAndDate(
       @PathVariable Long id,
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @AuthenticationPrincipal User user) {
     Symptoms symptoms = symptomsService.getLatestSymptomsByUserIdAndDateForAdmin(id, date, user);

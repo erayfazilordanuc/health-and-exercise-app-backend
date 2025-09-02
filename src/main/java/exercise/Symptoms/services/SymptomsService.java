@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -110,7 +111,7 @@ public class SymptomsService {
         LocalDate todayTr = LocalDate.now(TR);
         LocalDate monday = todayTr.with(DayOfWeek.MONDAY);
 
-        Timestamp startTs = Timestamp.valueOf(monday.atStartOfDay()); // bu haftanın başlangıcı
+        Timestamp startTs = Timestamp.valueOf(monday.atStartOfDay());
         Timestamp endTs = Timestamp.valueOf(monday.plusWeeks(1).atStartOfDay());
 
         Integer sum = symptomsRepo.sumStepsOfLatestPerDayInRangePg(userId, startTs, endTs);
@@ -267,6 +268,18 @@ public class SymptomsService {
 
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
         Symptoms symptoms = symptomsRepo.findLatestByUserIdAndDate(userId, startOfDay);
+
+        List<Symptoms> daySymptoms = symptomsRepo.findByUserIdAndDate(userId, startOfDay);
+        List<Integer> pulses = daySymptoms.stream().map(Symptoms::getSteps)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        if (!pulses.isEmpty()) {
+            double avg = pulses.stream().mapToInt(Integer::intValue).average().orElse(0);
+            symptoms.setPulse((int) Math.round(avg));
+        } else {
+            symptoms.setPulse(null);
+        }
 
         return symptoms;
     }
