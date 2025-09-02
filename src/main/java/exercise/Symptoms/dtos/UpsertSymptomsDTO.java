@@ -19,11 +19,12 @@ public class UpsertSymptomsDTO {
   private Integer activeCaloriesBurned;
 
   private Integer sleepMinutes; // sleepMinutes duration in minutes
-  private List<String> sleepSessions; // JSON string olabilir (örneğin REM/DEEP uyku vs.)
 
-  public UpsertSymptomsDTO(Symptoms symptom) {
-    this.pulse = symptom.getPulse();
-    this.steps = symptom.getSteps();
-    this.sleepMinutes = symptom.getSleepMinutes();
+  public UpsertSymptomsDTO(Symptoms symptoms) {
+    this.pulse = symptoms.getPulse();
+    this.steps = symptoms.getSteps();
+    this.totalCaloriesBurned = symptoms.getTotalCaloriesBurned();
+    this.activeCaloriesBurned = symptoms.getActiveCaloriesBurned();
+    this.sleepMinutes = symptoms.getSleepMinutes();
   }
 }

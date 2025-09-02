@@ -49,6 +49,62 @@ public class SymptomsService {
         return savedSymptoms;
     }
 
+    public Symptoms upsertSymptoms(Long id, UpsertSymptomsDTO symptomsDTO, User user) {
+        Optional<Symptoms> optionalSymptoms = symptomsRepo.findById(id);
+
+        Symptoms symptoms = optionalSymptoms.orElseGet(() -> {
+            Symptoms s = new Symptoms();
+            s.setUser(user);
+            return s;
+        });
+
+        if (optionalSymptoms.isPresent()) {
+            if (!Objects.equals(user.getId(), symptoms.getUser().getId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
+            }
+        }
+
+        System.out.println(symptoms);
+
+        symptoms.setPulse(symptomsDTO.getPulse());
+        symptoms.setSteps(symptomsDTO.getSteps());
+        symptoms.setTotalCaloriesBurned(symptomsDTO.getTotalCaloriesBurned());
+        symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
+        symptoms.setSleepMinutes(symptomsDTO.getSleepMinutes());
+
+        Symptoms savedSymptoms = symptomsRepo.save(symptoms);
+
+        return savedSymptoms;
+    }
+
+    public Symptoms upsertSymptoms(LocalDate date, UpsertSymptomsDTO symptomsDTO, User user) {
+        Symptoms symptoms = new Symptoms(user);
+
+        Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
+        Symptoms existingSymptoms = symptomsRepo.findLatestByUserIdAndDate(user.getId(), startOfDay);
+        if (Objects.nonNull(existingSymptoms)) {
+            if (!Objects.equals(user.getId(), existingSymptoms.getUser().getId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
+            }
+            if (existingSymptoms.getUpdatedAt().toLocalDateTime().toLocalDate()
+                    .isEqual(LocalDate.now())) {
+                symptoms = existingSymptoms;
+            }
+        }
+
+        System.out.println(symptoms);
+
+        symptoms.setPulse(symptomsDTO.getPulse());
+        symptoms.setSteps(symptomsDTO.getSteps());
+        symptoms.setTotalCaloriesBurned(symptomsDTO.getTotalCaloriesBurned());
+        symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
+        symptoms.setSleepMinutes(symptomsDTO.getSleepMinutes());
+
+        Symptoms savedSymptoms = symptomsRepo.save(symptoms);
+
+        return savedSymptoms;
+    }
+
     public Integer getWeeklySteps(Long userId) {
         Timestamp lastWeek = new Timestamp(System.currentTimeMillis() - 7L * 24 * 60 * 60 * 1000);
 
@@ -131,18 +187,6 @@ public class SymptomsService {
         return ResponseEntity.ok(dto);
     }
 
-    public List<Symptoms> getAllSymptomsByUserId(Long userId, User actor) {
-        if (!Objects.isNull(actor)) { // if true, the actor is admin
-            if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "KVKK consent required");
-        }
-
-        List<Symptoms> symptoms = symptomsRepo.findByUserId(userId);
-
-        return symptoms;
-    }
-
     public ResponseEntity<SymptomsDTO> getSymptomsById(Long id) {
         Symptoms symptoms = symptomsRepo.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Symptoms not found"));
@@ -151,80 +195,18 @@ public class SymptomsService {
         return ResponseEntity.ok(dto);
     }
 
-    public Symptoms getSymptomsByUserIdAndDate(User user, LocalDate date) {
+    public List<Symptoms> getAllSymptomsByUserIdAndDate(User user, LocalDate date) {
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
-        Symptoms symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
+        List<Symptoms> symptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
 
         return symptoms;
     }
 
-    public Symptoms getSymptomsByUserIdAndDate(Long userId, LocalDate date, User actor) {
-        if (!Objects.isNull(actor)) { // if true, the actor is admin
-            if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
-                throw new ResponseStatusException(
-                        HttpStatus.FORBIDDEN, "KVKK consent required");
-        }
-
+    public Symptoms getLatestSymptomsByUserIdAndDate(User user, LocalDate date) {
         Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
-        Symptoms symptoms = symptomsRepo.findByUserIdAndDate(userId, startOfDay);
+        Symptoms symptoms = symptomsRepo.findLatestByUserIdAndDate(user.getId(), startOfDay);
 
         return symptoms;
-    }
-
-    public Symptoms upsertSymptoms(Long id, UpsertSymptomsDTO symptomsDTO, User user) {
-        Optional<Symptoms> optionalSymptoms = symptomsRepo.findById(id);
-
-        Symptoms symptoms = optionalSymptoms.orElseGet(() -> {
-            Symptoms s = new Symptoms();
-            s.setUser(user);
-            return s;
-        });
-
-        if (optionalSymptoms.isPresent()) {
-            if (!Objects.equals(user.getId(), symptoms.getUser().getId())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
-            }
-        }
-
-        System.out.println(symptoms);
-
-        symptoms.setPulse(symptomsDTO.getPulse());
-        symptoms.setSteps(symptomsDTO.getSteps());
-        symptoms.setTotalCaloriesBurned(symptomsDTO.getTotalCaloriesBurned());
-        symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
-        symptoms.setSleepMinutes(symptomsDTO.getSleepMinutes());
-
-        Symptoms savedSymptoms = symptomsRepo.save(symptoms);
-
-        return savedSymptoms;
-    }
-
-    public Symptoms upsertSymptoms(LocalDate date, UpsertSymptomsDTO symptomsDTO, User user) {
-        Symptoms symptoms = new Symptoms(user);
-
-        Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
-        Symptoms existingSymptoms = symptomsRepo.findByUserIdAndDate(user.getId(), startOfDay);
-        if (Objects.nonNull(existingSymptoms)) {
-            if (!Objects.equals(user.getId(), existingSymptoms.getUser().getId())) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "This symptoms is not yours");
-            }
-            if (existingSymptoms.getUpdatedAt().toLocalDateTime().toLocalDate()
-                    .isEqual(LocalDate.now())) {
-                symptoms = existingSymptoms;
-            }
-        }
-
-        System.out.println(symptoms);
-
-        symptoms.setPulse(symptomsDTO.getPulse());
-        symptoms.setSteps(symptomsDTO.getSteps());
-        symptoms.setTotalCaloriesBurned(symptomsDTO.getTotalCaloriesBurned());
-        symptoms.setActiveCaloriesBurned(symptomsDTO.getActiveCaloriesBurned());
-        symptoms.setSleepMinutes(symptomsDTO.getSleepMinutes());
-
-        Symptoms savedSymptoms = symptomsRepo.save(symptoms);
-
-        return savedSymptoms;
     }
 
     public String deleteSymptoms(Long id, User user) {
@@ -253,5 +235,31 @@ public class SymptomsService {
                 .forEach(symptomsRepo::delete);
 
         return "Symptoms deleted successfully";
+    }
+
+    // Admin Methods
+    public List<Symptoms> getAllSymptomsByUserId(Long userId, User actor) {
+        if (!Objects.isNull(actor)) { // if true, the actor is admin
+            if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "KVKK consent required");
+        }
+
+        List<Symptoms> symptoms = symptomsRepo.findByUserId(userId);
+
+        return symptoms;
+    }
+
+    public Symptoms getLatestSymptomsByUserIdAndDateForAdmin(Long userId, LocalDate date, User actor) {
+        if (!Objects.isNull(actor)) { // if true, the actor is admin
+            if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "KVKK consent required");
+        }
+
+        Timestamp startOfDay = Timestamp.valueOf(date.atStartOfDay());
+        Symptoms symptoms = symptomsRepo.findLatestByUserIdAndDate(userId, startOfDay);
+
+        return symptoms;
     }
 }

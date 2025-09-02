@@ -39,7 +39,13 @@ public class SymptomsController {
   @Autowired
   public StepGoalService stepGoalService;
 
-  // @Tag(name = "Symptoms - GET Operations")
+  @GetMapping
+  public List<Symptoms> getSymptomsByUser(
+      @AuthenticationPrincipal User user) {
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user.getId(), null);
+    return symptoms;
+  }
+
   @GetMapping("/id/{id}")
   public ResponseEntity<SymptomsDTO> getSymptomsById(
       @PathVariable Long id,
@@ -52,18 +58,20 @@ public class SymptomsController {
     return response;
   }
 
-  @GetMapping
-  public List<Symptoms> getSymptomsByUser(
+  @GetMapping("/{date}") // sonuna /all eklenebilir
+  public List<Symptoms> getAllSymptomsByDate(
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
-    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user.getId(), null);
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserIdAndDate(user, date);
     return symptoms;
   }
 
-  @GetMapping("/date/{date}")
-  public Symptoms getSymptomsByDate(
+  // Old
+  @GetMapping("/date/{date}") // sonuna /latest eklenmeli
+  public Symptoms getLatestSymptomsByDate(
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
-    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(user, date);
+    Symptoms symptoms = symptomsService.getLatestSymptomsByUserIdAndDate(user, date);
     return symptoms;
   }
 
@@ -86,7 +94,7 @@ public class SymptomsController {
     return symptoms;
   }
 
-  @PutMapping("/date/{date}")
+  @PutMapping("/date/{date}") // sonuna latest lazım
   public Symptoms upsertSymptomsByDate(
       @PathVariable(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @RequestBody UpsertSymptomsDTO symptomsDTO,
@@ -169,7 +177,7 @@ public class SymptomsController {
   public Symptoms getSymptomsByUserIdAndDate(
       @PathVariable Long id,
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @AuthenticationPrincipal User user) {
-    Symptoms symptoms = symptomsService.getSymptomsByUserIdAndDate(id, date, user);
+    Symptoms symptoms = symptomsService.getLatestSymptomsByUserIdAndDateForAdmin(id, date, user);
     return symptoms;
   }
 }
