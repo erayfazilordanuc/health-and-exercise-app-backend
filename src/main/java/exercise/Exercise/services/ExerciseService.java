@@ -75,6 +75,9 @@ public class ExerciseService {
   @Autowired
   private ExerciseMapper exerciseMapper;
 
+  @Autowired
+  private ExerciseService exerciseService;
+
   public List<ExerciseDTO> getAll() {
     return exerciseRepo.findAll().stream()
         .map(exerciseMapper::entityToDto)
@@ -191,7 +194,12 @@ public class ExerciseService {
             HttpStatus.FORBIDDEN, "KVKK consent required");
     }
 
-    List<DayOfWeek> activeDays = List.of(DayOfWeek.MONDAY, DayOfWeek.WEDNESDAY, DayOfWeek.FRIDAY);
+    List<Long> rawDays = exerciseService.getScheduleByUserId(userId);
+
+    List<DayOfWeek> activeDays = rawDays.stream()
+        .map(Long::intValue)
+        .map(DayOfWeek::of)
+        .toList();
     LocalDate today = LocalDate.now();
     LocalDate monday = today.with(DayOfWeek.MONDAY);
 
@@ -281,11 +289,9 @@ public class ExerciseService {
   }
 
   public Integer getAverageExercisePulseByDate(LocalDate date, Long userId) {
-    // TR gün sınırını doğru almak istiyorsan ZoneId kullan (opsiyonel)
-    LocalDateTime startOfDay = date.atStartOfDay(); // 00:00
-    LocalDateTime endOfDay = startOfDay.plusDays(1); // ertesi gün 00:00
+    LocalDateTime startOfDay = date.atStartOfDay();
+    LocalDateTime endOfDay = startOfDay.plusDays(1);
 
-    // Gün içindeki tüm video progress kayıtlarını topla
     List<ExerciseVideoProgress> videoProgress = exerciseVideoProgressRepo
         .findByUserIdAndCreatedAtBetween(
             userId,
@@ -294,10 +300,9 @@ public class ExerciseService {
             Sort.by(Sort.Direction.ASC, "createdAt"));
 
     if (videoProgress.isEmpty()) {
-      return null; // o gün hiç progress yoksa
+      return null;
     }
 
-    // Her progress için (createdAt, updatedAt) aralığındaki pulse ortalamasını çek
     List<Double> perProgressAverages = new ArrayList<>();
 
     for (ExerciseVideoProgress vp : videoProgress) {

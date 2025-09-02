@@ -39,8 +39,27 @@ public class SymptomsController {
   @Autowired
   public StepGoalService stepGoalService;
 
+  @PostMapping
+  public Symptoms createSymptoms(
+      @RequestBody UpsertSymptomsDTO symptomsDTO,
+      @AuthenticationPrincipal User user) {
+    Symptoms symptoms = symptomsService.createSymptoms(symptomsDTO, user);
+
+    return symptoms;
+  }
+
+  @PutMapping("/id/{id}")
+  public Symptoms upsertSymptomsById(
+      @PathVariable Long id, @RequestBody UpsertSymptomsDTO symptomsDTO,
+      @AuthenticationPrincipal User user) {
+
+    Symptoms symptoms = symptomsService.upsertSymptoms(id, symptomsDTO, user);
+
+    return symptoms;
+  }
+
   @GetMapping
-  public List<Symptoms> getSymptomsByUser(
+  public List<Symptoms> getSymptoms(
       @AuthenticationPrincipal User user) {
     List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user.getId(), null);
     return symptoms;
@@ -58,8 +77,7 @@ public class SymptomsController {
     return response;
   }
 
-  // sonuna /all eklenebilir
-  @GetMapping("/{date}")
+  @GetMapping("/{date}/all")
   public List<Symptoms> getAllSymptomsByDate(
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
@@ -73,25 +91,6 @@ public class SymptomsController {
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
     Symptoms symptoms = symptomsService.getLatestSymptomsByUserIdAndDate(user, date);
-    return symptoms;
-  }
-
-  @PostMapping
-  public Symptoms createSymptoms(
-      @RequestBody UpsertSymptomsDTO symptomsDTO,
-      @AuthenticationPrincipal User user) {
-    Symptoms symptoms = symptomsService.createSymptoms(symptomsDTO, user);
-
-    return symptoms;
-  }
-
-  @PutMapping("/id/{id}")
-  public Symptoms upsertSymptomsById(
-      @PathVariable Long id, @RequestBody UpsertSymptomsDTO symptomsDTO,
-      @AuthenticationPrincipal User user) {
-
-    Symptoms symptoms = symptomsService.upsertSymptoms(id, symptomsDTO, user);
-
     return symptoms;
   }
 
