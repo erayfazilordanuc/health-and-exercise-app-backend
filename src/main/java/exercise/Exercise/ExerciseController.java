@@ -139,8 +139,9 @@ public class ExerciseController {
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/schedule/{userId}")
-  public ResponseEntity<List<Long>> getExerciseScheduleByUserId(@PathVariable Long userId) {
-    List<Long> activeDays = exerciseService.getScheduleByUserId(userId);
+  public ResponseEntity<List<Long>> getExerciseScheduleByUserId(@PathVariable Long userId,
+      @AuthenticationPrincipal User user) {
+    List<Long> activeDays = exerciseService.getScheduleByUserId(userId, user);
     return ResponseEntity.ok(activeDays);
   }
 

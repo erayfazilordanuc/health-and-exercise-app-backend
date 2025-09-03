@@ -102,10 +102,12 @@ public class ExerciseService {
         .orElseThrow(() -> new NoSuchElementException("Schedule not found for user: " + user.getId()));
   }
 
-  public List<Long> getScheduleByUserId(Long userId) {
-    if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
-      throw new ResponseStatusException(
-          HttpStatus.FORBIDDEN, "KVKK consent required");
+  public List<Long> getScheduleByUserId(Long userId, User actor) {
+    if (!Objects.equals(userId, actor.getId())) {
+      if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN, "KVKK consent required");
+    }
 
     return exerciseScheduleRepo.findByUserId(userId)
         .map(ExerciseSchedule::getActiveDays)
@@ -191,7 +193,7 @@ public class ExerciseService {
             HttpStatus.FORBIDDEN, "KVKK consent required");
     }
 
-    List<Long> rawDays = getScheduleByUserId(userId);
+    List<Long> rawDays = getScheduleByUserId(userId, actor);
 
     List<DayOfWeek> activeDays = rawDays.stream()
         .map(Long::intValue)
