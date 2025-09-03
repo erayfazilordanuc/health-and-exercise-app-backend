@@ -80,14 +80,14 @@ public class ExerciseController {
 
   @GetMapping("/weekly-active-days/progress")
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(@AuthenticationPrincipal User user) {
-    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(user.getId(), null);
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(user.getId(), user);
     return exerciseProgress;
   }
 
   @GetMapping("/daily/progress")
   public ExerciseProgressDTO getTodaysExerciseProgress(
       @AuthenticationPrincipal User user) {
-    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(user.getId(), null);
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(user.getId(), user);
     return exerciseProgress;
   }
 

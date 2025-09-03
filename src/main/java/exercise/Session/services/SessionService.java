@@ -95,7 +95,7 @@ public class SessionService {
 
   @Transactional
   public List<SessionDTO> listSessionsForUser(Long userId, Instant from, Instant to, User actor) {
-    if (!Objects.isNull(actor)) { // if true, the actor is admin
+    if (!Objects.equals(userId, actor.getId())) { // if true, the actor is admin
       if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
         throw new ResponseStatusException(
             HttpStatus.FORBIDDEN, "KVKK consent required");
@@ -114,7 +114,7 @@ public class SessionService {
 
   @Transactional
   public List<DailySessionSummaryDTO> getDailySummary(Long userId, int days, User actor) {
-    if (!Objects.isNull(actor)) { // if true, the actor is admin
+    if (!Objects.equals(userId, actor.getId())) { // if true, the actor is admin
       if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
         throw new ResponseStatusException(
             HttpStatus.FORBIDDEN, "KVKK consent required");

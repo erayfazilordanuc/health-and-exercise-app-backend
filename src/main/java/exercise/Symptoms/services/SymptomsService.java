@@ -248,7 +248,7 @@ public class SymptomsService {
 
     // Admin Methods
     public List<Symptoms> getAllSymptomsByUserId(Long userId, User actor) {
-        if (!Objects.isNull(actor)) { // if true, the actor is admin
+        if (!Objects.equals(userId, actor.getId())) { // if true, the actor is admin
             if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "KVKK consent required");
@@ -260,7 +260,7 @@ public class SymptomsService {
     }
 
     public Symptoms getLatestSymptomsByUserIdAndDateForAdmin(Long userId, LocalDate date, User actor) {
-        if (!Objects.isNull(actor)) { // actor varsa admin
+        if (!Objects.equals(userId, actor.getId())) { // actor varsa admin
             if (!userService.checkUserConsentState(userId))
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "KVKK consent required");

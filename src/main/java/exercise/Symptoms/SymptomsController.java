@@ -61,7 +61,7 @@ public class SymptomsController {
   @GetMapping
   public List<Symptoms> getSymptoms(
       @AuthenticationPrincipal User user) {
-    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user.getId(), null);
+    List<Symptoms> symptoms = symptomsService.getAllSymptomsByUserId(user.getId(), user);
     return symptoms;
   }
 
