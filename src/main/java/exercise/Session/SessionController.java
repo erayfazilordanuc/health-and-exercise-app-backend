@@ -63,6 +63,7 @@ public class SessionController {
     return ResponseEntity.ok(service.listSessionsForUser(user.getId(), from, to, null));
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/users/{userId}")
   public ResponseEntity<List<SessionDTO>> getUserSessions(
@@ -73,6 +74,7 @@ public class SessionController {
     return ResponseEntity.ok(service.listSessionsForUser(userId, from, to, user));
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/users/{userId}/weekly")
   public ResponseEntity<List<DailySessionSummaryDTO>> getWeeklySummary(

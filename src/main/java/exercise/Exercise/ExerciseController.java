@@ -127,14 +127,24 @@ public class ExerciseController {
   // return userService.getAchievements(id);
   // }
 
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/date/{date}/pulse/{userId}")
+  public Integer getAverageExercisePulseByDateAndUserId(
+      @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @PathVariable Long userId) {
+    Integer pulseAvg = exerciseService.getAverageExercisePulseByDate(date, userId);
+    return pulseAvg;
+  }
+
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/schedule/{userId}")
-  public ResponseEntity<List<Long>> getExerciseScheduleByUserId(@PathVariable Long userId,
-      @AuthenticationPrincipal User user) {
+  public ResponseEntity<List<Long>> getExerciseScheduleByUserId(@PathVariable Long userId) {
     List<Long> activeDays = exerciseService.getScheduleByUserId(userId);
     return ResponseEntity.ok(activeDays);
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/weekly-active-days/progress/{userId}")
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgressByUserId(@PathVariable Long userId,
@@ -143,6 +153,7 @@ public class ExerciseController {
     return exerciseProgress;
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/daily/progress/{userId}")
   public ExerciseProgressDTO getTodaysExerciseProgressByUserId(
@@ -151,6 +162,7 @@ public class ExerciseController {
     return exerciseProgress;
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ExerciseDTO createExercise(@RequestBody CreateExerciseDTO exerciseDTO,
@@ -159,6 +171,7 @@ public class ExerciseController {
     return savedExerciseDTO;
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{id}")
   public ResponseEntity<ExerciseDTO> updateExercise(@PathVariable Long id,
@@ -168,6 +181,7 @@ public class ExerciseController {
     return ResponseEntity.ok(savedExerciseDTO);
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteExercise(@PathVariable Long id,
@@ -176,13 +190,15 @@ public class ExerciseController {
     return ResponseEntity.noContent().build();
   }
 
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/{id}/videos/presign")
   public String presignVideo(@PathVariable("id") Long exerciseId,
-      @RequestParam String fileName,
-      @AuthenticationPrincipal User user) {
+      @RequestParam String fileName) {
     return exerciseService.getPresignedUrl(exerciseId, fileName, "videos");
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/{exerciseId}/videos")
   public ResponseEntity<ExerciseDTO> addVideoToExercise(@PathVariable Long exerciseId,
@@ -192,6 +208,7 @@ public class ExerciseController {
     return ResponseEntity.ok(exerciseDTO);
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @PutMapping("/{exerciseId}/videos/id/{id}")
   public ResponseEntity<ExerciseDTO> updateExerciseVideo(@PathVariable Long exerciseId, @PathVariable Long id,
@@ -201,6 +218,7 @@ public class ExerciseController {
     return ResponseEntity.ok(exerciseDTO);
   }
 
+  @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{exerciseId}/videos/id/{id}")
   public ResponseEntity<Void> deleteVideoFromExercise(@PathVariable Long exerciseId, @PathVariable Long id,

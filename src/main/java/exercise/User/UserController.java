@@ -85,6 +85,7 @@ public class UserController {
         return userDTO;
     }
 
+    // @Tag(name = "Admin Operations")
     // @PreAuthorize("hasRole('ADMIN')")
     // @PutMapping("/id/{id}")
     // public String updateById(@PathVariable Long id, @RequestBody UpdateUserDTO
@@ -94,6 +95,7 @@ public class UserController {
     // return "User " + updatedUser.getId() + " updated";
     // }
 
+    // @Tag(name = "Admin Operations")
     // @PreAuthorize("hasRole('ADMIN')")
     // @DeleteMapping("/id/{id}")
     // public String deleteById(@PathVariable Long id) {
