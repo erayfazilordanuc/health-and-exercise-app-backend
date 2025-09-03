@@ -18,6 +18,15 @@ spring:
   jackson:
     time-zone: Europe/Istanbul
 
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: Europe/Istanbul
+
+server:
+  time-zone: Europe/Istanbul
+
 springdoc:
   swagger-ui:
     enabled: true
