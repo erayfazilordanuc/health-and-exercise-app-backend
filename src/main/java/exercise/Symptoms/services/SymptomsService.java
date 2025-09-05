@@ -60,7 +60,8 @@ public class SymptomsService {
                 isSame = false;
             if (!Objects.equals(existingSymptoms.getSleepMinutes(), symptomsDTO.getSleepMinutes()))
                 isSame = false;
-        }
+        } else
+            isSame = false;
 
         if (!isSame) {
             Symptoms newSymptoms = new Symptoms(null, symptomsDTO.getPulse(),
