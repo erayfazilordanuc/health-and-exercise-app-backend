@@ -131,16 +131,43 @@ public class SymptomsService {
         return savedSymptoms;
     }
 
+    // public Integer getWeeklySteps(Long userId) {
+    // ZoneId TR = ZoneId.of("Europe/Istanbul");
+    // LocalDate todayTr = LocalDate.now(TR);
+    // LocalDate mondayTr = todayTr.with(DayOfWeek.MONDAY);
+
+    // // [monday, today+1) gün aralığı
+    // LocalDate startDate = mondayTr;
+    // LocalDate endDate = todayTr.plusDays(1); // exclusive
+
+    // return symptomsRepo.sumStepsOfLatestPerDayInRangePgByDate(userId, startDate,
+    // endDate);
+    // }
+
     public Integer getWeeklySteps(Long userId) {
         ZoneId TR = ZoneId.of("Europe/Istanbul");
+
+        // Haftanın başı (Pzt 00:00 TR) ve "bugün+1" 00:00 TR (exclusive)
         LocalDate todayTr = LocalDate.now(TR);
         LocalDate mondayTr = todayTr.with(DayOfWeek.MONDAY);
 
-        // [monday, today+1) gün aralığı
-        LocalDate startDate = mondayTr;
-        LocalDate endDate = todayTr.plusDays(1); // exclusive
+        ZonedDateTime zStart = mondayTr.atStartOfDay(TR);
+        ZonedDateTime zEnd = todayTr.plusDays(1).atStartOfDay(TR);
 
-        return symptomsRepo.sumStepsOfLatestPerDayInRangePgByDate(userId, startDate, endDate);
+        Timestamp startTs = Timestamp.from(zStart.toInstant());
+        Timestamp endTs = Timestamp.from(zEnd.toInstant());
+
+        // Gün başına "son kayıt"ları çek
+        List<Symptoms> latestPerDay = symptomsRepo.findLatestPerDayInRangePg(userId, startTs, endTs);
+
+        // Adımların toplamını al (NULL'ları 0 say)
+        int total = latestPerDay.stream()
+                .map(Symptoms::getSteps)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        return total;
     }
 
     public int getAverageWeeklyStepsExcludingCurrent(Long userId) {
