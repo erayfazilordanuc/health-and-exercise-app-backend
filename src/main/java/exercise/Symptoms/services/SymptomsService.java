@@ -136,8 +136,12 @@ public class SymptomsService {
         LocalDate todayTr = LocalDate.now(TR);
         LocalDate monday = todayTr.with(DayOfWeek.MONDAY);
 
-        Timestamp startTs = Timestamp.valueOf(monday.atStartOfDay());
-        Timestamp endTs = Timestamp.valueOf(monday.plusWeeks(1).atStartOfDay()); // ALERT sıkıntı yapabilir
+        ZonedDateTime zStart = monday.atStartOfDay(TR);
+        ZonedDateTime zEnd = LocalDate.now(TR).plusDays(1)
+                .atStartOfDay(TR);
+
+        Timestamp startTs = Timestamp.from(zStart.toInstant());
+        Timestamp endTs = Timestamp.from(zEnd.toInstant());
 
         Integer sum = symptomsRepo.sumStepsOfLatestPerDayInRangePg(userId, startTs, endTs);
 
