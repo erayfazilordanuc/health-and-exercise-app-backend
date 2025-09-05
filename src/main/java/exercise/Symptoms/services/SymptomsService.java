@@ -49,7 +49,7 @@ public class SymptomsService {
         // son semptom ile gelen semptomu karşılaştırsın, eğer aynı ise yenisini
         // eklemesin
         Boolean isSame = true;
-        if (!Objects.isNull(existingSymptoms)) {
+        if (Objects.nonNull(existingSymptoms)) {
             if (!Objects.equals(existingSymptoms.getPulse(), symptomsDTO.getPulse()))
                 isSame = false;
             if (!Objects.equals(existingSymptoms.getSteps(), symptomsDTO.getSteps()))
@@ -67,6 +67,19 @@ public class SymptomsService {
             Symptoms newSymptoms = new Symptoms(null, symptomsDTO.getPulse(),
                     symptomsDTO.getSteps(), symptomsDTO.getTotalCaloriesBurned(), symptomsDTO.getActiveCaloriesBurned(),
                     symptomsDTO.getSleepMinutes(), user, null, null);
+
+            if (Objects.nonNull(existingSymptoms)) {
+                if (existingSymptoms.getSteps() > symptomsDTO.getSteps()) {
+                    newSymptoms.setSteps(existingSymptoms.getSteps());
+                }
+                if (existingSymptoms.getTotalCaloriesBurned() > symptomsDTO.getTotalCaloriesBurned()) {
+                    newSymptoms.setTotalCaloriesBurned(existingSymptoms.getTotalCaloriesBurned());
+                }
+                if (existingSymptoms.getActiveCaloriesBurned() > symptomsDTO.getActiveCaloriesBurned()) {
+                    newSymptoms.setActiveCaloriesBurned(existingSymptoms.getActiveCaloriesBurned());
+                }
+            }
+
             Symptoms savedSymptoms = symptomsRepo.save(newSymptoms);
 
             return savedSymptoms;
