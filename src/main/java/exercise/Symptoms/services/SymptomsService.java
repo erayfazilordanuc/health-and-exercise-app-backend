@@ -42,12 +42,36 @@ public class SymptomsService {
     private SymptomsMapper symptomsMapper;
 
     public Symptoms createSymptoms(UpsertSymptomsDTO symptomsDTO, User user) {
-        Symptoms newSymptoms = new Symptoms(null, symptomsDTO.getPulse(),
-                symptomsDTO.getSteps(), symptomsDTO.getTotalCaloriesBurned(), symptomsDTO.getActiveCaloriesBurned(),
-                symptomsDTO.getSleepMinutes(), user, null, null);
-        Symptoms savedSymptoms = symptomsRepo.save(newSymptoms);
+        LocalDate today = LocalDate.now(ZoneId.of("Europe/Istanbul"));
+        Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
+        Symptoms existingSymptoms = symptomsRepo.findLatestByUserIdAndDate(user.getId(), startOfDay);
 
-        return savedSymptoms;
+        // son semptom ile gelen semptomu karşılaştırsın, eğer aynı ise yenisini
+        // eklemesin
+        Boolean isSame = true;
+        if (!Objects.isNull(existingSymptoms)) {
+            if (!Objects.equals(existingSymptoms.getPulse(), symptomsDTO.getPulse()))
+                isSame = false;
+            if (!Objects.equals(existingSymptoms.getSteps(), symptomsDTO.getSteps()))
+                isSame = false;
+            if (!Objects.equals(existingSymptoms.getTotalCaloriesBurned(), symptomsDTO.getTotalCaloriesBurned()))
+                isSame = false;
+            if (!Objects.equals(existingSymptoms.getActiveCaloriesBurned(), symptomsDTO.getActiveCaloriesBurned()))
+                isSame = false;
+            if (!Objects.equals(existingSymptoms.getSleepMinutes(), symptomsDTO.getSleepMinutes()))
+                isSame = false;
+        }
+
+        if (!isSame) {
+            Symptoms newSymptoms = new Symptoms(null, symptomsDTO.getPulse(),
+                    symptomsDTO.getSteps(), symptomsDTO.getTotalCaloriesBurned(), symptomsDTO.getActiveCaloriesBurned(),
+                    symptomsDTO.getSleepMinutes(), user, null, null);
+            Symptoms savedSymptoms = symptomsRepo.save(newSymptoms);
+
+            return savedSymptoms;
+        }
+
+        return existingSymptoms;
     }
 
     public Symptoms upsertSymptoms(Long id, UpsertSymptomsDTO symptomsDTO, User user) {
@@ -112,7 +136,7 @@ public class SymptomsService {
         LocalDate monday = todayTr.with(DayOfWeek.MONDAY);
 
         Timestamp startTs = Timestamp.valueOf(monday.atStartOfDay());
-        Timestamp endTs = Timestamp.valueOf(monday.plusWeeks(1).atStartOfDay());
+        Timestamp endTs = Timestamp.valueOf(monday.plusWeeks(1).atStartOfDay()); // ALERT sıkıntı yapabilir
 
         Integer sum = symptomsRepo.sumStepsOfLatestPerDayInRangePg(userId, startTs, endTs);
 
