@@ -185,58 +185,26 @@ public class SymptomsService {
 
     public int getAverageWeeklyStepsExcludingCurrent(Long userId) {
         ZoneId TR = ZoneId.of("Europe/Istanbul");
+        LocalDate currentMonday = LocalDate.now(TR).with(DayOfWeek.MONDAY);
 
-        LocalDate todayTr = LocalDate.now(TR);
-        LocalDate currentMonday = todayTr.with(DayOfWeek.MONDAY);
-        LocalDateTime currentWeekStart = currentMonday.atStartOfDay();
-
-        List<Symptoms> allBeforeThisWeek = symptomsRepo.findAllByUserIdAndCreatedAtBefore(userId, currentWeekStart);
-        if (allBeforeThisWeek.isEmpty())
+        Double avg = symptomsRepo.avgWeeklyStepsBeforeMondayLatestPerDay(userId, currentMonday);
+        if (avg == null)
             return 0;
-
-        Map<LocalDate, Long> weeklyTotals = new HashMap<>();
-
-        for (Symptoms s : allBeforeThisWeek) {
-            Integer steps = s.getSteps();
-            if (steps == null || steps <= 0)
-                continue;
-
-            LocalDate createdDateTr = s.getCreatedAt()
-                    .toInstant()
-                    .atZone(TR)
-                    .toLocalDate();
-
-            LocalDate weekMonday = createdDateTr.with(DayOfWeek.MONDAY);
-            weeklyTotals.merge(weekMonday, steps.longValue(), Long::sum);
-        }
-
-        if (weeklyTotals.isEmpty())
-            return 0;
-
-        double avg = weeklyTotals.values().stream()
-                .mapToLong(Long::longValue)
-                .average()
-                .orElse(0);
-
         return (int) Math.round(avg);
     }
 
     public int getThisWeekTotalSteps(Long userId) {
         ZoneId TR = ZoneId.of("Europe/Istanbul");
+        LocalDate todayTr = LocalDate.now(TR);
+        LocalDate mondayTr = todayTr.with(DayOfWeek.MONDAY);
 
-        LocalDate monday = LocalDate.now(TR)
-                .with(java.time.temporal.TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-
-        // Hafta başlangıcı (Pazartesi 00:00)
-        ZonedDateTime zStart = monday.atStartOfDay(TR);
-        // Şu an (gelecek günleri dahil etmemek için)
-        ZonedDateTime zEnd = ZonedDateTime.now(TR);
-
-        Timestamp start = Timestamp.from(zStart.toInstant());
-        Timestamp end = Timestamp.from(zEnd.toInstant());
-
-        Long sum = symptomsRepo.sumStepsBetween(userId, start, end);
-        return sum == null ? 0 : sum.intValue();
+        // [monday, today+1) — gün sonu taşmaları için exclusive end
+        Integer sum = symptomsRepo.sumStepsOfLatestPerDayInRangePgByDate(
+                userId,
+                mondayTr,
+                todayTr.plusDays(1) // exclusive
+        );
+        return sum == null ? 0 : sum;
     }
 
     public ResponseEntity<SymptomsDTO> getSymptomsById(Long id, User user) {

@@ -120,4 +120,36 @@ public interface SymptomsRepository extends JpaRepository<Symptoms, Long> {
   Long sumStepsBetween(@Param("userId") Long userId,
       @Param("start") Timestamp start,
       @Param("end") Timestamp end);
+
+  @Query(value = """
+      WITH ranked AS (
+        SELECT
+          s.user_id,
+          (s.updated_at AT TIME ZONE 'Europe/Istanbul')::date AS day_tr,
+          COALESCE(s.steps, 0) AS steps,
+          ROW_NUMBER() OVER (
+            PARTITION BY s.user_id, (s.updated_at AT TIME ZONE 'Europe/Istanbul')::date
+            ORDER BY s.updated_at DESC
+          ) AS rn
+        FROM symptoms s
+        WHERE s.user_id = :userId
+          AND (s.updated_at AT TIME ZONE 'Europe/Istanbul')::date < :currentMonday -- mevcut haftayı hariç tut
+      ),
+      daily_last AS (
+        SELECT day_tr, steps
+        FROM ranked
+        WHERE rn = 1
+      ),
+      weekly AS (
+        SELECT date_trunc('week', day_tr::timestamp) AS week_start,
+               SUM(steps) AS week_steps
+        FROM daily_last
+        GROUP BY 1
+      )
+      SELECT COALESCE(AVG(week_steps), 0)
+      FROM weekly
+      """, nativeQuery = true)
+  Double avgWeeklyStepsBeforeMondayLatestPerDay(
+      @Param("userId") Long userId,
+      @Param("currentMonday") LocalDate currentMonday);
 }
