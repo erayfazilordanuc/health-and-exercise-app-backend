@@ -99,7 +99,7 @@ public class NotificationService {
     return ResponseEntity.ok("Notification sent");
   }
 
-  public ResponseEntity<?> sendReminderNotification(User receiver) {
+  public ResponseEntity<?> sendExerciseReminderNotification(User receiver) {
     List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
 
     fcmTokens.stream().forEach(token -> {
@@ -122,6 +122,31 @@ public class NotificationService {
     });
 
     return ResponseEntity.ok("Notification sent");
+  }
+
+  public ResponseEntity<?> sendDailyStatusReminderNotification(User receiver) {
+    List<FCMToken> fcmTokens = fcmTokenRepo.findByUserId(receiver.getId());
+
+    fcmTokens.forEach(token -> {
+      try {
+        com.google.firebase.messaging.Message message = com.google.firebase.messaging.Message.builder()
+            .setToken(token.getToken())
+            .setNotification(Notification.builder()
+                .setTitle("🩺 Günlük Sağlık Durumu")
+                .setBody("Bugün kendinizi nasıl hissediyorsunuz? Lütfen uygulamadan yanıtlayın. 💙")
+                .build())
+            .putData("screen", "Home")
+            .build();
+
+        String response = FirebaseMessaging.getInstance().send(message);
+        System.out.println("✅ Notification sent to " + token.getToken() + ": " + response);
+      } catch (Exception e) {
+        System.err.println("❌ Failed to send notification to token " + token.getToken());
+        e.printStackTrace();
+      }
+    });
+
+    return ResponseEntity.ok("Symptoms reminder notification sent");
   }
 
   public ResponseEntity<?> sendChatNotification(NotificationDTO notificationDTO, User sender) {

@@ -1,4 +1,4 @@
-package exercise.Exercise.services;
+package exercise.Common.cron;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
@@ -18,6 +18,10 @@ import exercise.Exercise.entities.ExerciseSchedule;
 import exercise.Exercise.entities.ExerciseVideoProgress;
 import exercise.Exercise.repositories.ExerciseScheduleRepository;
 import exercise.Exercise.repositories.ExerciseVideoProgressRepository;
+import exercise.Group.entities.Group;
+import exercise.Group.repositories.GroupRepository;
+import exercise.Message.entities.Message;
+import exercise.Message.services.MessageService;
 import exercise.Notification.services.NotificationService;
 import exercise.User.entities.User;
 import exercise.User.repositories.UserRepository;
@@ -30,6 +34,8 @@ public class ReminderScheduler {
   private final ExerciseScheduleRepository exerciseScheduleRepo;
   private final ExerciseVideoProgressRepository exerciseVideoProgressRepo;
   private final NotificationService notificationService;
+  private final MessageService messageService;
+  private final GroupRepository groupRepo;
 
   @Scheduled(cron = "0 0 12 * * ?", zone = "Europe/Istanbul")
   public void sendMiddayExerciseReminder() {
@@ -65,7 +71,28 @@ public class ReminderScheduler {
         })
         .toList();
 
-    usersToRemind.forEach(user -> notificationService.sendReminderNotification(user));
+    usersToRemind.forEach(user -> notificationService.sendExerciseReminderNotification(user));
+  }
+
+  @Scheduled(cron = "0 0 12 * * *", zone = "Europe/Istanbul")
+  public void sendDailyStatusReminder() {
+    List<User> allUsers = userRepo.findAll();
+
+    List<User> targetUsers = allUsers.stream().filter(u -> u.getRole().equals("ROLE_USER")).toList();
+
+    List<User> usersToRemind = targetUsers.stream()
+        .filter(u -> {
+          Group group = groupRepo.findById(u.getGroupId()).get();
+          User admin = userRepo.findById(group.getAdminId()).get();
+          Message dailyStatusMessage = messageService.isDailyStatusExistForToday(u.getUsername(), admin.getUsername());
+          if (Objects.nonNull(dailyStatusMessage))
+            return true;
+          else
+            return false;
+        })
+        .toList();
+
+    usersToRemind.forEach(user -> notificationService.sendDailyStatusReminderNotification(user));
   }
 
   // @Scheduled(cron = "0 0 12 ? * MON,WED,FRI", zone = "Europe/Istanbul")

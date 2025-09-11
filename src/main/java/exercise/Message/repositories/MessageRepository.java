@@ -44,4 +44,9 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
       String keyword, String sender, String receiver,
       LocalDateTime startOfDay,
       LocalDateTime endOfDay);
+
+  boolean existsBySenderAndReceiverAndMessageStartingWithAndCreatedAtBetween(
+      String sender, String receiver,
+      String prefix,
+      LocalDateTime start, LocalDateTime end);
 }
