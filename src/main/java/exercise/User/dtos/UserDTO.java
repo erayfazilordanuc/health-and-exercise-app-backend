@@ -36,6 +36,8 @@ public class UserDTO {
 
     private String theme;
 
+    private String avatar;
+
     public UserDTO(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
@@ -46,5 +48,6 @@ public class UserDTO {
         this.role = user.getRole();
         this.groupId = user.getGroupId();
         this.theme = user.getTheme();
+        this.avatar = user.getAvatar();
     }
 }
