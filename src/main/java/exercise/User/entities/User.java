@@ -69,6 +69,9 @@ public class User implements UserDetails {
     @Column
     private String theme;
 
+    @Column
+    private String avatar;
+
     // @Column
     // private Boolean kvkkApproved;
 
@@ -118,5 +121,6 @@ public class User implements UserDetails {
         this.password = password;
         this.groupId = groupId;
         this.theme = theme;
+        this.avatar = avatar;
     }
 }

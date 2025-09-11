@@ -52,6 +52,14 @@ public class UserController {
         return updatedUserDTO;
     }
 
+    @PutMapping("/me/avatar/{key}")
+    public UserDTO updateAvatarMe(@PathVariable String key,
+            @AuthenticationPrincipal User user) throws Exception {
+        UserDTO updatedUserDTO = userService.updateUserAvatarAndGetDTO(key, user);
+
+        return updatedUserDTO;
+    }
+
     @DeleteMapping("/me")
     public String deleteMe(@AuthenticationPrincipal User user) {
         String response = userService.deleteUser(user);

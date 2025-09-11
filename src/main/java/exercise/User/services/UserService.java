@@ -155,6 +155,13 @@ public class UserService implements UserDetailsService {
         return userDTO;
     }
 
+    public UserDTO updateUserAvatarAndGetDTO(String key, User user) {
+        user.setAvatar(key);
+        User updatedUser = userRepo.save(user);
+        UserDTO userDTO = new UserDTO(updatedUser);
+        return userDTO;
+    }
+
     public UserDTO joinGroup(Long groupId, User user) {
         user.setGroupId(groupId);
         User updatedUser = userRepo.save(user);
