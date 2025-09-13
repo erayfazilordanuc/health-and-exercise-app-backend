@@ -43,7 +43,7 @@ public class ReminderScheduler {
   private final MessageService messageService;
   private final GroupRepository groupRepo;
 
-  @Scheduled(cron = "0 26 14 * * ?", zone = "Europe/Istanbul")
+  @Scheduled(cron = "0 0 14 * * ?", zone = "Europe/Istanbul")
   public void sendMiddayExerciseReminder() {
     final ZoneId zone = ZoneId.of("Europe/Istanbul");
     final int todayIdx = ZonedDateTime.now(zone).getDayOfWeek().getValue();
@@ -80,7 +80,7 @@ public class ReminderScheduler {
     usersToRemind.forEach(user -> notificationService.sendExerciseReminderNotification(user));
   }
 
-  @Scheduled(cron = "0 25 14 * * ?", zone = "Europe/Istanbul")
+  @Scheduled(cron = "0 0 12 * * ?", zone = "Europe/Istanbul")
   public void sendDailyStatusReminder() {
     List<User> allUsers = userRepo.findAll();
 
