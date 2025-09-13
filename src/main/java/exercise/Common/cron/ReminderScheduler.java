@@ -43,7 +43,7 @@ public class ReminderScheduler {
   private final MessageService messageService;
   private final GroupRepository groupRepo;
 
-  @Scheduled(cron = "0 0 14 * * ?", zone = "Europe/Istanbul")
+  @Scheduled(cron = "0 26 14 * * ?", zone = "Europe/Istanbul")
   public void sendMiddayExerciseReminder() {
     final ZoneId zone = ZoneId.of("Europe/Istanbul");
     final int todayIdx = ZonedDateTime.now(zone).getDayOfWeek().getValue();
@@ -80,27 +80,38 @@ public class ReminderScheduler {
     usersToRemind.forEach(user -> notificationService.sendExerciseReminderNotification(user));
   }
 
-  @Scheduled(cron = "0 0 12 * * ?", zone = "Europe/Istanbul")
+  @Scheduled(cron = "0 25 14 * * ?", zone = "Europe/Istanbul")
   public void sendDailyStatusReminder() {
     List<User> allUsers = userRepo.findAll();
 
-    List<User> targetUsers = allUsers.stream().filter(u -> u.getRole().equals("ROLE_USER")).toList();
+    List<User> targetUsers = allUsers.stream()
+        .filter(u -> "ROLE_USER".equals(u.getRole()))
+        .toList();
 
     List<User> usersToRemind = targetUsers.stream()
         .filter(u -> {
-          Group group = groupRepo.findById(u.getGroupId()).orElse(null);
+          Long groupId = u.getGroupId();
+          if (groupId == null)
+            return false;
+
+          Group group = groupRepo.findById(groupId).orElse(null);
           if (group == null)
             return false;
-          User admin = userRepo.findById(group.getAdminId()).orElse(null);
+
+          Long adminId = group.getAdminId();
+          if (adminId == null)
+            return false;
+
+          User admin = userRepo.findById(adminId).orElse(null);
           if (admin == null)
             return false;
 
           Message dailyStatusMessage = messageService.isDailyStatusExistForToday(u.getUsername(), admin.getUsername());
-          return Objects.nonNull(dailyStatusMessage);
+          return dailyStatusMessage == null;
         })
         .toList();
 
-    usersToRemind.forEach(user -> notificationService.sendDailyStatusReminderNotification(user));
+    usersToRemind.forEach(notificationService::sendDailyStatusReminderNotification);
   }
 
   // @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
