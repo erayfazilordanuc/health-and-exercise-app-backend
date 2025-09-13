@@ -129,10 +129,10 @@ public class NotificationService {
 
     fcmTokens.forEach(token -> {
       try {
-        com.google.firebase.messaging.Message message = com.google.firebase.messaging.Message.builder()
+        Message message = Message.builder()
             .setToken(token.getToken())
             .setNotification(Notification.builder()
-                .setTitle("🩺 Günlük Sağlık Durumu")
+                .setTitle("🌿 Günlük Sağlık Durumu")
                 .setBody("Bugün kendinizi nasıl hissediyorsunuz? Lütfen uygulamadan yanıtlayın. 💙")
                 .build())
             .putData("screen", "Home")

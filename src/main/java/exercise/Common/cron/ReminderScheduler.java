@@ -8,6 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -82,43 +83,90 @@ public class ReminderScheduler {
 
     List<User> usersToRemind = targetUsers.stream()
         .filter(u -> {
-          Group group = groupRepo.findById(u.getGroupId()).get();
-          User admin = userRepo.findById(group.getAdminId()).get();
-          Message dailyStatusMessage = messageService.isDailyStatusExistForToday(u.getUsername(), admin.getUsername());
-          if (Objects.nonNull(dailyStatusMessage))
-            return true;
-          else
+          Group group = groupRepo.findById(u.getGroupId()).orElse(null);
+          if (group == null)
             return false;
+          User admin = userRepo.findById(group.getAdminId()).orElse(null);
+          if (admin == null)
+            return false;
+
+          Message dailyStatusMessage = messageService.isDailyStatusExistForToday(u.getUsername(), admin.getUsername());
+          return Objects.nonNull(dailyStatusMessage);
         })
         .toList();
 
     usersToRemind.forEach(user -> notificationService.sendDailyStatusReminderNotification(user));
   }
 
-  // @Scheduled(cron = "0 0 12 ? * MON,WED,FRI", zone = "Europe/Istanbul")
-  // public void sendMiddayExerciseReminder() {
-  // List<User> allUsers = userRepo.findAll();
+  @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
+  public void testSendMiddayExerciseReminder() {
+    final ZoneId zone = ZoneId.of("Europe/Istanbul");
+    final int todayIdx = ZonedDateTime.now(zone).getDayOfWeek().getValue();
 
-  // List<User> targetUsers = allUsers.stream().filter(u ->
-  // u.getRole().equals("ROLE_USER")).toList();
+    // Sadece test kullanıcıları
+    Set<String> allowed = Set.of("ordanuc", "test65");
+    List<User> targetUsers = userRepo.findAll()
+        .stream()
+        .filter(u -> allowed.contains(u.getUsername()))
+        .filter(u -> "ROLE_USER".equals(u.getRole()))
+        .toList();
 
-  // LocalDateTime startOfToday = LocalDate.now().atStartOfDay();
-  // Timestamp startTs = Timestamp.valueOf(startOfToday);
-  // Timestamp endTs = Timestamp.valueOf(startOfToday.plusDays(1));
+    // Bugünün başlangıcı ve sonu
+    LocalDateTime startOfToday = LocalDate.now(zone).atStartOfDay();
+    Timestamp startTs = Timestamp.valueOf(startOfToday);
+    Timestamp endTs = Timestamp.valueOf(startOfToday.plusDays(1));
 
-  // List<User> usersToRemind = targetUsers.stream()
-  // .filter(u -> {
-  // List<ExerciseVideoProgress> vp = exerciseVideoProgressRepo
-  // .findByUserIdAndCreatedAtBetween(u.getId(), startTs, endTs,
-  // Sort.by(Sort.Direction.ASC, "createdAt"));
-  // return vp.isEmpty() ||
-  // !vp.stream().allMatch(ExerciseVideoProgress::getIsCompeleted);
-  // })
-  // .toList();
+    List<User> usersToRemind = targetUsers.stream()
+        .filter(u -> {
+          Optional<ExerciseSchedule> scheduleOpt = exerciseScheduleRepo.findByUserId(u.getId());
+          if (scheduleOpt.isEmpty())
+            return false;
+          List<Long> activeDays = scheduleOpt.get().getActiveDays();
+          if (activeDays == null || activeDays.isEmpty())
+            return false;
+          boolean isActiveToday = activeDays.contains((long) todayIdx);
+          if (!isActiveToday)
+            return false;
 
-  // usersToRemind.forEach(user ->
-  // notificationService.sendReminderNotification(user));
-  // }
+          List<ExerciseVideoProgress> vp = exerciseVideoProgressRepo
+              .findByUserIdAndCreatedAtBetween(
+                  u.getId(), startTs, endTs, Sort.by(Sort.Direction.ASC, "createdAt"));
+          return vp.isEmpty() || !vp.stream().allMatch(ExerciseVideoProgress::getIsCompeleted);
+        })
+        .toList();
+
+    usersToRemind.forEach(notificationService::sendExerciseReminderNotification);
+  }
+
+  // Her dakika, Europe/Istanbul
+  @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
+  public void testSendDailyStatusReminder() {
+    // Sadece test kullanıcıları
+    Set<String> allowed = Set.of("ordanuc", "test65");
+    List<User> targetUsers = userRepo.findAll()
+        .stream()
+        .filter(u -> allowed.contains(u.getUsername()))
+        .filter(u -> "ROLE_USER".equals(u.getRole()))
+        .toList();
+
+    List<User> usersToRemind = targetUsers.stream()
+        .filter(u -> {
+          Group group = groupRepo.findById(u.getGroupId()).orElse(null);
+          if (group == null)
+            return false;
+          User admin = userRepo.findById(group.getAdminId()).orElse(null);
+          if (admin == null)
+            return false;
+
+          // Mevcut kodundaki mantığı aynen korudum:
+          // Günlük durum mesajı VARSA true (hatırlatma gönder)
+          Message dailyStatusMessage = messageService.isDailyStatusExistForToday(u.getUsername(), admin.getUsername());
+          return Objects.nonNull(dailyStatusMessage);
+        })
+        .toList();
+
+    usersToRemind.forEach(notificationService::sendDailyStatusReminderNotification);
+  }
 
   // @Scheduled(cron = "0 35 12 ? * SUN", zone = "Europe/Istanbul")
   public void testReminderSchedule() {
