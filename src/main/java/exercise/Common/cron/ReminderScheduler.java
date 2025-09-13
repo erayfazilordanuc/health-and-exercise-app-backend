@@ -114,7 +114,7 @@ public class ReminderScheduler {
     usersToRemind.forEach(notificationService::sendDailyStatusReminderNotification);
   }
 
-  @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
+  // @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
   public void testSendMiddayExerciseReminder() {
     final String runId = UUID.randomUUID().toString().substring(0, 8);
     final Logger log = LoggerFactory.getLogger(getClass());
@@ -186,7 +186,7 @@ public class ReminderScheduler {
     }
   }
 
-  @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
+  // @Scheduled(cron = "0 * * * * *", zone = "Europe/Istanbul")
   public void testSendDailyStatusReminder() {
     final String runId = UUID.randomUUID().toString().substring(0, 8);
     final Logger log = LoggerFactory.getLogger(getClass());
