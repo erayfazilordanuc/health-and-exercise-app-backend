@@ -93,6 +93,12 @@ public class GroupService {
         return groups;
     }
 
+    public List<Group> getByAdmin(Long adminId) {
+        return groupRepo.findAll().stream()
+                .filter(g -> Objects.equals(g.getAdminId(), adminId))
+                .toList();
+    }
+
     public Group getGroupById(Long id) {
         Optional<Group> optionalGroup = groupRepo.findById(id);
         if (!optionalGroup.isPresent()) {

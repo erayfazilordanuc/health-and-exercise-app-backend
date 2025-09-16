@@ -67,6 +67,12 @@ public class GroupController {
     return groups;
   }
 
+  @GetMapping("/admin/{id}")
+  public List<Group> getByAdmin(@PathVariable Long id) {
+    List<Group> groups = groupService.getByAdmin(id);
+    return groups;
+  }
+
   @GetMapping("/id/{id}")
   public Group getById(@PathVariable Long id) {
     Group group = groupService.getGroupById(id);
