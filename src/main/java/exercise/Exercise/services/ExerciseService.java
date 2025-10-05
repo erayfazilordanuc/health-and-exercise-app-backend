@@ -186,7 +186,7 @@ public class ExerciseService {
     return new ExerciseVideoProgressDTO(savedVideoProgress);
   }
 
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId, User actor) {
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(Long userId, User actor, LocalDate date) {
     if (!Objects.equals(userId, actor.getId())) { // if true, the actor is admin
       if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
         throw new ResponseStatusException(
@@ -199,7 +199,7 @@ public class ExerciseService {
         .map(Long::intValue)
         .map(DayOfWeek::of)
         .toList();
-    LocalDate today = LocalDate.now();
+    LocalDate today = (date != null) ? date : LocalDate.now();
     LocalDate monday = today.with(DayOfWeek.MONDAY);
 
     List<ExerciseProgressDTO> result = new ArrayList<>();

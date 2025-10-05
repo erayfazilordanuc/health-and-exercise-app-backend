@@ -149,8 +149,9 @@ public class ExerciseController {
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/weekly-active-days/progress/{userId}")
   public List<ExerciseProgressDTO> getWeeklyActiveDaysProgressByUserId(@PathVariable Long userId,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
       @AuthenticationPrincipal User user) {
-    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(userId, user);
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(userId, user, date);
     return exerciseProgress;
   }
 
