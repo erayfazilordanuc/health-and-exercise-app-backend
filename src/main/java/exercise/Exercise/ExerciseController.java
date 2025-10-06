@@ -79,8 +79,9 @@ public class ExerciseController {
   }
 
   @GetMapping("/weekly-active-days/progress")
-  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(@AuthenticationPrincipal User user) {
-    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(user.getId(), user, null);
+  public List<ExerciseProgressDTO> getWeeklyActiveDaysProgress(@AuthenticationPrincipal User user,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+    List<ExerciseProgressDTO> exerciseProgress = exerciseService.getWeeklyActiveDaysProgress(user.getId(), user, date);
     return exerciseProgress;
   }
 
