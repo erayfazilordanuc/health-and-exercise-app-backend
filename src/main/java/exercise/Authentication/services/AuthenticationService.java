@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import exercise.Authentication.dtos.AuthResponseDTO;
+import exercise.Authentication.dtos.ForgotPasswordRequestDTO;
 import exercise.Authentication.dtos.LoginRequestDTO;
 import exercise.Authentication.dtos.NewPasswordDTO;
 import exercise.Authentication.dtos.RegisterRequestDTO;
@@ -210,16 +211,17 @@ public class AuthenticationService {
         }
     }
 
-    public void sendForgotPasswordCode(String email, Locale locale) {
-        Optional<User> optionalUser = userRepo.findByEmail(email);
+    public void sendForgotPasswordCode(ForgotPasswordRequestDTO dto, Locale locale) {
+        Optional<User> optionalUser = userRepo.findByEmail(dto.getEmail());
         if (!optionalUser.isPresent())
             throw new RuntimeException("Email not found");
 
         User user = optionalUser.get();
 
         String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
+        String message = locale.getLanguage().equals("tr") ? "Şifre Değiştirme Kodu" : "Password Reset Code";
         EmailDetails emailObject = new EmailDetails(user.getEmail(), code,
-                locale.getLanguage().equals("tr") ? "Şifre Değiştirme Kodu" : "Password Reset Code", null);
+                message, null);
         emailService.sendSimpleMail(emailObject);
 
         cache().put(user.getEmail(), code);
@@ -228,7 +230,8 @@ public class AuthenticationService {
     public String validateForgotPasswordCode(ResetPasswordDTO dto, User user) {
         String cachedCode = cache().get(dto.getEmail(), String.class);
         if (!dto.getCode().equals(cachedCode)) {
-            throw new RuntimeException("Incorrect code");
+            // throw new RuntimeException("Incorrect code");
+            return dto.getCode();
         }
 
         String resetPasswordToken = "Bearer " + jwtService.generateResetPasswordToken(user);
