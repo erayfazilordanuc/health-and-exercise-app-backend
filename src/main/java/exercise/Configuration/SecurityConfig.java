@@ -44,7 +44,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/**", "/api/symptoms/**", "/api/groups/**", "/api/messages/**",
                                 "/api/notifications/**",
-                                "/api/exercises/**")
+                                "/api/exercises/**", "/api/auth/change-password")
                         .authenticated()
                         // .requestMatchers("/api/symptoms/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().permitAll() // Give permission to all other endpoints

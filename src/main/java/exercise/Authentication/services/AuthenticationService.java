@@ -2,7 +2,9 @@ package exercise.Authentication.services;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -25,7 +27,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import exercise.Authentication.dtos.AuthResponseDTO;
 import exercise.Authentication.dtos.LoginRequestDTO;
+import exercise.Authentication.dtos.NewPasswordDTO;
 import exercise.Authentication.dtos.RegisterRequestDTO;
+import exercise.Authentication.dtos.ResetPasswordDTO;
 import exercise.Authentication.dtos.TwoStepLoginRequestDTO;
 import exercise.Authentication.dtos.TwoStepRegisterRequestDTO;
 import exercise.Common.email.entities.EmailDetails;
@@ -61,7 +65,7 @@ public class AuthenticationService {
     private CacheManager cacheManager;
 
     private Cache cache() {
-        return cacheManager.getCache("adminCodes");
+        return cacheManager.getCache("codes");
     }
 
     @Value("${auth.admin.usernames}")
@@ -124,7 +128,7 @@ public class AuthenticationService {
         return response;
     }
 
-    public AuthResponseDTO loginAdmin(TwoStepLoginRequestDTO requestDTO) {
+    public AuthResponseDTO loginAdmin(TwoStepLoginRequestDTO requestDTO, Locale locale) {
         LoginRequestDTO loginDTO = requestDTO.getLoginDTO();
         User user = userRepo.findByUsername(loginDTO.getUsername());
 
@@ -135,7 +139,8 @@ public class AuthenticationService {
                 if (Objects.isNull(requestDTO.getCode())) {
                     String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
                     cache().put(loginDTO.getUsername(), code);
-                    EmailDetails email = new EmailDetails(user.getEmail(), code, "Giriş Doğrulama Kodu", null);
+                    EmailDetails email = new EmailDetails(user.getEmail(), code,
+                            locale.getLanguage().equals("tr") ? "Giriş Doğrulama Kodu" : "Login Validation Code", null);
                     emailService.sendSimpleMail(email);
                     return null;
                 } else {
@@ -151,7 +156,7 @@ public class AuthenticationService {
         throw new BadCredentialsException("Invalid admin credentials");
     }
 
-    public AuthResponseDTO registerAdmin(TwoStepRegisterRequestDTO requestDTO) {
+    public AuthResponseDTO registerAdmin(TwoStepRegisterRequestDTO requestDTO, Locale locale) {
         RegisterRequestDTO registerDTO = requestDTO.getRegisterDTO();
 
         // if (!adminUsernames.contains(registerDTO.getUsername()))
@@ -166,7 +171,9 @@ public class AuthenticationService {
                 String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
                 cache().put(registerDTO.getUsername(), code);
                 EmailDetails email = new EmailDetails(registerDTO.getEmail(), code,
-                        "Hesap Oluşturma Doğrulama Kodu", null);
+                        locale.getLanguage().equals("tr") ? "Hesap Oluşturma Doğrulama Kodu"
+                                : "Registration Validation Code",
+                        null);
                 emailService.sendSimpleMail(email);
                 return null;
             } else {
@@ -201,5 +208,45 @@ public class AuthenticationService {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public void sendForgotPasswordCode(String email, Locale locale) {
+        Optional<User> optionalUser = userRepo.findByEmail(email);
+        if (!optionalUser.isPresent())
+            throw new RuntimeException("Email not found");
+
+        User user = optionalUser.get();
+
+        String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
+        EmailDetails emailObject = new EmailDetails(user.getEmail(), code,
+                locale.getLanguage().equals("tr") ? "Şifre Değiştirme Kodu" : "Password Reset Code", null);
+        emailService.sendSimpleMail(emailObject);
+
+        cache().put(email, code);
+    }
+
+    public String validateForgotPasswordCode(ResetPasswordDTO dto, User user) {
+        String cachedCode = cache().get(dto.getEmail(), String.class);
+        if (!dto.getCode().equals(cachedCode)) {
+            throw new RuntimeException("Incorrect code");
+        }
+        String resetPasswordToken = "Bearer " + jwtService.generateAccessToken(user);
+
+        return resetPasswordToken;
+    }
+
+    public UserDTO changePassword(NewPasswordDTO dto, String token, User user) {
+        UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
+        boolean isValid = jwtService.validateToken(token, userDetails, "resetPassword");
+        if (!isValid) {
+            throw new RuntimeException("Invalid refresh token");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
+        User updatedUser = userRepo.save(user);
+
+        UserDTO userDto = new UserDTO(updatedUser);
+        return userDto;
     }
 }
