@@ -73,8 +73,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/forgot-password/validate-code")
-    public ResponseEntity<String> validateCode(@RequestBody ResetPasswordDTO dto, @AuthenticationPrincipal User user) {
-        String passwordResetToken = authenticationService.validateForgotPasswordCode(dto, user);
+    public ResponseEntity<String> validateCode(@RequestBody ResetPasswordDTO dto) {
+        String passwordResetToken = authenticationService.validateForgotPasswordCode(dto);
         return ResponseEntity.ok(passwordResetToken);
     }
 
