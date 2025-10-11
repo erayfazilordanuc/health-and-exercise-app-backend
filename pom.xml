@@ -90,7 +90,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <!-- <version>${lombok.version}</version>  -->
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -181,13 +181,13 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <!-- <version>${maven-compiler-plugin.version}</version> -->
                 <configuration>
-                    <!-- <source>${java.version}</source>
-                    <target>${java.version}</target> -->
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <!-- <version>${lombok.version}</version>  -->
+                            <version>${lombok.version}</version> 
                         </path>
                         <!-- Başka annotation processor'lar varsa buraya eklenebilir.
                         Örn: MapStruct, Hibernate Metamodel Generator, vs. -->
