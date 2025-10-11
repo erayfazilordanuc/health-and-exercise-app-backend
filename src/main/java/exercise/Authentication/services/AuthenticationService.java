@@ -230,8 +230,7 @@ public class AuthenticationService {
     public String validateForgotPasswordCode(ResetPasswordDTO dto, User user) {
         String cachedCode = cache().get(dto.getEmail(), String.class);
         if (!dto.getCode().equals(cachedCode)) {
-            // throw new RuntimeException("Incorrect code");
-            return dto.getCode();
+            throw new RuntimeException("Incorrect code");
         }
 
         String resetPasswordToken = "Bearer " + jwtService.generateResetPasswordToken(user);
