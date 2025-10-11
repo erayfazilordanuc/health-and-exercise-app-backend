@@ -1,5 +1,6 @@
 package exercise.User.dtos;
 
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,9 +21,9 @@ public class UpdateUserDTO {
 
     private String fullName;
 
-    private String height;
+    private BigDecimal height;
 
-    private String weight;
+    private BigDecimal weight;
 
     private Long groupId;
 
