@@ -28,7 +28,10 @@
     </scm>
     <properties>
         <java.version>21</java.version>
+        <lombok.version>1.18.34</lombok.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -84,10 +87,16 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.34</version>
+            <scope>provided</scope>
+        </dependency> -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version> 
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -158,6 +167,7 @@
 
     <build>
         <plugins>
+            <!-- Bu plugin doğru yapılandırılmış, dokunmanıza gerek yok -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -170,9 +180,12 @@
                     </excludes>
                 </configuration>
             </plugin>
+            
+            <!-- EN ÖNEMLİ KISIM BURASI -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -180,8 +193,10 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.32</version>
+                            <version>${lombok.version}</version> 
                         </path>
+                        <!-- Başka annotation processor'lar varsa buraya eklenebilir. 
+                        Örn: MapStruct, Hibernate Metamodel Generator, vs. -->
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>

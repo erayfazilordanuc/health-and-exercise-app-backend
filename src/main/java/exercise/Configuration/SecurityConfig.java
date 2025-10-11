@@ -28,6 +28,9 @@ public class SecurityConfig {
     @Autowired
     private JWTAuthFilter authFilter;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Bean
     public UserDetailsService userDetailsService() {
         return new UserService(); // Ensure UserInfoService implements UserDetailsService
@@ -55,16 +58,16 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // Password encoding
-    }
+    // @Bean
+    // public PasswordEncoder passwordEncoder() {
+    // return new BCryptPasswordEncoder(); // Password encoding
+    // }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService());
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
         return authenticationProvider;
     }
 

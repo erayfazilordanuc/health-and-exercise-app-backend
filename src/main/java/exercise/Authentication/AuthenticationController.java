@@ -56,4 +56,9 @@ public class AuthenticationController {
     public AuthResponseDTO refreshAccessToken(@RequestHeader("Authorization") String refreshToken) {
         return authenticationService.refreshAccessToken(refreshToken);
     }
+
+    @PostMapping("/forgot-password")
+    public AuthResponseDTO forgotPassword(@RequestHeader("Authorization") String refreshToken) {
+        return authenticationService.refreshAccessToken(refreshToken);
+    }
 }

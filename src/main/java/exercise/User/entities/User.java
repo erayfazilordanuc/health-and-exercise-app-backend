@@ -1,5 +1,6 @@
 package exercise.User.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
@@ -10,17 +11,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
@@ -59,6 +56,12 @@ public class User implements UserDetails {
 
     @Column
     private String gender;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal height;
+
+    @Column(precision = 5, scale = 2)
+    private BigDecimal weight;
 
     @Column(nullable = false)
     private String role = "ROLE_USER";

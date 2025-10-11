@@ -16,9 +16,13 @@ public class UpdateUserDTO {
 
     private String email;
 
+    private String password;
+
     private String fullName;
 
-    // private String password;
+    private String height;
+
+    private String weight;
 
     private Long groupId;
 

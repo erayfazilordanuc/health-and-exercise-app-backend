@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import exercise.User.dtos.UserDTO;
+import exercise.User.dtos.UpdateMeasurementsDTO;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.services.UserService;
@@ -52,10 +53,26 @@ public class UserController {
         return updatedUserDTO;
     }
 
+    @PutMapping("/theme/{key}")
+    public UserDTO updateTheme(@PathVariable String key,
+            @AuthenticationPrincipal User user) throws Exception {
+        UserDTO updatedUserDTO = userService.updateTheme(key, user);
+
+        return updatedUserDTO;
+    }
+
     @PutMapping("/me/avatar/{key}")
-    public UserDTO updateAvatarMe(@PathVariable String key,
+    public UserDTO updateAvatar(@PathVariable String key,
             @AuthenticationPrincipal User user) throws Exception {
         UserDTO updatedUserDTO = userService.updateUserAvatarAndGetDTO(key, user);
+
+        return updatedUserDTO;
+    }
+
+    @PutMapping("/measurements")
+    public UserDTO updateMeasurements(@RequestBody UpdateMeasurementsDTO newMeasurements,
+            @AuthenticationPrincipal User user) throws Exception {
+        UserDTO updatedUserDTO = userService.updateMeasurements(newMeasurements, user);
 
         return updatedUserDTO;
     }

@@ -25,6 +25,8 @@ import exercise.Group.dtos.GroupDTO;
 import exercise.Group.dtos.GroupRequestDTO;
 import exercise.Group.dtos.UpdateGroupDTO;
 import exercise.Group.entities.Group;
+import exercise.Group.enums.MemberSort;
+import exercise.Group.enums.SortDir;
 import exercise.Group.services.GroupService;
 import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
@@ -93,8 +95,10 @@ public class GroupController {
 
   @GetMapping("/id/{id}/users")
   @Transactional(readOnly = true)
-  public List<UserDTO> getByGroupId(@PathVariable Long id) {
-    List<UserDTO> userDTOs = userService.getUsersByGroupId(id);
+  public List<UserDTO> getByGroupId(@PathVariable Long id,
+      @RequestParam(required = false, defaultValue = "DEFAULT") MemberSort sort,
+      @RequestParam(required = false, defaultValue = "DESC") SortDir dir) {
+    List<UserDTO> userDTOs = userService.getUsersByGroupId(id, sort, dir);
     return userDTOs;
   }
 

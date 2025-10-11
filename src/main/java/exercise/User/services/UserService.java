@@ -3,7 +3,6 @@ package exercise.User.services;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -11,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +20,10 @@ import exercise.Consent.enums.ConsentPurpose;
 import exercise.Consent.enums.ConsentStatus;
 import exercise.Consent.repositories.ConsentRepository;
 import exercise.Group.entities.Group;
+import exercise.Group.enums.MemberSort;
+import exercise.Group.enums.SortDir;
 import exercise.Group.repositories.GroupRepository;
+import exercise.User.dtos.UpdateMeasurementsDTO;
 import exercise.User.dtos.UpdateUserDTO;
 import exercise.User.entities.User;
 import exercise.User.mappers.UserMapper;
@@ -40,6 +43,9 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public boolean checkUserConsentState(Long userId) {
         // isAdmin eklenip ona göre kontrol eklenebilir yoksa her seferinde userRepodan
@@ -133,7 +139,7 @@ public class UserService implements UserDetailsService {
         return null;
     }
 
-    public List<UserDTO> getUsersByGroupId(Long id) {
+    public List<UserDTO> getUsersByGroupId(Long id, MemberSort sort, SortDir dir) {
         List<User> users = userRepo.findByGroupId(id);
         List<UserDTO> userDTOs = users.stream()
                 .map(userMapper::entityToDTO)
@@ -155,8 +161,23 @@ public class UserService implements UserDetailsService {
         return userDTO;
     }
 
+    public UserDTO updateTheme(String themeKey, User user) {
+        user.setTheme(themeKey);
+        User updatedUser = userRepo.save(user);
+        UserDTO userDTO = new UserDTO(updatedUser);
+        return userDTO;
+    }
+
     public UserDTO updateUserAvatarAndGetDTO(String key, User user) {
         user.setAvatar(key);
+        User updatedUser = userRepo.save(user);
+        UserDTO userDTO = new UserDTO(updatedUser);
+        return userDTO;
+    }
+
+    public UserDTO updateMeasurements(UpdateMeasurementsDTO dto, User user) {
+        user.setHeight(dto.getHeight());
+        user.setWeight(dto.getWeight());
         User updatedUser = userRepo.save(user);
         UserDTO userDTO = new UserDTO(updatedUser);
         return userDTO;
@@ -183,8 +204,17 @@ public class UserService implements UserDetailsService {
         if (dto.getEmail() != null)
             user.setEmail(dto.getEmail());
 
+        if (dto.getPassword() != null)
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+
         if (dto.getFullName() != null)
             user.setFullName(dto.getFullName());
+
+        if (dto.getHeight() != null)
+            user.setHeight(dto.getHeight());
+
+        if (dto.getWeight() != null)
+            user.setWeight(dto.getWeight());
 
         if (dto.getGroupId() != null)
             user.setGroupId(dto.getGroupId());
