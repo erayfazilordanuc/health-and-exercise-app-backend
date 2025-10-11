@@ -222,7 +222,7 @@ public class AuthenticationService {
                 locale.getLanguage().equals("tr") ? "Şifre Değiştirme Kodu" : "Password Reset Code", null);
         emailService.sendSimpleMail(emailObject);
 
-        cache().put(email, code);
+        cache().put(user.getEmail(), code);
     }
 
     public String validateForgotPasswordCode(ResetPasswordDTO dto, User user) {
@@ -230,7 +230,8 @@ public class AuthenticationService {
         if (!dto.getCode().equals(cachedCode)) {
             throw new RuntimeException("Incorrect code");
         }
-        String resetPasswordToken = "Bearer " + jwtService.generateAccessToken(user);
+
+        String resetPasswordToken = "Bearer " + jwtService.generateResetPasswordToken(user);
 
         return resetPasswordToken;
     }

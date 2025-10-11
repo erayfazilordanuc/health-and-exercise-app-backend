@@ -25,7 +25,7 @@ public class JWTService {
     @Value("${jwt.secret.key}")
     private String SECRET;
 
-    public String generatePasswordResetToken(User user) {
+    public String generateResetPasswordToken(User user) {
         return generateToken(user, "resetPassword", 1000 * 60 * 60);
     }
 
