@@ -242,13 +242,15 @@ public class AuthenticationService {
         return resetPasswordToken;
     }
 
-    public UserDTO changePassword(NewPasswordDTO dto, String token, User user) {
-        UserDetails userDetails = userService.loadUserByUsername(user.getUsername());
+    public UserDTO changePassword(NewPasswordDTO dto, String token) {
+        String username = jwtService.extractUsername(token);
+        UserDetails userDetails = userService.loadUserByUsername(username);
         boolean isValid = jwtService.validateToken(token, userDetails, "resetPassword");
         if (!isValid) {
             throw new RuntimeException("Invalid refresh token");
         }
 
+        User user = userRepo.findByUsername(username);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         User updatedUser = userRepo.save(user);

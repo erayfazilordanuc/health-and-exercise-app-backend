@@ -80,7 +80,7 @@ public class AuthenticationController {
 
     @PostMapping("/change-password")
     public ResponseEntity<UserDTO> changePassword(@RequestHeader("Authorization") String token, NewPasswordDTO dto,
-            @AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(authenticationService.changePassword(dto, token, user));
+            ) {
+        return ResponseEntity.ok(authenticationService.changePassword(dto, token));
     }
 }
