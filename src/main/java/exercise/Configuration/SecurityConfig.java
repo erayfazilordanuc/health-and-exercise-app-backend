@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -44,7 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/**", "/api/symptoms/**", "/api/groups/**", "/api/messages/**",
                                 "/api/notifications/**",
-                                "/api/exercises/**", "/api/auth/change-password")
+                                "/api/exercises/**")
                         .authenticated()
                         // .requestMatchers("/api/symptoms/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().permitAll() // Give permission to all other endpoints

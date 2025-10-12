@@ -30,7 +30,7 @@ import exercise.Authentication.dtos.ForgotPasswordRequestDTO;
 import exercise.Authentication.dtos.LoginRequestDTO;
 import exercise.Authentication.dtos.NewPasswordDTO;
 import exercise.Authentication.dtos.RegisterRequestDTO;
-import exercise.Authentication.dtos.ResetPasswordDTO;
+import exercise.Authentication.dtos.VerifyCodeDTO;
 import exercise.Authentication.dtos.TwoStepLoginRequestDTO;
 import exercise.Authentication.dtos.TwoStepRegisterRequestDTO;
 import exercise.Common.email.entities.EmailDetails;
@@ -228,7 +228,7 @@ public class AuthenticationService {
         cache().put(user.getEmail(), code);
     }
 
-    public String validateForgotPasswordCode(ResetPasswordDTO dto) {
+    public String verifyForgotPasswordCode(VerifyCodeDTO dto) {
         String cachedCode = cache().get(dto.getEmail(), String.class);
         if (!dto.getCode().equals(cachedCode)) {
             throw new RuntimeException("Incorrect code");

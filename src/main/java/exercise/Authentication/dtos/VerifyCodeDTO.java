@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ResetPasswordDTO {
+public class VerifyCodeDTO {
 
     @NotEmpty
     private String email;

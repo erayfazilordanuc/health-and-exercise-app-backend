@@ -16,7 +16,7 @@ import exercise.Authentication.dtos.ForgotPasswordRequestDTO;
 import exercise.Authentication.dtos.LoginRequestDTO;
 import exercise.Authentication.dtos.NewPasswordDTO;
 import exercise.Authentication.dtos.RegisterRequestDTO;
-import exercise.Authentication.dtos.ResetPasswordDTO;
+import exercise.Authentication.dtos.VerifyCodeDTO;
 import exercise.Authentication.dtos.TwoStepLoginRequestDTO;
 import exercise.Authentication.dtos.TwoStepRegisterRequestDTO;
 import exercise.Authentication.services.AuthenticationService;
@@ -73,8 +73,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/forgot-password/validate-code")
-    public ResponseEntity<String> validateCode(@RequestBody ResetPasswordDTO dto) {
-        String passwordResetToken = authenticationService.validateForgotPasswordCode(dto);
+    public ResponseEntity<String> verifyCode(@RequestBody VerifyCodeDTO dto) {
+        String passwordResetToken = authenticationService.verifyForgotPasswordCode(dto);
         return ResponseEntity.ok(passwordResetToken);
     }
 
