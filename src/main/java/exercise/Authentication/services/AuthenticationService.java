@@ -104,11 +104,11 @@ public class AuthenticationService {
     }
 
     public AuthResponseDTO registerUserAndGenerateAuthResponseDTO(RegisterRequestDTO registerDTO,
-            String role) {
+            String role, Locale locale) {
         User user = new User(null, registerDTO.getUsername(), registerDTO.getEmail(),
                 registerDTO.getFullName(), registerDTO.getBirthDate(),
                 passwordEncoder.encode(registerDTO.getPassword()), registerDTO.getGender(), null, null, role, null,
-                registerDTO.getTheme(), "non");
+                registerDTO.getTheme(), "non", locale.getCountry());
         userRepo.save(user);
 
         String accessToken = "Bearer " +
@@ -122,10 +122,10 @@ public class AuthenticationService {
         return responseDTO;
     }
 
-    public AuthResponseDTO register(RegisterRequestDTO requestDTO) {
+    public AuthResponseDTO register(RegisterRequestDTO requestDTO, Locale locale) {
         if (adminUsernames.contains(requestDTO.getUsername()))
             throw new RuntimeException("This username is unselectable");
-        AuthResponseDTO response = registerUserAndGenerateAuthResponseDTO(requestDTO, "ROLE_USER");
+        AuthResponseDTO response = registerUserAndGenerateAuthResponseDTO(requestDTO, "ROLE_USER", locale);
         return response;
     }
 
@@ -180,7 +180,8 @@ public class AuthenticationService {
             } else {
                 String cachedCode = cache().get(registerDTO.getUsername(), String.class);
                 if (requestDTO.getCode().equals(cachedCode)) {
-                    AuthResponseDTO response = registerUserAndGenerateAuthResponseDTO(registerDTO, "ROLE_ADMIN");
+                    AuthResponseDTO response = registerUserAndGenerateAuthResponseDTO(registerDTO, "ROLE_ADMIN",
+                            locale);
                     return response;
                 }
             }

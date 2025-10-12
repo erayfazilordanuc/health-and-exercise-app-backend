@@ -75,6 +75,9 @@ public class User implements UserDetails {
     @Column
     private String avatar;
 
+    @Column
+    private String locale;
+
     // @Column
     // private Boolean kvkkApproved;
 

@@ -79,11 +79,15 @@ public class NotificationService {
 
     fcmTokens.stream().forEach(token -> {
       try {
+        String title = receiver.getLocale().equals("TR") ? "💪 Egzersiz Hatırlatıcısı" : "💪 Exercise Reminder";
+        String body = receiver.getLocale().equals("TR")
+            ? "🔥 Bugün seni bekleyen bir egzersiz var! 🚀 Haydi, hemen başla!"
+            : "🔥 There's an exercise waiting for you today! 🚀 Come on, start now!";
         Message message = Message.builder()
             .setToken(token.getToken())
             .setNotification(Notification.builder()
-                .setTitle("💪 Egzersiz Hatırlatıcısı")
-                .setBody("🔥 Bugün seni bekleyen bir egzersiz var! 🚀 Haydi, hemen başla!")
+                .setTitle(title)
+                .setBody(body)
                 .build())
             .putData("screen", "Exercise")
             .build();
@@ -104,11 +108,15 @@ public class NotificationService {
 
     fcmTokens.stream().forEach(token -> {
       try {
+        String title = receiver.getLocale().equals("TR") ? "💪 Egzersiz Hatırlatıcısı" : "💪 Exercise Reminder";
+        String body = receiver.getLocale().equals("TR")
+            ? "🔥 Bugün seni bekleyen bir egzersiz var! 🚀 Haydi, hemen başla!"
+            : "🔥 There's an exercise waiting for you today! 🚀 Come on, start now!";
         Message message = Message.builder()
             .setToken(token.getToken())
             .setNotification(Notification.builder()
-                .setTitle("💪 Egzersiz Hatırlatıcısı")
-                .setBody("🔥 Bugün seni bekleyen bir egzersiz var! 🚀 Haydi, hemen başla!")
+                .setTitle(title)
+                .setBody(body)
                 .build())
             .putData("screen", "Exercise")
             .build();
@@ -129,11 +137,15 @@ public class NotificationService {
 
     fcmTokens.forEach(token -> {
       try {
+        String title = receiver.getLocale().equals("TR") ? "🌿 Günlük Sağlık Durumu" : "🌿 Daily Health Status";
+        String body = receiver.getLocale().equals("TR")
+            ? "Bugün kendinizi nasıl hissediyorsunuz? Lütfen uygulamadan yanıtlayın. 💙"
+            : "How are you feeling today? Please reply from the app. 💙";
         Message message = Message.builder()
             .setToken(token.getToken())
             .setNotification(Notification.builder()
-                .setTitle("🌿 Günlük Sağlık Durumu")
-                .setBody("Bugün kendinizi nasıl hissediyorsunuz? Lütfen uygulamadan yanıtlayın. 💙")
+                .setTitle(title)
+                .setBody(body)
                 .build())
             .putData("screen", "Home")
             .build();

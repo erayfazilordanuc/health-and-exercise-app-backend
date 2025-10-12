@@ -16,9 +16,9 @@ import exercise.Authentication.dtos.ForgotPasswordRequestDTO;
 import exercise.Authentication.dtos.LoginRequestDTO;
 import exercise.Authentication.dtos.NewPasswordDTO;
 import exercise.Authentication.dtos.RegisterRequestDTO;
-import exercise.Authentication.dtos.VerifyCodeDTO;
 import exercise.Authentication.dtos.TwoStepLoginRequestDTO;
 import exercise.Authentication.dtos.TwoStepRegisterRequestDTO;
+import exercise.Authentication.dtos.VerifyCodeDTO;
 import exercise.Authentication.services.AuthenticationService;
 import exercise.User.dtos.UserDTO;
 import exercise.User.entities.User;
@@ -40,8 +40,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public AuthResponseDTO register(@Valid @RequestBody RegisterRequestDTO registerDTO) {
-        return authenticationService.register(registerDTO);
+    public AuthResponseDTO register(@Valid @RequestBody RegisterRequestDTO registerDTO, Locale locale) {
+        return authenticationService.register(registerDTO, locale);
     }
 
     @Tag(name = "Admin Operations")

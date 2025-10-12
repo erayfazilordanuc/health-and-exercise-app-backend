@@ -1,18 +1,18 @@
 package exercise.Common.email.services;
 
+import java.io.File;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
+
 import exercise.Common.email.entities.EmailDetails;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
-
-import java.io.File;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
 
 @Service
 public class EmailServiceImpl implements EmailService {
@@ -47,7 +47,7 @@ public class EmailServiceImpl implements EmailService {
 
       MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
 
-      helper.setFrom(new InternetAddress(sender, "HopeMove, egzersiz takip ve sağlık uygulaması"));
+      helper.setFrom(new InternetAddress(sender, "HopeMove, health and exercise tracking app"));
 
       helper.setTo(details.getRecipient());
       helper.setSubject(details.getSubject());

@@ -2,8 +2,6 @@ package exercise.Authentication.dtos;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,4 +29,6 @@ public class RegisterRequestDTO {
     private String gender;
 
     private String theme = "blueSystem";
+
+    private String locale;
 }
