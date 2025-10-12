@@ -219,11 +219,11 @@ public class AuthenticationService {
         User user = optionalUser.get();
 
         String code = String.format("%06d", ThreadLocalRandom.current().nextInt(0, 1_000_000));
-        // String message = locale.getLanguage().equals("tr") ? "Şifre Değiştirme Kodu"
-        // : "Password Reset Code";
-        // EmailDetails emailObject = new EmailDetails(user.getEmail(), code,
-        // message, null);
-        // emailService.sendSimpleMail(emailObject);
+        String message = locale.getLanguage().equals("tr") ? "Şifre Değiştirme Kodu"
+                : "Password Reset Code";
+        EmailDetails emailObject = new EmailDetails(user.getEmail(), code,
+                message, null);
+        emailService.sendSimpleMail(emailObject);
 
         cache().put(user.getEmail(), code);
     }
