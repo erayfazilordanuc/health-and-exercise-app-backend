@@ -4,7 +4,6 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -21,7 +20,6 @@ import exercise.Authentication.dtos.TwoStepRegisterRequestDTO;
 import exercise.Authentication.dtos.VerifyCodeDTO;
 import exercise.Authentication.services.AuthenticationService;
 import exercise.User.dtos.UserDTO;
-import exercise.User.entities.User;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.tags.Tags;
 import jakarta.validation.Valid;
@@ -79,8 +77,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<UserDTO> changePassword(@RequestHeader("Authorization") String token, NewPasswordDTO dto,
-            ) {
+    public ResponseEntity<UserDTO> changePassword(@RequestHeader("Authorization") String token, NewPasswordDTO dto) {
         return ResponseEntity.ok(authenticationService.changePassword(dto, token));
     }
 }
