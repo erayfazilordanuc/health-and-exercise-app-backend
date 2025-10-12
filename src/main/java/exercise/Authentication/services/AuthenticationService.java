@@ -243,6 +243,7 @@ public class AuthenticationService {
     }
 
     public UserDTO changePassword(NewPasswordDTO dto, String token) {
+        token = token.replaceFirst("^Bearer\\s+", "");
         String username = jwtService.extractUsername(token);
         UserDetails userDetails = userService.loadUserByUsername(username);
         boolean isValid = jwtService.validateToken(token, userDetails, "resetPassword");
