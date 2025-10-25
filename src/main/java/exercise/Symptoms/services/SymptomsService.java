@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,8 +42,6 @@ public class SymptomsService {
         Timestamp startOfDay = Timestamp.valueOf(today.atStartOfDay());
         Symptoms existingSymptoms = symptomsRepo.findLatestByUserIdAndDate(user.getId(), startOfDay);
 
-        // son semptom ile gelen semptomu karşılaştırsın, eğer aynı ise yenisini
-        // eklemesin
         Boolean isSame = true;
         if (Objects.nonNull(existingSymptoms)) {
             if (!Objects.equals(existingSymptoms.getPulse(), symptomsDTO.getPulse()))
@@ -139,23 +138,9 @@ public class SymptomsService {
         return savedSymptoms;
     }
 
-    // public Integer getWeeklySteps(Long userId) {
-    // ZoneId TR = ZoneId.of("Europe/Istanbul");
-    // LocalDate todayTr = LocalDate.now(TR);
-    // LocalDate mondayTr = todayTr.with(DayOfWeek.MONDAY);
-
-    // // [monday, today+1) gün aralığı
-    // LocalDate startDate = mondayTr;
-    // LocalDate endDate = todayTr.plusDays(1); // exclusive
-
-    // return symptomsRepo.sumStepsOfLatestPerDayInRangePgByDate(userId, startDate,
-    // endDate);
-    // }
-
     public Integer getWeeklySteps(Long userId) {
         ZoneId TR = ZoneId.of("Europe/Istanbul");
 
-        // Haftanın başı (Pzt 00:00 TR) ve "bugün+1" 00:00 TR (exclusive)
         LocalDate todayTr = LocalDate.now(TR);
         LocalDate mondayTr = todayTr.with(DayOfWeek.MONDAY);
 
@@ -165,10 +150,8 @@ public class SymptomsService {
         Timestamp startTs = Timestamp.from(zStart.toInstant());
         Timestamp endTs = Timestamp.from(zEnd.toInstant());
 
-        // Gün başına "son kayıt"ları çek
         List<Symptoms> latestPerDay = symptomsRepo.findLatestPerDayInRangePg(userId, startTs, endTs);
 
-        // Adımların toplamını al (NULL'ları 0 say)
         int total = latestPerDay.stream()
                 .map(Symptoms::getSteps)
                 .filter(Objects::nonNull)
@@ -193,12 +176,10 @@ public class SymptomsService {
         LocalDate todayTr = LocalDate.now(TR);
         LocalDate mondayTr = todayTr.with(DayOfWeek.MONDAY);
 
-        // [monday, today+1) — gün sonu taşmaları için exclusive end
         Integer sum = symptomsRepo.sumStepsOfLatestPerDayInRangePgByDate(
                 userId,
                 mondayTr,
-                todayTr.plusDays(1) // exclusive
-        );
+                todayTr.plusDays(1));
         return sum == null ? 0 : sum;
     }
 
@@ -264,10 +245,9 @@ public class SymptomsService {
         return "Symptoms deleted successfully";
     }
 
-    // Admin Methods
     public List<Symptoms> getAllSymptomsByUserId(Long userId, User actor) {
-        if (!Objects.equals(userId, actor.getId())) { // if true, the actor is admin
-            if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
+        if (!Objects.equals(userId, actor.getId())) {
+            if (!userService.checkUserConsentState(userId))
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "KVKK consent required");
         }
@@ -278,7 +258,7 @@ public class SymptomsService {
     }
 
     public Symptoms getLatestSymptomsByUserIdAndDateForAdmin(Long userId, LocalDate date, User actor) {
-        if (!Objects.equals(userId, actor.getId())) { // actor varsa admin
+        if (!Objects.equals(userId, actor.getId())) {
             if (!userService.checkUserConsentState(userId))
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "KVKK consent required");
@@ -303,7 +283,8 @@ public class SymptomsService {
     public WeeklySymptomsSummary getSymptomsByUserIdAndDateRangeForAdmin(Long userId, LocalDate startDate,
             LocalDate endDate,
             User actor) {
-        if (!Objects.equals(userId, actor.getId())) { // actor varsa admin
+
+        if (!Objects.equals(userId, actor.getId())) {
             if (!userService.checkUserConsentState(userId))
                 throw new ResponseStatusException(
                         HttpStatus.FORBIDDEN, "KVKK consent required");
@@ -311,25 +292,50 @@ public class SymptomsService {
 
         List<Symptoms> symptoms = symptomsRepo.findLatestForEachDayInRange(userId, startDate, endDate);
 
-        WeeklySymptomsSummary summary = new WeeklySymptomsSummary(null, null, null, null, null, null, null);
-
-        Integer pulseSum = 0;
-        for (Symptoms s : symptoms) {
-            Integer pulse = s.getPulse();
-            pulseSum += pulse;
-            if (summary.getMaxPulse() == null || summary.getMaxPulse() < s.getPulse())
-                summary.setMaxPulse(pulse);
-            if (summary.getMinPulse() == null || summary.getMinPulse() > s.getPulse())
-                summary.setMinPulse(pulse);
-            summary.setSteps(s.getSteps());
-            summary.setTotalCaloriesBurned(s.getTotalCaloriesBurned());
-            summary.setActiveCaloriesBurned(s.getActiveCaloriesBurned());
-            summary.setSleepMinutes(s.getSleepMinutes());
+        if (symptoms == null || symptoms.isEmpty()) {
+            return new WeeklySymptomsSummary(null, null, null, null, null, null, null);
         }
 
-        summary.setAvgPulse(pulseSum / symptoms.size());
+        IntSummaryStatistics pulseStats = symptoms.stream()
+                .map(Symptoms::getPulse)
+                .filter(Objects::nonNull)
+                .mapToInt(Integer::intValue)
+                .summaryStatistics();
 
-        // symptoms.stream().map(s -> {});
+        Integer avgPulse = null;
+        Integer maxPulse = null;
+        Integer minPulse = null;
+
+        if (pulseStats.getCount() > 0) {
+            avgPulse = (int) pulseStats.getAverage();
+            maxPulse = pulseStats.getMax();
+            minPulse = pulseStats.getMin();
+        }
+
+        Integer totalSteps = symptoms.stream()
+                .mapToInt(s -> s.getSteps() != null ? s.getSteps() : 0)
+                .sum();
+
+        Integer totalCalories = symptoms.stream()
+                .mapToInt(s -> s.getTotalCaloriesBurned() != null ? s.getTotalCaloriesBurned() : 0)
+                .sum();
+
+        Integer activeCalories = symptoms.stream()
+                .mapToInt(s -> s.getActiveCaloriesBurned() != null ? s.getActiveCaloriesBurned() : 0)
+                .sum();
+
+        Integer totalSleep = symptoms.stream()
+                .mapToInt(s -> s.getSleepMinutes() != null ? s.getSleepMinutes() : 0)
+                .sum();
+
+        WeeklySymptomsSummary summary = new WeeklySymptomsSummary(
+                avgPulse,
+                maxPulse,
+                minPulse,
+                totalSteps,
+                totalCalories,
+                activeCalories,
+                totalSleep);
 
         return summary;
     }
