@@ -313,6 +313,24 @@ public class SymptomsService {
 
         WeeklySymptomsSummary summary = new WeeklySymptomsSummary(null, null, null, null, null, null, null);
 
+        Integer pulseSum = 0;
+        for (Symptoms s : symptoms) {
+            Integer pulse = s.getPulse();
+            pulseSum += pulse;
+            if (summary.getMaxPulse() == null || summary.getMaxPulse() < s.getPulse())
+                summary.setMaxPulse(pulse);
+            if (summary.getMinPulse() == null || summary.getMinPulse() > s.getPulse())
+                summary.setMinPulse(pulse);
+            summary.setSteps(s.getSteps());
+            summary.setTotalCaloriesBurned(s.getTotalCaloriesBurned());
+            summary.setActiveCaloriesBurned(s.getActiveCaloriesBurned());
+            summary.setSleepMinutes(s.getSleepMinutes());
+        }
+
+        summary.setAvgPulse(pulseSum / symptoms.size());
+
+        // symptoms.stream().map(s -> {});
+
         return summary;
     }
 }
