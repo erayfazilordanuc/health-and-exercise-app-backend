@@ -262,6 +262,36 @@ public class ExerciseService {
     }
   }
 
+  public ExerciseProgressDTO getExerciseProgress(Long userId, User actor, LocalDate date) {
+    if (!Objects.equals(userId, actor.getId())) { // if true, the actor is admin
+      if (!userService.checkUserConsentState(userId)) // !userService.checkUserConsentState(actor.getId()) ||
+        throw new ResponseStatusException(
+            HttpStatus.FORBIDDEN, "KVKK consent required");
+    }
+
+    LocalDateTime start = date.atStartOfDay();
+    LocalDateTime end = start.plusDays(1);
+
+    List<ExerciseVideoProgress> videoProgress = exerciseVideoProgressRepo
+        .findByUserIdAndCreatedAtBetween(
+            userId,
+            Timestamp.valueOf(start),
+            Timestamp.valueOf(end), Sort.by(Sort.Direction.ASC, "createdAt"));
+
+    if (videoProgress.isEmpty())
+      return null;
+    else {
+      List<ExerciseVideoProgressDTO> videoProgressDTO = videoProgress.stream()
+          .map(vp -> new ExerciseVideoProgressDTO(vp))
+          .collect(Collectors.toList());
+      BigDecimal totalProgress = videoProgress.stream()
+          .map(p -> p != null && p.getProgressDuration() != null ? p.getProgressDuration() : BigDecimal.ZERO)
+          .reduce(BigDecimal.ZERO, BigDecimal::add);
+      return new ExerciseProgressDTO(userId,
+          new ExerciseDTO(videoProgress.get(0).getExercise()), videoProgressDTO, totalProgress);
+    }
+  }
+
   public ExerciseProgressDTO getExerciseProgress(LocalDate date, Long userId) {
     LocalDateTime startOfDay = date.atStartOfDay(); // 00:00:00
     LocalDateTime endOfDay = startOfDay.plusDays(1); // ertesi gün 00:00:00

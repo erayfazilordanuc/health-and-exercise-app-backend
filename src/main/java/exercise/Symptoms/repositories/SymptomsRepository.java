@@ -33,6 +33,21 @@ public interface SymptomsRepository extends JpaRepository<Symptoms, Long> {
       """, nativeQuery = true)
   Symptoms findLatestByUserIdAndDate(Long userId, Timestamp targetDate);
 
+  @Query(value = """
+      SELECT DISTINCT ON (s.updated_at::date)
+             s.*
+      FROM symptoms s
+      WHERE s.user_id = :userId
+        AND s.updated_at::date BETWEEN CAST(:startDate AS date) AND CAST(:endDate AS date)
+      ORDER BY
+        s.updated_at::date,  -- Önce güne göre sırala (DISTINCT ON için zorunlu)
+        s.updated_at DESC    -- Sonra o gün içindeki en yeniyi bulmak için saate göre ters sırala
+      """, nativeQuery = true)
+  List<Symptoms> findLatestForEachDayInRange(
+      Long userId,
+      LocalDate startDate,
+      LocalDate endDate);
+
   Symptoms findByUserIdAndUpdatedAtBetweenOrderByUpdatedAtDesc(
       Long userId, Timestamp start, Timestamp end);
 

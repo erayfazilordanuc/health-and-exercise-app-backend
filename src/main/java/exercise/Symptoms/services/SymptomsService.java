@@ -3,15 +3,11 @@ package exercise.Symptoms.services;
 import java.sql.Timestamp;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,14 +15,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import exercise.Symptoms.dtos.UpsertSymptomsDTO;
 import exercise.Symptoms.dtos.SymptomsDTO;
 import exercise.Symptoms.dtos.UpsertSymptomsDTO;
+import exercise.Symptoms.dtos.WeeklySymptomsSummary;
 import exercise.Symptoms.entities.Symptoms;
 import exercise.Symptoms.mappers.SymptomsMapper;
 import exercise.Symptoms.repositories.SymptomsRepository;
 import exercise.User.entities.User;
-import exercise.User.repositories.UserRepository;
 import exercise.User.services.UserService;
 
 @Service
@@ -303,5 +298,21 @@ public class SymptomsService {
         }
 
         return symptoms;
+    }
+
+    public WeeklySymptomsSummary getSymptomsByUserIdAndDateRangeForAdmin(Long userId, LocalDate startDate,
+            LocalDate endDate,
+            User actor) {
+        if (!Objects.equals(userId, actor.getId())) { // actor varsa admin
+            if (!userService.checkUserConsentState(userId))
+                throw new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "KVKK consent required");
+        }
+
+        List<Symptoms> symptoms = symptomsRepo.findLatestForEachDayInRange(userId, startDate, endDate);
+
+        WeeklySymptomsSummary summary = new WeeklySymptomsSummary(null, null, null, null, null, null, null);
+
+        return summary;
     }
 }

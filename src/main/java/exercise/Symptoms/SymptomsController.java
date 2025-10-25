@@ -18,15 +18,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
 import exercise.Symptoms.dtos.StepGoalDTO;
 import exercise.Symptoms.dtos.SymptomsDTO;
 import exercise.Symptoms.dtos.UpsertSymptomsDTO;
+import exercise.Symptoms.dtos.WeeklySymptomsSummary;
 import exercise.Symptoms.entities.Symptoms;
 import exercise.Symptoms.services.StepGoalService;
 import exercise.Symptoms.services.SymptomsService;
 import exercise.User.entities.User;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.tags.Tags;
 
 @RestController
 @RequestMapping("/api/symptoms")
@@ -179,5 +180,19 @@ public class SymptomsController {
       @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @AuthenticationPrincipal User user) {
     Symptoms symptoms = symptomsService.getLatestSymptomsByUserIdAndDateForAdmin(id, date, user);
     return symptoms;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/user/id/{id}/range")
+  public WeeklySymptomsSummary getSymptomsByUserIdAndDateRange(
+      @PathVariable Long id,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+      @AuthenticationPrincipal User user) {
+    WeeklySymptomsSummary symptomsSummary = symptomsService.getSymptomsByUserIdAndDateRangeForAdmin(id, startDate,
+        endDate,
+        user);
+    return symptomsSummary;
   }
 }

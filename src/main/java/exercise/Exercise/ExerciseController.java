@@ -167,6 +167,15 @@ public class ExerciseController {
 
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/{date}/progress/{userId}")
+  public ExerciseProgressDTO getExerciseProgressByUserIdAndDate(
+      @PathVariable Long userId, @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @AuthenticationPrincipal User user) {
+    ExerciseProgressDTO exerciseProgress = exerciseService.getExerciseProgress(userId, user,date);
+    return exerciseProgress;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ExerciseDTO createExercise(@RequestBody CreateExerciseDTO exerciseDTO,
       @AuthenticationPrincipal User user) throws IOException {
