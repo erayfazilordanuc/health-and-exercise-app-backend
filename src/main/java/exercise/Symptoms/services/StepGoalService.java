@@ -107,6 +107,24 @@ public class StepGoalService {
     }
   }
 
+  public StepGoalDTO getWeeklyStepGoalByUserId(Long userId, LocalDate startDate, LocalDate endDate) {
+    Timestamp startRange;
+    Timestamp endRange;
+    ZoneId userZone = getUserZoneId(userId);
+
+    if (startDate != null && endDate != null) {
+      startRange = Timestamp.from(startDate.atStartOfDay(userZone).toInstant());
+      endRange = Timestamp.from(endDate.atTime(LocalTime.MAX).atZone(userZone).toInstant());
+    } else {
+      TimeRange weekRange = getCurrentWeekRangeAsTimestamp(userId);
+      startRange = weekRange.start();
+      endRange = weekRange.end();
+    }
+
+    return new StepGoalDTO(repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId, startRange, endRange)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Step Goal Not Found")));
+  }
+
   /**
    * Verilen tarihin içinde bulunduğu haftanın (Pazartesi 00:00 - Pazar 23:59)
    * başlangıç ve bitişini Timestamp (veritabanı tipi) olarak döndürür.
