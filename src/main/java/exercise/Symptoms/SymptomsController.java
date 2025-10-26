@@ -150,14 +150,6 @@ public class SymptomsController {
 
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
-  @GetMapping("/user/id/{id}/step-goal/weekly")
-  public StepGoalDTO getWeeklyStepGoalByUserId(@PathVariable Long id) {
-    StepGoalDTO response = stepGoalService.getWeeklyStepGoalByUserId(id);
-    return response;
-  }
-
-  @Tag(name = "Admin Operations")
-  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/user/id/{id}/step-goal/weekly/range")
   public StepGoalDTO getWeeklyStepGoalByRange(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
