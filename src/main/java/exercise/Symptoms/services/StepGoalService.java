@@ -226,11 +226,27 @@ public class StepGoalService {
       endRange = weekRange.end();
     }
 
-    return new StepGoalDTO(repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId, startRange, endRange)
-        .orElseThrow(() -> {
-          logger.warn("Step Goal Not Found for user {} in range {} - {}", userId, startRange, endRange);
-          return new ResponseStatusException(HttpStatus.NOT_FOUND, "Step Goal Not Found");
-        }));
+    StepGoal result = new StepGoal();
+
+    List<StepGoal> goals = repo.findByUserId(userId);
+
+    for (StepGoal goal : goals) {
+      if (goal.getUpdatedAt().after(endRange) && goal.getUpdatedAt().before(endRange)) {
+        result = goal;
+      }
+    }
+
+    return new StepGoalDTO(result);
+
+    // return new
+    // StepGoalDTO(repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId,
+    // startRange, endRange)
+    // .orElseThrow(() -> {
+    // logger.warn("Step Goal Not Found for user {} in range {} - {}", userId,
+    // startRange, endRange);
+    // return new ResponseStatusException(HttpStatus.NOT_FOUND, "Step Goal Not
+    // Found");
+    // }));
   }
 
   public List<StepGoalDTO> getDonesByUserId(Long userId) {
