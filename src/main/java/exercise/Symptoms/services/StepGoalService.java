@@ -3,6 +3,7 @@ package exercise.Symptoms.services;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import exercise.Symptoms.dtos.StepGoalDTO;
 import exercise.Symptoms.entities.StepGoal;
-import exercise.Symptoms.entities.Symptoms;
 import exercise.Symptoms.repositories.StepGoalRepository;
 import exercise.User.entities.User;
 
@@ -76,7 +76,7 @@ public class StepGoalService {
     return new StepGoalDTO(repo.save(goal));
   }
 
-  public StepGoalDTO getWeeklyByUserId(Long userId) {
+  public StepGoalDTO getWeeklyStepGoalByUserId(Long userId) {
     // Türkiye saat dilimi
     ZoneId zone = ZoneId.of("Europe/Istanbul");
     LocalDate today = LocalDate.now(zone);
@@ -91,10 +91,41 @@ public class StepGoalService {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Step Goal Not Found")));
   }
 
+  public StepGoalDTO getWeeklyStepGoalInRangeForUser(Long userId, LocalDate startDate, LocalDate endDate) {
+
+    LocalDateTime startRange;
+    LocalDateTime endRange;
+
+    if (startDate != null && endDate != null) {
+      startRange = startDate.atStartOfDay();
+      endRange = endDate.atTime(LocalTime.MAX);
+    } else {
+      ZoneId zone = ZoneId.of("Europe/Istanbul");
+      LocalDate today = LocalDate.now(zone);
+
+      LocalDate startOfWeek = today.with(DayOfWeek.MONDAY);
+
+      startRange = startOfWeek.atStartOfDay();
+      endRange = startRange.plusDays(7);
+    }
+
+    return new StepGoalDTO(repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId, startRange, endRange)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Step Goal Not Found")));
+  }
+
   public List<StepGoalDTO> getDonesByUserId(Long userId) {
     return repo.findAllByUserIdAndIsDoneTrueOrderByCreatedAtDesc(userId)
         .stream()
         .map(StepGoalDTO::new)
         .toList();
+  }
+
+  public List<StepGoalDTO> getDonesByUserIdUpToDate(Long userId, LocalDate endDate) {
+    LocalDateTime endOfDay = endDate.atTime(LocalTime.MAX);
+
+    return repo.findAllByUserIdAndIsDoneTrueAndCreatedAtLessThanEqualOrderByCreatedAtDesc(userId, endOfDay)
+        .stream()
+        .map(StepGoalDTO::new)
+        .toList(); // .collect(Collectors.toList()) de olur
   }
 }

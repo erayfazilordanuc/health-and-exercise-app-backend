@@ -130,7 +130,7 @@ public class SymptomsController {
 
   @GetMapping("/step-goal/weekly")
   public StepGoalDTO getWeeklyStepGoal(@AuthenticationPrincipal User user) {
-    StepGoalDTO response = stepGoalService.getWeeklyByUserId(user.getId());
+    StepGoalDTO response = stepGoalService.getWeeklyStepGoalByUserId(user.getId());
     return response;
   }
 
@@ -152,7 +152,18 @@ public class SymptomsController {
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/user/id/{id}/step-goal/weekly")
   public StepGoalDTO getWeeklyStepGoalByUserId(@PathVariable Long id) {
-    StepGoalDTO response = stepGoalService.getWeeklyByUserId(id);
+    StepGoalDTO response = stepGoalService.getWeeklyStepGoalByUserId(id);
+    return response;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/user/id/{id}/step-goal/weekly/range")
+  public StepGoalDTO getWeeklyStepGoalByRange(
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+      @AuthenticationPrincipal User user) {
+    StepGoalDTO response = stepGoalService.getWeeklyStepGoalInRangeForUser(user.getId(), startDate, endDate);
     return response;
   }
 
@@ -161,6 +172,16 @@ public class SymptomsController {
   @GetMapping("/user/id/{id}/step-goal/done")
   public List<StepGoalDTO> getDoneStepGoalsByUserId(@PathVariable Long id) {
     List<StepGoalDTO> response = stepGoalService.getDonesByUserId(id);
+    return response;
+  }
+
+  @Tag(name = "Admin Operations")
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/user/id/{id}/step-goal/done/until")
+  public List<StepGoalDTO> getDoneStepGoalsUntilADate(
+      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+      @AuthenticationPrincipal User user) {
+    List<StepGoalDTO> response = stepGoalService.getDonesByUserIdUpToDate(user.getId(), date);
     return response;
   }
 

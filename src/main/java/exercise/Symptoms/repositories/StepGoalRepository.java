@@ -22,4 +22,8 @@ public interface StepGoalRepository extends JpaRepository<StepGoal, Long> {
       Long userId, LocalDateTime start, LocalDateTime end);
 
   List<StepGoal> findAllByUserIdAndIsDoneTrueOrderByCreatedAtDesc(Long userId);
+
+  List<StepGoal> findAllByUserIdAndIsDoneTrueAndCreatedAtLessThanEqualOrderByCreatedAtDesc(
+      Long userId,
+      LocalDateTime endDate);
 }
