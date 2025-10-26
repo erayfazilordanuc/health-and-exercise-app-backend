@@ -212,7 +212,7 @@ public class StepGoalService {
     return new StepGoalDTO(repo.save(goal));
   }
 
-  public StepGoalDTO getWeeklyStepGoalInRangeForUser(Long userId, LocalDate startDate, LocalDate endDate) {
+  public List<StepGoal> getWeeklyStepGoalInRangeForUser(Long userId, LocalDate startDate, LocalDate endDate) {
     Timestamp startRange;
     Timestamp endRange;
     ZoneId userZone = getUserZoneId(userId);
@@ -236,7 +236,9 @@ public class StepGoalService {
       }
     }
 
-    return new StepGoalDTO(result);
+    // return new StepGoalDTO(result);
+
+    return goals;
 
     // return new
     // StepGoalDTO(repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId,

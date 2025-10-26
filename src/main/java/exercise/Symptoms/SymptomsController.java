@@ -22,6 +22,7 @@ import exercise.Symptoms.dtos.StepGoalDTO;
 import exercise.Symptoms.dtos.SymptomsDTO;
 import exercise.Symptoms.dtos.UpsertSymptomsDTO;
 import exercise.Symptoms.dtos.WeeklySymptomsSummary;
+import exercise.Symptoms.entities.StepGoal;
 import exercise.Symptoms.entities.Symptoms;
 import exercise.Symptoms.services.StepGoalService;
 import exercise.Symptoms.services.SymptomsService;
@@ -151,11 +152,11 @@ public class SymptomsController {
   @Tag(name = "Admin Operations")
   @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/user/id/{id}/step-goal/weekly/range")
-  public StepGoalDTO getWeeklyStepGoalByRange(
+  public List<StepGoal> getWeeklyStepGoalByRange(
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
       @AuthenticationPrincipal User user) {
-    StepGoalDTO response = stepGoalService.getWeeklyStepGoalInRangeForUser(user.getId(), startDate, endDate);
+    List<StepGoal> response = stepGoalService.getWeeklyStepGoalInRangeForUser(user.getId(), startDate, endDate);
     return response;
   }
 
