@@ -212,7 +212,7 @@ public class StepGoalService {
     return new StepGoalDTO(repo.save(goal));
   }
 
-  public List<StepGoal> getWeeklyStepGoalInRangeForUser(Long userId, LocalDate startDate, LocalDate endDate) {
+  public StepGoalDTO getWeeklyStepGoalInRangeForUser(Long userId, LocalDate startDate, LocalDate endDate) {
     Timestamp startRange;
     Timestamp endRange;
     ZoneId userZone = getUserZoneId(userId);
@@ -226,29 +226,11 @@ public class StepGoalService {
       endRange = weekRange.end();
     }
 
-    StepGoal result = new StepGoal();
-
-    List<StepGoal> goals = repo.findByUserId(userId);
-
-    for (StepGoal goal : goals) {
-      if (goal.getUpdatedAt().after(endRange) && goal.getUpdatedAt().before(endRange)) {
-        result = goal;
-      }
-    }
-
-    // return new StepGoalDTO(result);
-
-    return goals;
-
-    // return new
-    // StepGoalDTO(repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId,
-    // startRange, endRange)
-    // .orElseThrow(() -> {
-    // logger.warn("Step Goal Not Found for user {} in range {} - {}", userId,
-    // startRange, endRange);
-    // return new ResponseStatusException(HttpStatus.NOT_FOUND, "Step Goal Not
-    // Found");
-    // }));
+    return new StepGoalDTO(repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId, startRange, endRange)
+        .orElseThrow(() -> {
+          logger.warn("Step Goal Not Found for user {} in range {} - {}", userId, startRange, endRange);
+          return new ResponseStatusException(HttpStatus.NOT_FOUND, "Step Goal Not Found");
+        }));
   }
 
   public List<StepGoalDTO> getDonesByUserId(Long userId) {
