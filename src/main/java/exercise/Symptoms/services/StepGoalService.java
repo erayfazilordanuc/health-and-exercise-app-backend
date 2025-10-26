@@ -107,6 +107,19 @@ public class StepGoalService {
     }
   }
 
+  public StepGoalDTO getWeeklyStepGoalByUserId(Long userId) {
+    Timestamp startRange;
+    Timestamp endRange;
+    ZoneId userZone = getUserZoneId(userId);
+
+    TimeRange weekRange = getCurrentWeekRangeAsTimestamp(userId);
+    startRange = weekRange.start();
+    endRange = weekRange.end();
+
+    return new StepGoalDTO(repo.findTopByUserIdAndCreatedAtBetweenOrderByCreatedAtDesc(userId, startRange, endRange)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Step Goal Not Found")));
+  }
+
   public StepGoalDTO getWeeklyStepGoalByUserId(Long userId, LocalDate startDate, LocalDate endDate) {
     Timestamp startRange;
     Timestamp endRange;
